@@ -12,6 +12,7 @@ import { SimilarView } from './list/Similar';
 import { FacesView } from './list/Faces';
 import { Years, YearView } from './year/Years';
 import { Tags } from './tags/Tags';
+import { Folders } from './folders/Folders';
 import { Map } from './map';
 import { MediaView } from './single/MediaView';
 import { useAppConfig } from "./config/useAppConfig";
@@ -31,6 +32,7 @@ export const AppRoutes = () => {
       {!appConfig.pages?.disabled?.includes('date') && <Route path="/years/:year" element={<YearView />} />}
       {!appConfig.pages?.disabled?.includes('tag') && <Route path="/tags" element={<Tags />} />}
       {!appConfig.pages?.disabled?.includes('map') && <Route path="/map" element={<Map />} />}
+      {!appConfig.pages?.disabled?.includes('folder') && <Route path="/folders" element={<Folders />} />}
 
       {/* Conditional routes */}
       {<Route path="/similar/:id" element={<SimilarView />} />}

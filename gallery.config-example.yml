@@ -359,6 +359,7 @@
       #- video
       #- map
       #- tag
+      #- folder
       #- ...any string
     #
     # Customize single media view

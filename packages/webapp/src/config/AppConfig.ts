@@ -61,7 +61,7 @@ export interface PluginManager {
  * Customize pages
  */
 export interface Pages {
-  disabled?: (("edit" | "date" | "video" | "map" | "tag") | string)[];
+  disabled?: (("edit" | "date" | "video" | "map" | "tag" | "folder") | string)[];
   mediaView?: MediaViewPage;
   [k: string]: unknown;
 }

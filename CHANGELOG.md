@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- webapp: Add folders page to browse media by directory tree
+
 ### Fixed
 
 - server: Escape social media title and description agains injections

@@ -113,7 +113,8 @@
                       "date",
                       "video",
                       "map",
-                      "tag"
+                      "tag",
+                      "folder"
                     ]
                   },
                   {
