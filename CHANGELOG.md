@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Show the index as root folder on the folders page with `webapp.pages.folders.showIndex`
 - webapp: Add order menu to the nav bar of media lists which sets the `order by` expression of the search query
 - webapp: Add ascending and descending name order to the folders page. Its initial order can be set with `webapp.pages.folders.order`
+- webapp: Add squared thumbnail layout to the media lists. It can be toggled in the nav bar and its initial value can be set with `webapp.pages.list.thumbnails`
 
 ### Fixed
 

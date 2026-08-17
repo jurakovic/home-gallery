@@ -11,6 +11,8 @@ import { Scrollbar } from "./scrollbar";
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
+import { grid } from "./grid";
+import { useThumbnailLayout } from "./useThumbnailLayout";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";
 
 const NAV_HEIGHT = 44
@@ -33,6 +35,9 @@ const useViewHeight = (offset) => {
 const mobileRowHeights = {minHeight: 75, maxHeight: 110, maxPotraitHeight: 185}
 const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280}
 
+const mobileGridSize = 110
+const desktopGridSize = 180
+
 export const List = () => {
   const entries = useEntryStore(state => state.entries)
 
@@ -43,6 +48,7 @@ export const List = () => {
 
   const { width, height } = useBodyDimensions();
   const [ deviceType ] = useDeviceType();
+  const [ layout ] = useThumbnailLayout();
 
   const viewHeight = height - NAV_HEIGHT - BOTTOM_MARGIN
   const padding = 8
@@ -55,9 +61,15 @@ export const List = () => {
   }, [showSelected, selectedIds, entries])
 
   const rows = useMemo(() => {
-    const rowHeights = deviceType === DeviceType.MOBILE ? mobileRowHeights : desktopRowHeights
+    const isMobile = deviceType === DeviceType.MOBILE
+    if (layout == 'square') {
+      const minSize = isMobile ? mobileGridSize : desktopGridSize
+      return grid(visibleEntries, {padding, width, minSize});
+    }
+
+    const rowHeights = isMobile ? mobileRowHeights : desktopRowHeights
     return fluent(visibleEntries, {padding, width, ...rowHeights});
-  }, [width, visibleEntries, deviceType])
+  }, [width, visibleEntries, deviceType, layout])
 
   const topDateItems = useMemo(() => {
     return rows.map(({top, height, columns}) => ({top, height, date: columns[0].item?.date || '1970-01-01T00:00:00', dateValue: '1970'}))
@@ -68,7 +80,7 @@ export const List = () => {
     <>
       <MultiTagDialogProvider>
         <>
-          <NavBar showSort={true} />
+          <NavBar showList={true} />
           <div className="relative z-0">
             <Scrollbar containerRef={containerRef}
               style={{marginTop: 0, marginBottom: BOTTOM_MARGIN}}

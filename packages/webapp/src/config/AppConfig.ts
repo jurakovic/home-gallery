@@ -63,6 +63,7 @@ export interface PluginManager {
 export interface Pages {
   disabled?: (("edit" | "date" | "video" | "map" | "tag" | "folder") | string)[];
   folders?: FoldersPage;
+  list?: ListPage;
   mediaView?: MediaViewPage;
   [k: string]: unknown;
 }
@@ -78,6 +79,16 @@ export interface FoldersPage {
    * Initial folder order. It is overruled by the order of the page
    */
   order?: "name" | "nameDesc";
+  [k: string]: unknown;
+}
+/**
+ * Customize media lists
+ */
+export interface ListPage {
+  /**
+   * Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares. It is overruled by the layout toggle of the nav bar
+   */
+  thumbnails?: "fluent" | "square";
   [k: string]: unknown;
 }
 /**

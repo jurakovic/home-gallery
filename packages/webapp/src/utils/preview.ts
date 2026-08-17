@@ -27,3 +27,23 @@ export const getHigherPreviewUrl = (previews, size) => {
 }
 
 export const getWidthFactor = (width, height) => width >= height ? 1 : height / (width || 1)
+
+/**
+ * Preview size which is required to fill a cell with a media of the given size.
+ *
+ * The thumbnails are rendered with `object-cover`: the media is scaled until it
+ * covers the cell and the overlapping part is cropped. The preview size is the
+ * longest edge of the preview, so the scaled longest edge of the media is
+ * required.
+ *
+ * A squared cell needs a larger preview than a cell of the media aspect ratio:
+ * the shorter media edge fills the cell and the longer edge is cropped
+ */
+export const getCoverPreviewSize = (cellWidth, cellHeight, mediaWidth, mediaHeight) => {
+  if (!mediaWidth || !mediaHeight) {
+    return cellWidth * getWidthFactor(cellWidth, cellHeight)
+  }
+
+  const scale = Math.max(cellWidth / mediaWidth, cellHeight / mediaHeight)
+  return Math.max(mediaWidth, mediaHeight) * scale
+}

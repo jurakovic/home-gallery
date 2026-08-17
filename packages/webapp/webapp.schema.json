@@ -147,6 +147,24 @@
                 }
               }
             },
+            "list": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "$id": "https://raw.githubusercontent.com/xemle/home-gallery/master/gallery.config.schema.json#webapp.pages.list",
+              "title": "ListPage",
+              "description": "Customize media lists",
+              "default": [],
+              "type": "object",
+              "properties": {
+                "thumbnails": {
+                  "description": "Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares. It is overruled by the layout toggle of the nav bar",
+                  "enum": [
+                    "fluent",
+                    "square"
+                  ],
+                  "default": "fluent"
+                }
+              }
+            },
             "mediaView": {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
               "$id": "https://raw.githubusercontent.com/xemle/home-gallery/master/gallery.config.schema.json#webapp.pages.mediaView",

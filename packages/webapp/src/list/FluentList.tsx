@@ -11,7 +11,7 @@ import { useLastLocation } from '../utils/lastLocation/useLastLocation'
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { VirtualScroll } from "./VirtualScroll";
 import { humanizeDuration } from "../utils/format";
-import { getHigherPreviewUrl, getWidthFactor } from '../utils/preview';
+import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { classNames } from '../utils/class-names'
 
 const Cell = ({height, width, index, item, items}) => {
@@ -26,8 +26,8 @@ const Cell = ({height, width, index, item, items}) => {
   const style = { height, width, backgroundColor: (vibrantColors && vibrantColors[1]) || 'inherited' }
   const navigate = useNavigate();
 
-  const widthFactor = getWidthFactor(width, height);
-  const previewUrl = getHigherPreviewUrl(previews, width * widthFactor * (window.devicePixelRatio || 1));
+  const previewSize = getCoverPreviewSize(width, height, item.width, item.height);
+  const previewUrl = getHigherPreviewUrl(previews, previewSize * (window.devicePixelRatio || 1));
 
   const showImage = () => {
     navigate(`/view/${shortId}`, {state: {listLocation: location, index}});

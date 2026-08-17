@@ -378,6 +378,18 @@
       #order: name
       #order: nameDesc
     #
+    # Customize media lists
+    #
+    # default: []
+    #list:
+      # Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media,
+      # 'square' crops them to a grid of squares. It is overruled by the
+      # layout toggle of the nav bar
+      #
+      # default: fluent
+      #thumbnails: fluent
+      #thumbnails: square
+    #
     # Customize single media view
     #
     # default: []
