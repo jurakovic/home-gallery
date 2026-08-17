@@ -8,6 +8,7 @@ import { NavBar } from '../navbar/NavBar';
 import { useEntryStore } from '../store/entry-store';
 import { buildTree, type TreeNode } from './buildTree';
 import { toFolderQuery } from './toFolderQuery';
+import { useAppConfig } from '../config/useAppConfig';
 
 type ExpandedMap = {[key: string]: boolean}
 
@@ -15,6 +16,8 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toFolderQuery(node)
+  // only shown with the showIndex option, otherwise every node has a path
+  const isIndex = !node.path
 
   return (
     <>
@@ -33,8 +36,8 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
           <Link className="flex items-center justify-start gap-2 p-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
-            <FontAwesomeIcon icon={isExpanded ? icons.faFolderOpen : icons.faFolder} />
-            <span className="break-all">{node.name} ({node.count})</span>
+            <FontAwesomeIcon icon={isIndex ? icons.faDatabase : (isExpanded ? icons.faFolderOpen : icons.faFolder)} />
+            <span className="break-all">{node.name || '(no index)'} ({node.count})</span>
           </Link>
         </span>
       </li>
@@ -47,8 +50,10 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
 
 export const Folders = () => {
   const allEntries = useEntryStore(state => state.allEntries);
+  const appConfig = useAppConfig()
+  const showIndex = !!appConfig.pages?.folders?.showIndex
 
-  const root = useMemo(() => buildTree(allEntries), [allEntries]);
+  const root = useMemo(() => buildTree(allEntries, showIndex), [allEntries, showIndex]);
 
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 

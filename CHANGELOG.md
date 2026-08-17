@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - webapp: Add folders page to browse media by directory tree
 - webapp: Autoplay videos in the media view. It can be disabled with `webapp.pages.mediaView.autoPlayVideo`
+- webapp: Show the index as root folder on the folders page with `webapp.pages.folders.showIndex`
 
 ### Fixed
 

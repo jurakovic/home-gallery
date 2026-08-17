@@ -62,7 +62,18 @@ export interface PluginManager {
  */
 export interface Pages {
   disabled?: (("edit" | "date" | "video" | "map" | "tag" | "folder") | string)[];
+  folders?: FoldersPage;
   mediaView?: MediaViewPage;
+  [k: string]: unknown;
+}
+/**
+ * Customize folders page
+ */
+export interface FoldersPage {
+  /**
+   * Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed
+   */
+  showIndex?: boolean;
   [k: string]: unknown;
 }
 /**

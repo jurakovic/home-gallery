@@ -61,15 +61,17 @@ const sortChildren = (node: TreeNode) => {
  * files can live in other directories than the main file and would double count
  * entries otherwise.
  *
- * The tree levels are the index relative directories of the media files. The
- * index directories itself are not part of the tree: an index is the mounted
- * source directory and would be a single node which every other node is below.
- * Its direct subdirectories are the first tree level instead.
+ * The tree levels are the index relative directories of the media files. An
+ * index is the mounted source directory and would be a single node which every
+ * other node is below. It is therefore skipped by default and its direct
+ * subdirectories are the first tree level. With `showIndex` the index nodes are
+ * the first tree level instead, which also lists media of the source directory
+ * itself.
  *
  * Counts are visible counts: they only reflect the entries of the given list,
  * which is already filtered by the server for the current user.
  */
-export const buildTree = (entries: Entry[]): TreeNode => {
+export const buildTree = (entries: Entry[], showIndex: boolean = false): TreeNode => {
   const root = createNode('', '', '')
   const indexNodes = createNode('', '', '')
 
@@ -101,9 +103,13 @@ export const buildTree = (entries: Entry[]): TreeNode => {
     node.ownCount++
   }
 
-  // Skip the index level: the subdirectories of all indices are the first level
-  root.children = indexNodes.children.flatMap(indexNode => indexNode.children)
-  root.ownCount = indexNodes.children.reduce((sum, indexNode) => sum + indexNode.ownCount, 0)
+  if (showIndex) {
+    root.children = indexNodes.children
+  } else {
+    // Skip the index level: the subdirectories of all indices are the first level
+    root.children = indexNodes.children.flatMap(indexNode => indexNode.children)
+    root.ownCount = indexNodes.children.reduce((sum, indexNode) => sum + indexNode.ownCount, 0)
+  }
 
   sortChildren(root)
 

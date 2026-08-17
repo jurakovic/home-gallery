@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/xemle/home-gallery/master/gallery.config.schema.json#webapp.pages.folders",
+  "title": "FoldersPage",
+  "description": "Customize folders page",
+  "default": [],
+  "type": "object",
+  "properties": {
+    "showIndex": {
+      "description": "Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

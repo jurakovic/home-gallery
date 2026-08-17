@@ -362,6 +362,17 @@
       #- folder
       #- ...any string
     #
+    # Customize folders page
+    #
+    # default: []
+    #folders:
+      # Show the index as root folder. An index is a media source directory
+      # and is the parent of all its folders. By default only its
+      # subdirectories are listed
+      #
+      # default: false
+      #showIndex: false
+    #
     # Customize single media view
     #
     # default: []
