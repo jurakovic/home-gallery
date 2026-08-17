@@ -15,7 +15,6 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toFolderQuery(node)
-  const isIndex = !node.path
 
   return (
     <>
@@ -34,8 +33,8 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
           <Link className="flex items-center justify-start gap-2 p-4 text-gray-500 grow hover:text-gray-300 hover:bg-gray-700 hover:cursor-pointer"
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
-            <FontAwesomeIcon icon={isIndex ? icons.faDatabase : (isExpanded ? icons.faFolderOpen : icons.faFolder)} />
-            <span className="break-all">{node.name || '(no index)'} - {node.count}</span>
+            <FontAwesomeIcon icon={isExpanded ? icons.faFolderOpen : icons.faFolder} />
+            <span className="break-all">{node.name} ({node.count})</span>
           </Link>
         </span>
       </li>

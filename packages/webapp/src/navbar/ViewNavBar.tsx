@@ -39,10 +39,10 @@ export const ViewNavBar = ({disableEdit}) => {
       },
     },
     {
-      icon: icons.faClock,
-      text: 'Years',
-      action: () => navigate('/years'),
-      hidden: appConfig.pages?.disabled?.includes('date'),
+      icon: icons.faFolderTree,
+      text: 'Folders',
+      action: () => navigate('/folders'),
+      hidden: appConfig.pages?.disabled?.includes('folder'),
     },
     {
       icon: icons.faPlay,
@@ -69,10 +69,10 @@ export const ViewNavBar = ({disableEdit}) => {
       hidden: appConfig.pages?.disabled?.includes('tag'),
     },
     {
-      icon: icons.faFolderTree,
-      text: 'Folders',
-      action: () => navigate('/folders'),
-      hidden: appConfig.pages?.disabled?.includes('folder'),
+      icon: icons.faClock,
+      text: 'Years',
+      action: () => navigate('/years'),
+      hidden: appConfig.pages?.disabled?.includes('date'),
     },
     {
       icon: icons.faMap,

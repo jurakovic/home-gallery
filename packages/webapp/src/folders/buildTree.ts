@@ -7,7 +7,7 @@ export interface TreeNode {
   index: string
   /**
    * Index relative directory path of this node with forward slashes.
-   * Empty for the virtual root and for index nodes
+   * Empty for the virtual root
    */
   path: string
   /** Unique key of the node, built from index and path */
@@ -61,14 +61,17 @@ const sortChildren = (node: TreeNode) => {
  * files can live in other directories than the main file and would double count
  * entries otherwise.
  *
- * The first tree level are the index names, the levels below are the index
- * relative directories of the media files.
+ * The tree levels are the index relative directories of the media files. The
+ * index directories itself are not part of the tree: an index is the mounted
+ * source directory and would be a single node which every other node is below.
+ * Its direct subdirectories are the first tree level instead.
  *
  * Counts are visible counts: they only reflect the entries of the given list,
  * which is already filtered by the server for the current user.
  */
 export const buildTree = (entries: Entry[]): TreeNode => {
   const root = createNode('', '', '')
+  const indexNodes = createNode('', '', '')
 
   for (const entry of entries) {
     const file = entry.files?.[0]
@@ -81,7 +84,7 @@ export const buildTree = (entries: Entry[]): TreeNode => {
     // last part is the basename and is not part of the tree
     dirs.pop()
 
-    const indexNode = getChild(root, index, index, '')
+    const indexNode = getChild(indexNodes, index, index, '')
     root.count++
     indexNode.count++
 
@@ -97,6 +100,10 @@ export const buildTree = (entries: Entry[]): TreeNode => {
     }
     node.ownCount++
   }
+
+  // Skip the index level: the subdirectories of all indices are the first level
+  root.children = indexNodes.children.flatMap(indexNode => indexNode.children)
+  root.ownCount = indexNodes.children.reduce((sum, indexNode) => sum + indexNode.ownCount, 0)
 
   sortChildren(root)
 
