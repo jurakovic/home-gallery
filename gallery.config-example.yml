@@ -375,6 +375,11 @@
         #- tag
         # Disables navigation to overview, prev and next
         #- nav
+      # Start the video playback when a video is opened. Browsers can still
+      # block the autoplay until the site has user interaction
+      #
+      # default: true
+      #autoPlayVideo: true
   #
   # Date format as in linux date command
   #   %b month name

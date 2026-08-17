@@ -19,9 +19,9 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
   return (
     <>
       <li className="border border-collapse border-gray-800">
-        <span className="flex items-center justify-start" style={{paddingLeft: `${level}rem`}}>
+        <span className="group flex items-center justify-start hover:bg-gray-700" style={{paddingLeft: `${level}rem`}}>
           { isExpandable &&
-            <a className="flex items-center justify-center w-8 p-4 text-gray-500 hover:text-gray-300 hover:bg-gray-700 hover:cursor-pointer"
+            <a className="flex items-center justify-center w-8 p-4 text-gray-500 group-hover:text-gray-300 hover:bg-gray-600 hover:cursor-pointer"
               onClick={() => toggle(node.key)}
               title={isExpanded ? 'Collapse folder' : 'Expand folder'}>
               <FontAwesomeIcon icon={isExpanded ? icons.faAngleDown : icons.faAngleRight} />
@@ -30,7 +30,7 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
           { !isExpandable &&
             <span className="w-8 p-4" />
           }
-          <Link className="flex items-center justify-start gap-2 p-4 text-gray-500 grow hover:text-gray-300 hover:bg-gray-700 hover:cursor-pointer"
+          <Link className="flex items-center justify-start gap-2 p-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
             <FontAwesomeIcon icon={isExpanded ? icons.faFolderOpen : icons.faFolder} />

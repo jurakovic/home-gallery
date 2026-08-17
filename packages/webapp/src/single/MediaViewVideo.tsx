@@ -5,6 +5,7 @@ import Hammer from 'hammerjs'
 import { getHigherPreviewUrl } from '../utils/preview'
 import { usePreviewSize } from "./usePreviewSize";
 import { classNames } from "../utils/class-names";
+import { useAppConfig } from "../config/useAppConfig";
 
 export const MediaViewVideo = (props) => {
   const { media, dispatch } = props
@@ -13,7 +14,10 @@ export const MediaViewVideo = (props) => {
   const ref = useRef()
   const gestureOverlay = useRef()
   const previewSize = usePreviewSize()
+  const appConfig = useAppConfig()
   const posterUrl = getHigherPreviewUrl(previews, previewSize) || ''
+  // autoplay is enabled by default and needs to be disabled explicitly
+  const autoPlay = appConfig.pages?.mediaView?.autoPlayVideo !== false
 
   const videoPreview = previews.filter(p => p.match(/video-preview/)).shift()
   const videoUrl = videoPreview ? `files/${videoPreview}` : ''
@@ -93,7 +97,7 @@ export const MediaViewVideo = (props) => {
   return (
     <>
       <div className="flex items-center justify-center w-full h-full">
-        <video ref={ref} controls playsinline poster={posterUrl} className="w-full h-full">
+        <video ref={ref} controls autoPlay={autoPlay} playsinline poster={posterUrl} className="w-full h-full">
           <source src={videoUrl} type={videoMime} />
           No native video element support. Watch video file from <a href={videoUrl}>here</a>
         </video>

@@ -70,6 +70,10 @@ export interface Pages {
  */
 export interface MediaViewPage {
   disabled?: MediaViewDisableFlags;
+  /**
+   * Start the video playback when a video is opened. Browsers can still block the autoplay until the site has user interaction
+   */
+  autoPlayVideo?: boolean;
   [k: string]: unknown;
 }
 /**
