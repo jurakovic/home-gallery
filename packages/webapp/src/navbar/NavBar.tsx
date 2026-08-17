@@ -11,9 +11,10 @@ import { type Tag } from "../api/models";
 import { EditNavBar } from './EditNavBar';
 import { NavItem } from './NavItem';
 import { ViewNavBar } from './ViewNavBar';
+import { SortMenu } from './SortMenu';
 import { SearchInput, SearchButton } from "./SearchInput";
 
-export const DesktopNavBar = ({disableEdit = false, showDialog}) => {
+export const DesktopNavBar = ({disableEdit = false, showSort = false, showDialog}) => {
   const viewMode = useEditModeStore(state => state.viewMode);
 
   return (
@@ -28,6 +29,9 @@ export const DesktopNavBar = ({disableEdit = false, showDialog}) => {
               { viewMode === ViewMode.EDIT && (
                 <EditNavBar showDialog={showDialog}/>
               )}
+              { showSort && viewMode === ViewMode.VIEW && (
+                <SortMenu />
+              )}
             </div>
             <div className="flex pr-2 space-x-4">
               <SearchInput focus={false} />
@@ -39,7 +43,7 @@ export const DesktopNavBar = ({disableEdit = false, showDialog}) => {
   )
 }
 
-export const MobileNavBar = ({disableEdit = false, showDialog}) => {
+export const MobileNavBar = ({disableEdit = false, showSort = false, showDialog}) => {
   const [showSearch, setShowSearch] = useState(false)
   const viewMode = useEditModeStore(state => state.viewMode);
 
@@ -56,6 +60,9 @@ export const MobileNavBar = ({disableEdit = false, showDialog}) => {
                   )}
                   { viewMode === ViewMode.EDIT && (
                     <EditNavBar showDialog={showDialog}/>
+                  )}
+                  { showSort && viewMode === ViewMode.VIEW && (
+                    <SortMenu />
                   )}
                 </div>
                 <div className="flex pr-2 space-x-4">
@@ -84,7 +91,7 @@ export const MobileNavBar = ({disableEdit = false, showDialog}) => {
   )
 }
 
-export const NavBar = ({disableEdit = false}) => {
+export const NavBar = ({disableEdit = false, showSort = false}) => {
   const [ deviceType ] = useDeviceType();
   const { setDialogVisible, openDialog } = useTagDialog()
 
@@ -106,10 +113,10 @@ export const NavBar = ({disableEdit = false}) => {
   return (
     <>
       { deviceType === DeviceType.DESKTOP &&
-        <DesktopNavBar showDialog={showDialog} disableEdit={disableEdit} />
+        <DesktopNavBar showDialog={showDialog} disableEdit={disableEdit} showSort={showSort} />
       }
       { deviceType === DeviceType.MOBILE &&
-        <MobileNavBar showDialog={showDialog} disableEdit={disableEdit} />
+        <MobileNavBar showDialog={showDialog} disableEdit={disableEdit} showSort={showSort} />
       }
     </>
   )

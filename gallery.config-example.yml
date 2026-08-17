@@ -372,6 +372,11 @@
       #
       # default: false
       #showIndex: false
+      # Initial folder order. It is overruled by the order of the page
+      #
+      # default: name
+      #order: name
+      #order: nameDesc
     #
     # Customize single media view
     #

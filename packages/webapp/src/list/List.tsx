@@ -68,7 +68,7 @@ export const List = () => {
     <>
       <MultiTagDialogProvider>
         <>
-          <NavBar />
+          <NavBar showSort={true} />
           <div className="relative z-0">
             <Scrollbar containerRef={containerRef}
               style={{marginTop: 0, marginBottom: BOTTOM_MARGIN}}

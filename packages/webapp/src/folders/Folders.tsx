@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as icons from '@fortawesome/free-solid-svg-icons'
 
@@ -53,16 +53,35 @@ export const Folders = () => {
   const appConfig = useAppConfig()
   const showIndex = !!appConfig.pages?.folders?.showIndex
 
-  const root = useMemo(() => buildTree(allEntries, showIndex), [allEntries, showIndex]);
+  const [searchParams, setSearchParams] = useSearchParams()
+  // the url is the source of truth so that an order can be shared. The config
+  // sets the initial order only
+  const descending = searchParams.has('dir') ?
+    searchParams.get('dir') == 'desc' :
+    appConfig.pages?.folders?.order == 'nameDesc'
+
+  const root = useMemo(() => buildTree(allEntries, showIndex, descending), [allEntries, showIndex, descending]);
 
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 
   const toggle = (key: string) => setExpanded(expanded => ({...expanded, [key]: !expanded[key]}))
 
+  // the direction is always explicit, otherwise the toggle would fall back to
+  // the configured order again
+  const toggleOrder = () => setSearchParams({dir: descending ? 'asc' : 'desc'})
+
   return (
     <>
       <NavBar disableEdit={true} />
-      <h2 className="m-4 text-xl text-gray-400">Folders</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2 m-4">
+        <h2 className="text-xl text-gray-400">Folders</h2>
+        <a className="flex items-center justify-center gap-2 px-2 py-1 text-gray-500 rounded hover:bg-gray-700 hover:text-gray-300 hover:cursor-pointer"
+          onClick={toggleOrder}
+          title={descending ? 'Order folders ascending by name' : 'Order folders descending by name'}>
+          <FontAwesomeIcon icon={descending ? icons.faArrowDownWideShort : icons.faArrowUpShortWide} />
+          <span className="text-sm">Name</span>
+        </a>
+      </div>
       { !root.children.length &&
         <p className="m-4 text-gray-500">No media found</p>
       }

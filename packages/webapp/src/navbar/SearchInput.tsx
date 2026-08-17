@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { useSearchStore } from "../store/search-store";
+import { useSearchNavigate } from "./useSearchNavigate";
 
 export const SearchButton = ({onClick}) => {
   return (
@@ -20,21 +20,7 @@ export const SearchInput = ({focus}) => {
 
   const [ term, setTerm ] = useState(query.type == 'query' ? query.value : query.query || '');
 
-  const navigate = useNavigate();
-
-  const onSearch = (termInput) => {
-    if (!termInput) {
-      navigate(`/`);
-    } else if (query.type == 'none' || query.type == 'query') {
-      navigate(`/search/${termInput}`);
-    } else if (query.type == 'year') {
-      navigate(`/years/${query.value}?q=${termInput}`);
-    } else if (query.type == 'similar') {
-      navigate(`/similar/${query.value}?q=${termInput}`);
-    } else if (query.type == 'faces') {
-      navigate(`/faces/${query.value.id}/${query.value.faceIndex}?q=${termInput}`);
-    }
-  }
+  const onSearch = useSearchNavigate();
 
   const onChange = e => setTerm(e.target.value)
 

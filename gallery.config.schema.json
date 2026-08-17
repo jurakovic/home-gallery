@@ -707,6 +707,14 @@
                   "description": "Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed",
                   "type": "boolean",
                   "default": false
+                },
+                "order": {
+                  "description": "Initial folder order. It is overruled by the order of the page",
+                  "enum": [
+                    "name",
+                    "nameDesc"
+                  ],
+                  "default": "name"
                 }
               }
             },

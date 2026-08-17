@@ -49,9 +49,9 @@ const byName = (a: TreeNode, b: TreeNode) => {
   return aName < bName ? -1 : 1
 }
 
-const sortChildren = (node: TreeNode) => {
-  node.children.sort(byName)
-  node.children.forEach(sortChildren)
+const sortChildren = (node: TreeNode, compare: (a: TreeNode, b: TreeNode) => number) => {
+  node.children.sort(compare)
+  node.children.forEach(child => sortChildren(child, compare))
 }
 
 /**
@@ -60,6 +60,9 @@ const sortChildren = (node: TreeNode) => {
  * The tree is built from the main file of an entry (`files[0]`) only. Sidecar
  * files can live in other directories than the main file and would double count
  * entries otherwise.
+ *
+ * The folders of every level are ordered by their name, `descending` reverses
+ * the order.
  *
  * The tree levels are the index relative directories of the media files. An
  * index is the mounted source directory and would be a single node which every
@@ -71,7 +74,7 @@ const sortChildren = (node: TreeNode) => {
  * Counts are visible counts: they only reflect the entries of the given list,
  * which is already filtered by the server for the current user.
  */
-export const buildTree = (entries: Entry[], showIndex: boolean = false): TreeNode => {
+export const buildTree = (entries: Entry[], showIndex: boolean = false, descending: boolean = false): TreeNode => {
   const root = createNode('', '', '')
   const indexNodes = createNode('', '', '')
 
@@ -111,7 +114,7 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false): TreeNod
     root.ownCount = indexNodes.children.reduce((sum, indexNode) => sum + indexNode.ownCount, 0)
   }
 
-  sortChildren(root)
+  sortChildren(root, descending ? (a, b) => -byName(a, b) : byName)
 
   return root
 }

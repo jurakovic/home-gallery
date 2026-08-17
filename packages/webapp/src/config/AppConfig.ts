@@ -74,6 +74,10 @@ export interface FoldersPage {
    * Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed
    */
   showIndex?: boolean;
+  /**
+   * Initial folder order. It is overruled by the order of the page
+   */
+  order?: "name" | "nameDesc";
   [k: string]: unknown;
 }
 /**
