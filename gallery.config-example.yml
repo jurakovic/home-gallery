@@ -389,6 +389,16 @@
       # default: fluent
       #thumbnails: fluent
       #thumbnails: square
+      # Order of media lists without an explicit 'order by' expression in the
+      # search query. It is an order key with an optional direction.
+      #
+      # Supported keys are date, updated, duration, width, height, filesize,
+      # random and count(files), count(tags), count(faces), count(objects)
+      #
+      # default: date desc
+      #defaultOrder: date desc
+      #defaultOrder: date asc
+      #defaultOrder: count(tags) desc
     #
     # Customize single media view
     #

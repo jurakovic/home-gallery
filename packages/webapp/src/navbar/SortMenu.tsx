@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { classNames } from "../utils/class-names";
-import { defaultOrder, getOrder, orderKeys, setOrder, toggleDirection, type TOrder } from "../utils/orderQuery";
+import { getOrder, orderKeys, parseOrder, setOrder, toggleDirection, type TOrder } from "../utils/orderQuery";
+import { useAppConfig } from "../config/useAppConfig";
 import { useSearchNavigate, useSearchTerm } from "./useSearchNavigate";
 
 const directionIcon = (direction: string) => direction == 'asc' ? icons.faArrowUpShortWide : icons.faArrowDownWideShort
@@ -12,18 +13,22 @@ const directionIcon = (direction: string) => direction == 'asc' ? icons.faArrowU
 export const SortMenu = () => {
   const term = useSearchTerm()
   const navigateToSearch = useSearchNavigate()
+  const appConfig = useAppConfig()
 
-  const [order, setCurrentOrder] = useState<TOrder>(defaultOrder)
+  // the order which the defaultOrder query plugin adds to queries without an
+  // order expression
+  const configOrder = parseOrder(appConfig.pages?.list?.defaultOrder)
+
+  const [order, setCurrentOrder] = useState<TOrder>(configOrder)
   const [isOpen, setIsOpen] = useState(false)
   const menu = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let outdated = false
-    // the query term is the source of truth. Fall back to the order which the
-    // defaultOrder query plugin adds to queries without an order expression
-    getOrder(term).then(order => !outdated && setCurrentOrder(order || defaultOrder))
+    // the query term is the source of truth
+    getOrder(term).then(order => !outdated && setCurrentOrder(order || configOrder))
     return () => { outdated = true }
-  }, [term])
+  }, [term, configOrder.key, configOrder.direction])
 
   useEffect(() => {
     if (!isOpen) {

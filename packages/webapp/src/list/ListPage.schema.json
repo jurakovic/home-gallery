@@ -10,6 +10,11 @@
       "description": "Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares. It is overruled by the layout toggle of the nav bar",
       "enum": ["fluent", "square"],
       "default": "fluent"
+    },
+    "defaultOrder": {
+      "description": "Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)",
+      "type": "string",
+      "default": "date desc"
     }
   }
 }

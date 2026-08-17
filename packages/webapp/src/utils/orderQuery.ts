@@ -32,12 +32,45 @@ export const orderKeys: TOrderKey[] = [
 ]
 
 /**
- * Default order of the webapp. It is added by the defaultOrder query plugin
- * to every query without an explicit order
+ * Order keys of the query language. An unknown key is not sorted at all
+ *
+ * See packages/query/src/query/order-by.js
+ */
+export const knownOrderKeys = [
+  'date', 'updated', 'duration', 'width', 'height', 'filesize', 'random',
+  'count(files)', 'count(tags)', 'count(faces)', 'count(objects)'
+]
+
+export const isKnownOrderKey = (key: string) => knownOrderKeys.includes(key)
+
+/**
+ * Fallback order of the webapp. It is used if no order is configured. The
+ * defaultOrder query plugin adds the order to every query without an explicit
+ * order expression
  *
  * See packages/webapp/src/plugin/defaultQueryPlugin.ts
  */
 export const defaultOrder: TOrder = {key: 'date', direction: 'desc'}
+
+/**
+ * Reads an order of a config value like `date asc` or `count(files) desc`.
+ *
+ * A leading `order by` is accepted, too. Returns the `defaultOrder` for an
+ * empty value
+ */
+export const parseOrder = (value?: string): TOrder => {
+  const parts = (value || '').replace(/^\s*order\s+by\s+/i, '').trim().split(/\s+/)
+  const key = parts[0]
+  if (!key) {
+    return defaultOrder
+  }
+
+  const direction = (parts[1] || '').toLowerCase()
+  return {
+    key,
+    direction: direction == 'asc' || direction == 'desc' ? direction : ''
+  }
+}
 
 // Fallback to cut the order expression of an unparsable query
 const orderPattern = /\s*\border\s+by\s+\S+(\s+(asc|desc))?\s*$/i
