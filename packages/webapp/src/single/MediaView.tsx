@@ -25,6 +25,7 @@ import useBodyDimensions from "../utils/useBodyDimensions";
 import { classNames } from '../utils/class-names'
 import { SingleTagDialogProvider } from "../dialog/tag-dialog-provider";
 import { useMediaViewHotkeys } from "./useMediaViewHotkeys";
+import { useRevealNavigation } from "./useRevealNavigation";
 import { MediaViewDisableFlags } from "./MediaViewPage";
 
 const log = Logger('MediaView')
@@ -79,6 +80,8 @@ export const MediaView = () => {
 
   const [hideNavigation, setHideNavigation] = useState(false)
   const [zoomFactor, setZoomFactor] = useState(1)
+
+  const {revealed, handlers: revealHandlers} = useRevealNavigation(hideNavigation)
 
   const [hotkeys, hotkeyToAction] = useMediaViewHotkeys();
 
@@ -180,8 +183,8 @@ export const MediaView = () => {
       <SingleTagDialogProvider>
         <div className="flex flex-col w-screen md:flex-row h-dvh">
           <div className={classNames('w-full', {'h-1/2 flex-shrink-0 md:flex-shrink md:h-full': showDetails, 'h-full': !showDetails})}>
-            <div className="relative w-full h-full overflow-hidden">
-              {!hideNavigation && showNavigation &&
+            <div className="relative w-full h-full overflow-hidden" {...revealHandlers}>
+              {(!hideNavigation || revealed) && showNavigation &&
                 <MediaNav index={index} current={current} prev={prev} next={next} listLocation={listLocation} showNavigation={showNavigation} dispatch={dispatch} />
               }
               {isImage &&

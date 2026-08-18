@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Add ascending and descending name order to the folders page. Its initial order can be set with `webapp.pages.folders.order`
 - webapp: Add squared thumbnail layout to the media lists. It can be toggled in the nav bar and its initial value can be set with `webapp.pages.list.thumbnails`
 - webapp: Set the order of media lists without an explicit `order by` expression with `webapp.pages.list.defaultOrder`
+- webapp: Reveal the hidden navigation of a playing video by the mouse or by a tap without pausing it
 
 ### Fixed
 
