@@ -8,7 +8,7 @@ import { classNames } from "../utils/class-names";
 import { useAppConfig } from "../config/useAppConfig";
 
 export const MediaViewVideo = (props) => {
-  const { media, dispatch } = props
+  const { media, dispatch, navVisible } = props
   const { previews } = media;
   const [isPlaying, setIsPlaying] = useState(false)
   const ref = useRef()
@@ -56,9 +56,6 @@ export const MediaViewVideo = (props) => {
     }
 
     const onSwipeHandler = (ev) => {
-      if (!video.paused) {
-        return
-      }
       ev.preventDefault()
 
       if (ev.direction === Hammer.DIRECTION_LEFT) {
@@ -101,7 +98,16 @@ export const MediaViewVideo = (props) => {
           <source src={videoUrl} type={videoMime} />
           No native video element support. Watch video file from <a href={videoUrl}>here</a>
         </video>
-        <div ref={gestureOverlay} className={classNames('absolute top-0 left-0 right-0 bottom-14 md:bottom-18', {'hidden': isPlaying})}></div>
+        {/*
+          The overlay catches the gestures of the media. It ends above the
+          native video controls, so they stay reachable.
+
+          A playing video keeps it while the navigation is hidden to allow a
+          swipe to the previous or next media. Once the navigation is shown the
+          overlay steps aside, so that the video itself is reachable again to
+          pause it or to show its native controls
+        */}
+        <div ref={gestureOverlay} className={classNames('absolute top-0 left-0 right-0 bottom-14 md:bottom-18', {'hidden': isPlaying && navVisible})}></div>
       </div>
     </>
   )

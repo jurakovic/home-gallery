@@ -151,7 +151,15 @@ export const Zoomable: FunctionComponent<ZoomableProps> = ({childWidth, childHei
     mc.add(new Hammer.Swipe()).recognizeWith(mc.get('pan'));
     mc.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith([mc.get('pan')]);
 
-    mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2, interval: 400 }));
+    // the pan starts at the first moved pixel and would take the gesture from
+    // the double tap. A finger always moves a little, unlike a mouse, so the
+    // double tap has to recognize next to it.
+    //
+    // The default thresholds of a tap are meant for a mouse. A finger presses
+    // longer and is less precise. They are shared with useRevealNavigation,
+    // which suppresses its tap action for a double tap
+    mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2, interval: 400, time: 400, threshold: 15, posThreshold: 30 }))
+      .recognizeWith(mc.get('pan'));
     mc.add(new Hammer.Tap());
 
     mc.on("panstart panmove", onPanHandler);

@@ -81,8 +81,6 @@ export const MediaView = () => {
   const [hideNavigation, setHideNavigation] = useState(false)
   const [zoomFactor, setZoomFactor] = useState(1)
 
-  const {revealed, handlers: revealHandlers} = useRevealNavigation(hideNavigation)
-
   const [hotkeys, hotkeyToAction] = useMediaViewHotkeys();
 
   let index = findEntryIndex(location, entries, id);
@@ -97,7 +95,11 @@ export const MediaView = () => {
 
   const key = current ? current.id : (Math.random() * 100000).toFixed(0);
 
+  const {navVisible, handlers: revealHandlers} = useRevealNavigation(hideNavigation, !!isVideo)
+
   useEffect(() => { id && setLastId(id) }, [id])
+  // a playing video reports no pause when the media view leaves it
+  useEffect(() => { setHideNavigation(false) }, [id])
   useEffect(() => { index >= 0 && setLastIndex(index) }, [index])
 
   const viewEntry = (index: number) => {
@@ -184,7 +186,7 @@ export const MediaView = () => {
         <div className="flex flex-col w-screen md:flex-row h-dvh">
           <div className={classNames('w-full', {'h-1/2 flex-shrink-0 md:flex-shrink md:h-full': showDetails, 'h-full': !showDetails})}>
             <div className="relative w-full h-full overflow-hidden" {...revealHandlers}>
-              {(!hideNavigation || revealed) && showNavigation &&
+              {showNavigation && navVisible &&
                 <MediaNav index={index} current={current} prev={prev} next={next} listLocation={listLocation} showNavigation={showNavigation} dispatch={dispatch} />
               }
               {isImage &&
@@ -193,7 +195,7 @@ export const MediaView = () => {
                 </Zoomable>
               }
               {isVideo &&
-                <MediaViewVideo key={key} media={current} next={next} prev={prev} dispatch={dispatch}/>
+                <MediaViewVideo key={key} media={current} next={next} prev={prev} dispatch={dispatch} navVisible={navVisible}/>
               }
               {isUnknown &&
                 <MediaViewUnknownType key={key} media={current} next={next} prev={prev}/>
