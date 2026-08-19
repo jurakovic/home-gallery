@@ -14,6 +14,14 @@ export interface ListPage {
    */
   thumbnails?: "fluent" | "square";
   /**
+   * Initial size of the thumbnails. Smaller thumbnails show more media per row. It is overruled by the size controls of the nav bar
+   */
+  thumbnailSize?: "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /**
+   * Show the date scrollbar of media lists. It is placed at the right side of the list and jumps to the media of the selected date
+   */
+  scrollbar?: boolean;
+  /**
    * Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
    */
   defaultOrder?: string;
