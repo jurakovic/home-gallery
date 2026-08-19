@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension
 - webapp: Break long folder names at word boundaries on the folders page
+- webapp: Fix the PWA manifest scope and icon paths for gallery deployments under a path prefix
 
 ### Changed
 

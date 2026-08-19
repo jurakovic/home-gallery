@@ -30,35 +30,39 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'logo192.png', 'logo512.png', 'logo.svg'],
+        // All urls are relative to the manifest url so that the app stays
+        // installable when the gallery is served below a server.prefix. The id
+        // is omitted on purpose: it would resolve against the origin and not
+        // the manifest url. Without it the id falls back to the start_url which
+        // keeps two galleries on the same host apart
         manifest: {
-          id: '/',
           name: 'HomeGallery App',
           short_name: 'HomeGallery',
           description: 'All personal photos in your pocket',
-          start_url: '.',
-          scope: '/',
+          start_url: './',
+          scope: './',
           display: 'fullscreen',
           orientation: 'any',
           theme_color: '#000000',
           background_color: '#eee',
           icons: [
             {
-              src: '/favicon.ico',
+              src: 'favicon.ico',
               type: 'image/x-icon',
               sizes: '64x64 32x32 24x24 16x16'
             },
             {
-              src: '/logo192.png',
+              src: 'logo192.png',
               type: 'image/png',
               sizes: '192x192'
             },
             {
-              src: '/logo512.png',
+              src: 'logo512.png',
               type: 'image/png',
               sizes: '512x512'
             },
             {
-              src: '/logo.svg',
+              src: 'logo.svg',
               type: 'image/svg+xml',
               sizes: '512x512'
             }
