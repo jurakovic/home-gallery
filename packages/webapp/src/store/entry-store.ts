@@ -9,17 +9,24 @@ export interface EntryStore {
   id2Entries: Id2EntryMap
   allEntries: Entry[]
   entries: Entry[]
+  /**
+   * False while the initial database load is still adding entries. Consumers
+   * skip intermediate updates until it flips, see useLoadDatabase
+   */
+  initialLoadDone: boolean
 
   reset: () => void
   addEntries: (entries: Entry[]) => void
   removeEntries: (entries: Entry[]) => void
   setEntries: (entries: Entry[]) => void
+  setInitialLoadDone: () => void
 }
 
 const slice = (set) => ({
   id2Entries: {},
   allEntries: [],
   entries: [],
+  initialLoadDone: false,
 
   reset: () => set((state) => {
     return {
@@ -71,7 +78,9 @@ const slice = (set) => ({
     }
   }),
 
-  setEntries: (entries: Entry[]) => set((state) => ({...state, entries}))
+  setEntries: (entries: Entry[]) => set((state) => ({...state, entries})),
+
+  setInitialLoadDone: () => set((state) => state.initialLoadDone ? state : {...state, initialLoadDone: true})
 })
 
 export const useEntryStore = create<

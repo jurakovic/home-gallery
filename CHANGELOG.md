@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - server: Fix social media dimension
 - webapp: Break long folder names at word boundaries on the folders page
 - webapp: Fix the PWA manifest scope and icon paths for gallery deployments under a path prefix
+- webapp: Order the media list before its first render to avoid a visible re-order while the database loads
 
 ### Changed
 

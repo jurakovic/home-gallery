@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLogger, usePluginManager } from '../AppContext'
 import { useEntryStore } from '../store/entry-store'
 import type { TQueryContext } from '@home-gallery/types'
@@ -8,21 +8,58 @@ import { findAllEntriesByIdPrefix } from '../utils/findAllEntriesByIdPrefix'
 import { type Entry } from '../store/entry'
 
 /**
+ * Collapse a burst of entry updates into a single query run. Live updates like
+ * tagging or a reloaded server database arrive in chunks and each run would
+ * re-order the whole list
+ */
+const ENTRY_UPDATE_DEBOUNCE = 200
+
+/**
  * Bind entry store and search store with plugin manager and its executeQuery()
  */
 export const useSearchFilter = () => {
   const allEntries = useEntryStore(state => state.allEntries)
   const setEntries = useEntryStore(state => state.setEntries)
+  const initialLoadDone = useEntryStore(state => state.initialLoadDone)
   const query = useSearchStore(state => state.query)
   const manager = usePluginManager()
   const log = useLogger('SearchFilter')
 
-  useEffect(() => {
-    const databaseApi = createDatabaseApi(allEntries)
+  const lastQuery = useRef(query)
+  const hasRun = useRef(false)
 
-    run(databaseApi, query, manager, log)
-      .then(entries => setEntries(entries))
-  }, [allEntries, query])
+  useEffect(() => {
+    if (!initialLoadDone) {
+      // The database is written by date desc and is loaded in chunks. Running
+      // the query on every chunk would paint the list in source order first and
+      // re-order it visibly once the remaining chunks arrive
+      return
+    }
+
+    const isQueryChange = lastQuery.current != query
+    lastQuery.current = query
+    // Answer the first run and every query change instantly. Only further entry
+    // updates are debounced
+    const delay = !hasRun.current || isQueryChange ? 0 : ENTRY_UPDATE_DEBOUNCE
+
+    let isStale = false
+    const timer = setTimeout(() => {
+      hasRun.current = true
+      const databaseApi = createDatabaseApi(allEntries)
+
+      run(databaseApi, query, manager, log)
+        .then(entries => {
+          if (!isStale) {
+            setEntries(entries)
+          }
+        })
+    }, delay)
+
+    return () => {
+      isStale = true
+      clearTimeout(timer)
+    }
+  }, [allEntries, query, initialLoadDone])
 
 }
 

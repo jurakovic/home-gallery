@@ -11,16 +11,37 @@ import { useAppConfig } from '../config/useAppConfig';
 import { useOnEntries } from './useOnEntries';
 import { toAbsoluteUrl } from '../utils/toAbsoluteUrl';
 
+/**
+ * Paint the entries even if the initial database load did not finish yet. A
+ * large or slow library should not stare at an empty list forever
+ */
+const INITIAL_LOAD_TIMEOUT = 2 * 1000
+
 export const useLoadDatabase = () => {
   const removeEntries = useEntryStore(state => state.removeEntries);
+  const setInitialLoadDone = useEntryStore(state => state.setInitialLoadDone);
   const reapplyEvents = useEventStore(state => state.reapplyEvents);
   const appConfig = useAppConfig()
-  const onEntries = useOnEntries()
+  const { onEntries, flushEntries } = useOnEntries()
 
   useEffect(() => {
+    const initialLoadTimer = setTimeout(setInitialLoadDone, INITIAL_LOAD_TIMEOUT)
+
+    /**
+     * Called when a database load settled. The pending entries are added at
+     * once so that no throttled chunk re-orders the list after its first render
+     */
+    const onLoadDone = () => {
+      clearTimeout(initialLoadTimer)
+      flushEntries()
+      reapplyEvents()
+      setInitialLoadDone()
+    }
+
     onEntries(appConfig.entries as [] || [])
 
     if (appConfig.disabled?.includes('database')) {
+      onLoadDone()
       return
     }
 
@@ -45,11 +66,11 @@ export const useLoadDatabase = () => {
       await offlineDb('open')
       await offlineDb('sync')
 
-      reapplyEvents()
+      onLoadDone()
       onDatabaseReloaded(async () => {
         console.log(`Reload offline database from server`)
         await offlineDb('sync')
-        reapplyEvents()
+        onLoadDone()
       })
     }
 
@@ -60,10 +81,10 @@ export const useLoadDatabase = () => {
       async function run() {
         console.log(`Loading database from server`)
         return fetchAll(chunkLimits, onEntries)
-          .then(() => reapplyEvents())
           .catch(err => {
             console.log(`Failed to load database: ${err}`, err)
           })
+          .finally(() => onLoadDone())
       }
 
       onDatabaseReloaded(run)
@@ -81,5 +102,7 @@ export const useLoadDatabase = () => {
           loadLegacyDatabase()
         })
     }
+
+    return () => clearTimeout(initialLoadTimer)
   }, []);
 }
