@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - server: Add server.trustProxy option and disable proxy trust by default
+- webapp: Align all folder names to the left and shrink them on mobile on the folders page
 
 ## [1.21.0] - 2026-03-01
 

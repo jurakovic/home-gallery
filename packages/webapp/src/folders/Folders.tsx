@@ -30,10 +30,7 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
               <FontAwesomeIcon icon={isExpanded ? icons.faAngleDown : icons.faAngleRight} />
             </a>
           }
-          { !isExpandable &&
-            <span className="w-8 p-4" />
-          }
-          <Link className="flex items-center justify-start min-w-0 gap-2 p-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
+          <Link className="flex items-center justify-start min-w-0 gap-2 p-4 text-sm text-gray-500 md:text-base grow group-hover:text-gray-300 hover:cursor-pointer"
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
             <FontAwesomeIcon className="flex-shrink-0" icon={isIndex ? icons.faDatabase : (isExpanded ? icons.faFolderOpen : icons.faFolder)} />
