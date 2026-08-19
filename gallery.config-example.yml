@@ -361,6 +361,15 @@
       #- tag
       #- folder
       #- ...any string
+    # Initial page of the webapp on its first load. It falls back to the
+    # page of all media if the configured page is disabled
+    #
+    # default: all
+    #landing: all
+    #landing: folders
+    #landing: years
+    #landing: tags
+    #landing: map
     #
     # Customize folders page
     #

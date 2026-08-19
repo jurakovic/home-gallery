@@ -10,5 +10,9 @@
  */
 export interface Pages {
   disabled?: (("edit" | "date" | "video" | "map" | "tag" | "folder") | string)[];
+  /**
+   * Initial page of the webapp on its first load. It falls back to the page of all media if the configured page is disabled
+   */
+  landing?: "all" | "folders" | "years" | "tags" | "map";
   [k: string]: unknown;
 }
