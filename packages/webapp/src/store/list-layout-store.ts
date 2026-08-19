@@ -10,6 +10,12 @@ export interface ListLayoutStore {
    */
   layout: TThumbnailLayout | ''
   setLayout: (layout: TThumbnailLayout) => void
+  /**
+   * Thumbnail size of the user as step around the default size. It is empty as
+   * long as the user did not change the size, than the configured size is used
+   */
+  sizeStep: number | ''
+  setSizeStep: (sizeStep: number) => void
 }
 
 export const useListLayoutStore = create<
@@ -23,6 +29,12 @@ export const useListLayoutStore = create<
 
     setLayout: (layout: TThumbnailLayout) => {
       set((state) => ({...state, layout}))
+    },
+
+    sizeStep: '',
+
+    setSizeStep: (sizeStep: number) => {
+      set((state) => ({...state, sizeStep}))
     },
   }), { name: 'gallery-list-layout' })
 )

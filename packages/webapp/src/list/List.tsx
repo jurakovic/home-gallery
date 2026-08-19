@@ -12,7 +12,7 @@ import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
 import { grid } from "./grid";
-import { useThumbnailLayout } from "./useThumbnailLayout";
+import { useThumbnailLayout, useThumbnailSize } from "./useThumbnailLayout";
 import { useAppConfig } from "../config/useAppConfig";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";
 
@@ -39,6 +39,12 @@ const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280
 const mobileGridSize = 110
 const desktopGridSize = 180
 
+const scaleRowHeights = ({minHeight, maxHeight, maxPotraitHeight}, factor: number) => ({
+  minHeight: minHeight * factor,
+  maxHeight: maxHeight * factor,
+  maxPotraitHeight: maxPotraitHeight * factor
+})
+
 export const List = () => {
   const entries = useEntryStore(state => state.entries)
 
@@ -53,6 +59,7 @@ export const List = () => {
   const { width, height } = useBodyDimensions();
   const [ deviceType ] = useDeviceType();
   const [ layout ] = useThumbnailLayout();
+  const [ , sizeFactor ] = useThumbnailSize();
 
   const viewHeight = height - NAV_HEIGHT - BOTTOM_MARGIN
   const padding = 8
@@ -67,13 +74,13 @@ export const List = () => {
   const rows = useMemo(() => {
     const isMobile = deviceType === DeviceType.MOBILE
     if (layout == 'square') {
-      const minSize = isMobile ? mobileGridSize : desktopGridSize
+      const minSize = (isMobile ? mobileGridSize : desktopGridSize) * sizeFactor
       return grid(visibleEntries, {padding, width, minSize});
     }
 
-    const rowHeights = isMobile ? mobileRowHeights : desktopRowHeights
+    const rowHeights = scaleRowHeights(isMobile ? mobileRowHeights : desktopRowHeights, sizeFactor)
     return fluent(visibleEntries, {padding, width, ...rowHeights});
-  }, [width, visibleEntries, deviceType, layout])
+  }, [width, visibleEntries, deviceType, layout, sizeFactor])
 
   const topDateItems = useMemo(() => {
     return rows.map(({top, height, columns}) => ({top, height, date: columns[0].item?.date || '1970-01-01T00:00:00', dateValue: '1970'}))

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Toggle the navigation of the media view by a clean click or tap on the media
 - webapp: Swipe to the previous or next media while a video is playing and the navigation is hidden
 - webapp: Hide the date scrollbar of media lists with `webapp.pages.list.scrollbar`
+- webapp: Change the thumbnail size of media lists in the nav bar. Its initial value can be set with `webapp.pages.list.thumbnailSize`
 
 ### Fixed
 
