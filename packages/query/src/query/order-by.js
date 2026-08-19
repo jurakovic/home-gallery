@@ -1,3 +1,5 @@
+import { basename } from './utils.js'
+
 export const orderBy = (ast, context) => {
   if (ast.value.sort) {
     ast.sort = ast.value.sort
@@ -21,6 +23,16 @@ export const orderByKey = (ast, context) => {
     case 'filesize':
       ast.scoreFn = e => e.files?.length ? (e.files[0].size || 0) : 0
       ast.direction = 'desc'
+      break;
+    // 'file' is the path of the file, 'filename' its base name. Both match the
+    // keys of the compare filters
+    case 'file':
+      ast.scoreFn = e => e.files?.length ? (e.files[0].filename || '') : ''
+      ast.direction = 'asc'
+      break;
+    case 'filename':
+      ast.scoreFn = e => e.files?.length ? basename(e.files[0].filename || '') : ''
+      ast.direction = 'asc'
       break;
     case 'random':
       ast.sort = entries => {

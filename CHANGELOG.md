@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Hide the date scrollbar of media lists with `webapp.pages.list.scrollbar`
 - webapp: Change the thumbnail size of media lists in the nav bar. Its initial value can be set with `webapp.pages.list.thumbnailSize`
 - webapp: Set the initial page of the webapp with `webapp.pages.landing`
+- query: Order media by their file with `order by file` for the file path or `order by filename` for the base name
 
 ### Fixed
 

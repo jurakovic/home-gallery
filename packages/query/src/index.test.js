@@ -265,6 +265,11 @@ t.test('order by', async t => {
   t.same(await execQuery('order by updated desc'), ['1234', '1223', '0987', '6718'], 'by updated desc')
   t.resolves(execQuery('order by random'), 'by random')
 
+  // entries without files have no score and are sorted to the end of the
+  // descending order
+  t.same(await execQuery('order by file desc'), ['0987', '1223', '1234', '6718'], 'by file desc')
+  t.same(await execQuery('order by filename desc'), ['0987', '1223', '1234', '6718'], 'by filename desc')
+
   t.same(await execQuery('order by count(files)'), ['0987', '1223', '1234', '6718'], 'by count files')
   t.same(await execQuery('order by count(tags)'), ['1223', '1234', '0987', '6718'], 'by count tags')
 })
