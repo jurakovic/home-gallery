@@ -6,6 +6,13 @@ const mouseIdleTimeout = 3000
 /** Time after a tap until the navigation is hidden again */
 const touchIdleTimeout = 5000
 
+/**
+ * Time without mouse or keyboard input until the navigation of a media is
+ * hidden again. It is only used once such an input was seen, so a touch device
+ * keeps its navigation until it is tapped away
+ */
+const inputIdleTimeout = 3000
+
 /** Maximum movement in px and duration in ms of a pointer to count as a tap */
 const tapThreshold = 10
 const tapTime = 500
@@ -32,6 +39,10 @@ type TapStart = {
  * The navigation is remembered while the media view is open. A swipe to the
  * previous or next media keeps it as it is and a clean tap or click toggles it.
  *
+ * A mouse or a keyboard hides it after an idle time and shows it again on the
+ * next input. A click shows it and restarts that idle time. Touch input arms
+ * no idle time at all, so a tap stays the only way to hide it on a phone.
+ *
  * A playing video hides it to not cover the playback. The mouse reveals it by
  * moving, a tap toggles it and it hides again after a while. The remembered
  * visibility returns when the video pauses or is left.
@@ -45,13 +56,21 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
   const [visible, setVisible] = useState(true)
   // the temporary reveal while a video plays
   const [revealed, setRevealed] = useState(false)
+  // the idle hide of the remembered visibility. It is separate from it to keep
+  // an explicit hide by a tap or a click on the next input
+  const [autoHidden, setAutoHidden] = useState(false)
 
   const revealTimer = useRef<any>(null)
+  const idleTimer = useRef<any>(null)
+  // true once a mouse or a keyboard was used. Touch input arms no idle timer
+  const hasIdleInput = useRef(false)
   const tapTimer = useRef<any>(null)
   const tapStart = useRef<TapStart | null>(null)
   const lastTap = useRef({time: 0, x: 0, y: 0})
   // the timers fire late and need the values of that moment
   const revealedRef = useRef(false)
+  const visibleRef = useRef(true)
+  const autoHiddenRef = useRef(false)
   const mediaRef = useRef({isPlaying, isVideo})
   mediaRef.current = {isPlaying, isVideo}
 
@@ -78,6 +97,53 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
     revealTimer.current = setTimeout(() => setRevealedState(false), timeout)
   }
 
+  const setVisibleState = (value: boolean) => {
+    visibleRef.current = value
+    setVisible(value)
+  }
+
+  const setAutoHiddenState = (value: boolean) => {
+    autoHiddenRef.current = value
+    setAutoHidden(value)
+  }
+
+  const clearIdleTimer = () => {
+    if (idleTimer.current) {
+      clearTimeout(idleTimer.current)
+      idleTimer.current = null
+    }
+  }
+
+  const armIdleTimer = () => {
+    clearIdleTimer()
+    if (!hasIdleInput.current || mediaRef.current.isPlaying) {
+      return
+    }
+    idleTimer.current = setTimeout(() => setAutoHiddenState(true), inputIdleTimeout)
+  }
+
+  /** A mouse or keyboard input shows the navigation and restarts its idle time */
+  const onIdleInput = () => {
+    hasIdleInput.current = true
+    if (mediaRef.current.isPlaying) {
+      return
+    }
+    setAutoHiddenState(false)
+    armIdleTimer()
+  }
+
+  const toggleVisible = () => {
+    if (visibleRef.current && !autoHiddenRef.current) {
+      clearIdleTimer()
+      setVisibleState(false)
+      setAutoHiddenState(false)
+      return
+    }
+    setVisibleState(true)
+    setAutoHiddenState(false)
+    armIdleTimer()
+  }
+
   const toggle = (start: TapStart) => {
     const {isPlaying, isVideo} = mediaRef.current
 
@@ -90,7 +156,7 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
       // the tap of a paused video starts its playback
       return
     } else if (!isPlaying) {
-      setVisible(value => !value)
+      toggleVisible()
     } else if (start.pointerType != 'mouse') {
       revealedRef.current ? hideReveal() : reveal(touchIdleTimeout)
     }
@@ -98,8 +164,13 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
   }
 
   const onPointerMove = (ev: PointerEvent) => {
-    if (isPlaying && ev.pointerType == 'mouse') {
+    if (ev.pointerType != 'mouse') {
+      return
+    }
+    if (isPlaying) {
       reveal(mouseIdleTimeout)
+    } else {
+      onIdleInput()
     }
   }
 
@@ -152,19 +223,32 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
     tapTimer.current = setTimeout(() => toggle(start), doubleTapInterval)
   }
 
-  // the temporary reveal ends with the playback
+  // the temporary reveal ends with the playback. The idle time of the
+  // remembered visibility runs outside of it only
   useEffect(() => {
-    if (!isPlaying) {
-      hideReveal()
+    if (isPlaying) {
+      clearIdleTimer()
+      return
     }
+    hideReveal()
+    armIdleTimer()
   }, [isPlaying])
+
+  // the keyboard navigates the media without a pointer event
+  useEffect(() => {
+    const onKeyDown = () => onIdleInput()
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   useEffect(() => () => {
     clearRevealTimer()
+    clearIdleTimer()
     clearTimeout(tapTimer.current)
   }, [])
 
   const handlers = {onPointerMove, onPointerLeave, onPointerDownCapture, onPointerUpCapture, onPointerCancelCapture}
 
-  return {navVisible: isPlaying ? revealed : visible, handlers}
+  return {navVisible: isPlaying ? revealed : (visible && !autoHidden), handlers}
 }
