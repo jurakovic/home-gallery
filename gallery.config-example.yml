@@ -366,39 +366,31 @@
     #
     # default: []
     #folders:
-      # Show the index as root folder. An index is a media source directory
-      # and is the parent of all its folders. By default only its
-      # subdirectories are listed
+      # Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed
       #
       # default: false
       #showIndex: false
       # Initial folder order. It is overruled by the order of the page
       #
       # default: name
-      #order: name
-      #order: nameDesc
+      #order: name # one of: name, nameDesc
     #
     # Customize media lists
     #
     # default: []
     #list:
-      # Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media,
-      # 'square' crops them to a grid of squares. It is overruled by the
-      # layout toggle of the nav bar
+      # Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares. It is overruled by the layout toggle of the nav bar
       #
       # default: fluent
-      #thumbnails: fluent
-      #thumbnails: square
-      # Order of media lists without an explicit 'order by' expression in the
-      # search query. It is an order key with an optional direction.
+      #thumbnails: fluent # one of: fluent, square
+      # Show the date scrollbar of media lists. It is placed at the right side of the list and jumps to the media of the selected date
       #
-      # Supported keys are date, updated, duration, width, height, filesize,
-      # random and count(files), count(tags), count(faces), count(objects)
+      # default: true
+      #scrollbar: true
+      # Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
       #
-      # default: date desc
-      #defaultOrder: date desc
-      #defaultOrder: date asc
-      #defaultOrder: count(tags) desc
+      # default: 'date desc'
+      #defaultOrder: 'date desc'
     #
     # Customize single media view
     #
@@ -413,8 +405,7 @@
         #- tag
         # Disables navigation to overview, prev and next
         #- nav
-      # Start the video playback when a video is opened. Browsers can still
-      # block the autoplay until the site has user interaction
+      # Start the video playback when a video is opened. Browsers can still block the autoplay until the site has user interaction
       #
       # default: true
       #autoPlayVideo: true

@@ -13,6 +13,7 @@ import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
 import { grid } from "./grid";
 import { useThumbnailLayout } from "./useThumbnailLayout";
+import { useAppConfig } from "../config/useAppConfig";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";
 
 const NAV_HEIGHT = 44
@@ -45,6 +46,9 @@ export const List = () => {
   const selectedIds = useEditModeStore(state => state.selectedIds);
 
   const containerRef = useRef(window)
+
+  const appConfig = useAppConfig();
+  const showScrollbar = appConfig.pages?.list?.scrollbar !== false
 
   const { width, height } = useBodyDimensions();
   const [ deviceType ] = useDeviceType();
@@ -82,10 +86,12 @@ export const List = () => {
         <>
           <NavBar showList={true} />
           <div className="relative z-0">
-            <Scrollbar containerRef={containerRef}
-              style={{marginTop: 0, marginBottom: BOTTOM_MARGIN}}
-              pageHeight={viewHeight}
-              topDateItems={topDateItems} />
+            {showScrollbar && (
+              <Scrollbar containerRef={containerRef}
+                style={{marginTop: 0, marginBottom: BOTTOM_MARGIN}}
+                pageHeight={viewHeight}
+                topDateItems={topDateItems} />
+            )}
             <FluentList rows={rows} padding={padding} />
           </div>
         </>

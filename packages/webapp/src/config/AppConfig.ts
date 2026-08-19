@@ -15,11 +15,7 @@ export type PluginUrls = string[];
  * The feature flags can also be disabled by query param 'disabled'
  */
 export type FeatureFlags = (
-  | ("serverEvents" | "events" | "edit")
-  | "database"
-  | "pwa"
-  | ("offlineDatabase" | "worker")
-  | string
+  ("serverEvents" | "events" | "edit") | "database" | "pwa" | ("offlineDatabase" | "worker") | string
 )[];
 /**
  * List of downloadable media sources. This list will be injected from the server
@@ -89,6 +85,10 @@ export interface ListPage {
    * Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares. It is overruled by the layout toggle of the nav bar
    */
   thumbnails?: "fluent" | "square";
+  /**
+   * Show the date scrollbar of media lists. It is placed at the right side of the list and jumps to the media of the selected date
+   */
+  scrollbar?: boolean;
   /**
    * Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
    */
