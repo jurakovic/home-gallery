@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - server: Add server.trustProxy option and disable proxy trust by default
 - webapp: Align all folder names to the left and shrink them on mobile on the folders page
+- webapp: Offer the file path order in the order menu of media lists and drop the random and file count order
 
 ## [1.21.0] - 2026-03-01
 

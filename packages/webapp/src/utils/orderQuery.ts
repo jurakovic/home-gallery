@@ -23,12 +23,11 @@ export type TOrderKey = {
  */
 export const orderKeys: TOrderKey[] = [
   {key: 'date', name: 'Date', defaultDirection: 'desc'},
+  {key: 'file', name: 'File path', defaultDirection: 'asc'},
   {key: 'updated', name: 'Updated', defaultDirection: 'desc'},
   {key: 'filesize', name: 'File size', defaultDirection: 'desc'},
   {key: 'duration', name: 'Duration', defaultDirection: 'desc'},
-  {key: 'count(files)', name: 'File count', defaultDirection: 'desc'},
   {key: 'count(tags)', name: 'Tag count', defaultDirection: 'desc'},
-  {key: 'random', name: 'Random', defaultDirection: ''},
 ]
 
 /**
@@ -38,6 +37,7 @@ export const orderKeys: TOrderKey[] = [
  */
 export const knownOrderKeys = [
   'date', 'updated', 'duration', 'width', 'height', 'filesize', 'random',
+  'file', 'filename',
   'count(files)', 'count(tags)', 'count(faces)', 'count(objects)'
 ]
 

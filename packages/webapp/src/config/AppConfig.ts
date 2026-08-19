@@ -98,7 +98,7 @@ export interface ListPage {
    */
   scrollbar?: boolean;
   /**
-   * Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
+   * Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, file, filename, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
    */
   defaultOrder?: string;
   [k: string]: unknown;
