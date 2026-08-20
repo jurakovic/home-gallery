@@ -9,15 +9,22 @@ import { useEntryStore } from '../store/entry-store';
 import { buildTree, type TreeNode } from './buildTree';
 import { toFolderQuery } from './toFolderQuery';
 import { useAppConfig } from '../config/useAppConfig';
+import { getHigherPreviewUrl } from '../utils/preview';
+import { classNames } from '../utils/class-names';
 
 type ExpandedMap = {[key: string]: boolean}
 
-const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: number, expanded: ExpandedMap, toggle: (key: string) => void}) => {
+/** Rendered size of the folder cover in pixels. It matches the w-10 h-10 box */
+const coverSize = 40
+
+const FolderItem = ({node, level, showCover, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, expanded: ExpandedMap, toggle: (key: string) => void}) => {
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toFolderQuery(node)
   // only shown with the showIndex option, otherwise every node has a path
   const isIndex = !node.path
+  const icon = isIndex ? icons.faDatabase : (isExpanded ? icons.faFolderOpen : icons.faFolder)
+  const coverUrl = showCover ? getHigherPreviewUrl(node.cover?.previews, coverSize * (window.devicePixelRatio || 1)) : false
 
   return (
     <>
@@ -30,16 +37,25 @@ const FolderItem = ({node, level, expanded, toggle}: {node: TreeNode, level: num
               <FontAwesomeIcon icon={isExpanded ? icons.faAngleDown : icons.faAngleRight} />
             </a>
           }
-          <Link className="flex items-center justify-start min-w-0 gap-2 p-4 text-sm text-gray-500 md:text-base grow group-hover:text-gray-300 hover:cursor-pointer"
+          <Link className={classNames('flex items-center justify-start min-w-0 gap-2 text-sm text-gray-500 md:text-base grow group-hover:text-gray-300 hover:cursor-pointer', showCover ? 'px-4 py-2' : 'p-4')}
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
-            <FontAwesomeIcon className="flex-shrink-0" icon={isIndex ? icons.faDatabase : (isExpanded ? icons.faFolderOpen : icons.faFolder)} />
+            { showCover ?
+              // the box keeps the row height of folders without a cover media
+              <span className="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded bg-gray-800">
+                { coverUrl ?
+                  <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
+                  <FontAwesomeIcon icon={icon} />
+                }
+              </span> :
+              <FontAwesomeIcon className="flex-shrink-0" icon={icon} />
+            }
             <span className="min-w-0 break-words">{node.name || '(no index)'} <span className="whitespace-nowrap">({node.count})</span></span>
           </Link>
         </span>
       </li>
       { isExpanded && node.children.map(child => (
-        <FolderItem key={child.key} node={child} level={level + 1} expanded={expanded} toggle={toggle} />
+        <FolderItem key={child.key} node={child} level={level + 1} showCover={showCover} expanded={expanded} toggle={toggle} />
       ))}
     </>
   )
@@ -49,6 +65,7 @@ export const Folders = () => {
   const allEntries = useEntryStore(state => state.allEntries);
   const appConfig = useAppConfig()
   const showIndex = !!appConfig.pages?.folders?.showIndex
+  const showCover = appConfig.pages?.folders?.showCover ?? true
 
   const [searchParams, setSearchParams] = useSearchParams()
   // the url is the source of truth so that an order can be shared. The config
@@ -84,7 +101,7 @@ export const Folders = () => {
       }
       <ul className="m-4">
         {root.children.map(child => (
-          <FolderItem key={child.key} node={child} level={0} expanded={expanded} toggle={toggle} />
+          <FolderItem key={child.key} node={child} level={0} showCover={showCover} expanded={expanded} toggle={toggle} />
         ))}
       </ul>
       <p className="m-4 text-sm text-gray-600">Counts show the visible media of a folder and its subfolders.</p>

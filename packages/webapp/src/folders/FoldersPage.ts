@@ -14,6 +14,10 @@ export interface FoldersPage {
    */
   showIndex?: boolean;
   /**
+   * Show a cover thumbnail of the folder. The cover is the first media of the folder or of its first subfolder. A media whose file name ends with '_cover' before its extension is preferred
+   */
+  showCover?: boolean;
+  /**
    * Initial folder order. It is overruled by the order of the page
    */
   order?: "name" | "nameDesc";

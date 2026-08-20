@@ -16,8 +16,23 @@ export interface TreeNode {
   count: number
   /** Amount of visible media which are directly in this directory */
   ownCount: number
+  /** Media of this directory or of a subdirectory which represents this node */
+  cover?: Entry
   children: TreeNode[]
 }
+
+/** Cover state of a node while the tree is built */
+interface CoverCandidate {
+  /** Base name of the main file of the cover entry */
+  name: string
+  /** True if the base name is marked by the cover suffix */
+  isMarked: boolean
+}
+
+/** Base name suffix before the file extension which marks a cover media */
+const coverSuffixPattern = /_cover\.[^.]+$/i
+
+const basename = (filename: string) => filename.slice(filename.lastIndexOf('/') + 1)
 
 const createNode = (name: string, index: string, path: string): TreeNode => ({
   name,
@@ -40,13 +55,54 @@ const getChild = (parent: TreeNode, name: string, index: string, path: string): 
   return node
 }
 
-const byName = (a: TreeNode, b: TreeNode) => {
-  const aName = a.name.toLowerCase()
-  const bName = b.name.toLowerCase()
+const compareName = (a: string, b: string) => {
+  const aName = a.toLowerCase()
+  const bName = b.toLowerCase()
   if (aName == bName) {
-    return a.name < b.name ? -1 : 1
+    return a < b ? -1 : 1
   }
   return aName < bName ? -1 : 1
+}
+
+const byName = (a: TreeNode, b: TreeNode) => compareName(a.name, b.name)
+
+/**
+ * Sets the cover of the node if the entry is a better cover candidate.
+ *
+ * A media which is marked by the cover suffix beats every unmarked media. The
+ * first media by its base name wins otherwise. Media without a preview image
+ * are no candidates
+ */
+const addCoverCandidate = (node: TreeNode, entry: Entry, filename: string, candidates: Map<TreeNode, CoverCandidate>) => {
+  if (!entry.previews?.length) {
+    return
+  }
+
+  const name = basename(filename)
+  const isMarked = coverSuffixPattern.test(name)
+  const current = candidates.get(node)
+  if (current && (current.isMarked != isMarked ? current.isMarked : compareName(current.name, name) < 0)) {
+    return
+  }
+
+  candidates.set(node, {name, isMarked})
+  node.cover = entry
+}
+
+/**
+ * Sets the cover of all nodes without an own cover media.
+ *
+ * Such a node inherits the cover of its first subdirectory by name. The name
+ * order is independent from the folder order so that the cover of a node stays
+ * the same if the folder order is reversed
+ */
+const inheritCovers = (node: TreeNode) => {
+  node.children.forEach(inheritCovers)
+  if (node.cover) {
+    return
+  }
+
+  node.cover = [...node.children].sort(byName).find(child => child.cover)?.cover
 }
 
 const sortChildren = (node: TreeNode, compare: (a: TreeNode, b: TreeNode) => number) => {
@@ -73,10 +129,14 @@ const sortChildren = (node: TreeNode, compare: (a: TreeNode, b: TreeNode) => num
  *
  * Counts are visible counts: they only reflect the entries of the given list,
  * which is already filtered by the server for the current user.
+ *
+ * Every node gets a cover media of its directory or of a subdirectory, see
+ * `addCoverCandidate` and `inheritCovers`.
  */
 export const buildTree = (entries: Entry[], showIndex: boolean = false, descending: boolean = false): TreeNode => {
   const root = createNode('', '', '')
   const indexNodes = createNode('', '', '')
+  const coverCandidates = new Map<TreeNode, CoverCandidate>()
 
   for (const entry of entries) {
     const file = entry.files?.[0]
@@ -104,7 +164,11 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false, descendi
       node.count++
     }
     node.ownCount++
+    addCoverCandidate(node, entry, file.filename, coverCandidates)
   }
+
+  inheritCovers(indexNodes)
+  root.cover = indexNodes.cover
 
   if (showIndex) {
     root.children = indexNodes.children
