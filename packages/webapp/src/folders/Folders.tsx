@@ -14,6 +14,9 @@ import { classNames } from '../utils/class-names';
 
 type ExpandedMap = {[key: string]: boolean}
 
+/** Empty tree while the initial database load is still pending */
+const emptyRoot = buildTree([])
+
 /** Rendered size of the folder cover in pixels. It matches the w-10 h-10 box */
 const coverSize = 40
 
@@ -63,6 +66,7 @@ const FolderItem = ({node, level, showCover, expanded, toggle}: {node: TreeNode,
 
 export const Folders = () => {
   const allEntries = useEntryStore(state => state.allEntries);
+  const initialLoadDone = useEntryStore(state => state.initialLoadDone);
   const appConfig = useAppConfig()
   const showIndex = !!appConfig.pages?.folders?.showIndex
   const showCover = appConfig.pages?.folders?.showCover ?? true
@@ -74,7 +78,10 @@ export const Folders = () => {
     searchParams.get('dir') == 'desc' :
     appConfig.pages?.folders?.order == 'nameDesc'
 
-  const root = useMemo(() => buildTree(allEntries, showIndex, descending), [allEntries, showIndex, descending]);
+  // The database is loaded in chunks and the entries of the initial page are
+  // only the newest media. Their tree shows a few folders for a moment and is
+  // replaced by the full tree once the database is loaded, see useLoadDatabase
+  const root = useMemo(() => initialLoadDone ? buildTree(allEntries, showIndex, descending) : emptyRoot, [allEntries, initialLoadDone, showIndex, descending]);
 
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 
@@ -96,7 +103,10 @@ export const Folders = () => {
           <span className="text-sm">Name</span>
         </a>
       </div>
-      { !root.children.length &&
+      { !initialLoadDone &&
+        <p className="m-4 text-gray-500">Loading folders ...</p>
+      }
+      { initialLoadDone && !root.children.length &&
         <p className="m-4 text-gray-500">No media found</p>
       }
       <ul className="m-4">
