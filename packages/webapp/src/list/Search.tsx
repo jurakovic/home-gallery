@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useMemo, useEffect } from 'react'
+import { useMemo, useLayoutEffect } from 'react'
 
 import {
   useParams,
@@ -13,7 +13,7 @@ export const SearchView = () => {
   const search = useSearchStore(state => state.search);
 
   const term = useMemo(() => params.term, [params])
-  useEffect(() => {
+  useLayoutEffect(() => {
     const value = decodeURIComponent(term);
     search({type: 'query', value});
   }, [term])

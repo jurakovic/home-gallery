@@ -7,14 +7,14 @@ import {
 
 import { List } from './List';
 import { useSearchStore } from '../store/search-store'
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 export const SimilarView = () => {
   const params = useParams();
   const location = useLocation();
   const search = useSearchStore(state => state.search);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let locationQuery = new URLSearchParams(location.search && location.search.substring(1) || '');
     search({type: 'similar', value: params.id, query: locationQuery.get('q') || ''});
   }, [params.id, location.search])

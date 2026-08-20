@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 import {
   useParams,
@@ -14,7 +14,7 @@ export const FacesView = () => {
   const location = useLocation();
   const search = useSearchStore(state => state.search);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let locationQuery = new URLSearchParams(location.search && location.search.substring(1) || '');
     const value = {id: params.id, faceIndex: params.faceIndex};
     search({type: 'faces', value, query: locationQuery.get('q') || ''});

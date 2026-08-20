@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useMemo, useEffect } from "react";
+import { useMemo, useLayoutEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as icons from '@fortawesome/free-solid-svg-icons'
 
@@ -79,7 +79,7 @@ export const YearView = () => {
   const location = useLocation();
   const search = useSearchStore.getState().search;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const year = params.year;
     let locationQuery = new URLSearchParams(location.search && location.search.substring(1) || '');
     search({type: 'year', value: year, query: locationQuery.get('q') || ''});

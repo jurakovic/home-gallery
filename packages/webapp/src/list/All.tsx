@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 import { List } from './List';
 import { useSearchStore } from '../store/search-store'
@@ -7,7 +7,7 @@ import { useSearchStore } from '../store/search-store'
 export const AllView = () => {
   const search = useSearchStore(state => state.search);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     search({type: 'none'});
   }, [])
 

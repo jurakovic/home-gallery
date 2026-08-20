@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { useLogger, usePluginManager } from '../AppContext'
 import { useEntryStore } from '../store/entry-store'
 import type { TQueryContext } from '@home-gallery/types'
 import { stringifyEntry } from '@home-gallery/query'
 import { useSearchStore } from '../store/search-store'
+import { useSingleViewStore } from '../store/single-view-store'
 import { findAllEntriesByIdPrefix } from '../utils/findAllEntriesByIdPrefix'
 import { type Entry } from '../store/entry'
 
@@ -28,16 +29,28 @@ export const useSearchFilter = () => {
   const lastQuery = useRef(query)
   const hasRun = useRef(false)
 
-  useEffect(() => {
+  // The list views set their query in a layout effect. Both the reset below and
+  // the entries of the new query are therefore applied before the next paint
+  useLayoutEffect(() => {
+    const isQueryChange = lastQuery.current != query
+    lastQuery.current = query
+
+    if (isQueryChange) {
+      // A new query shows other media. Its entries replace the entries of the
+      // previous query which would be painted for the new query otherwise. The
+      // list of the new query starts at the top and the media view of the
+      // previous query is no scroll target anymore, see FluentList
+      setEntries([])
+      useSingleViewStore.getState().setLastId('')
+      window.scrollTo(0, 0)
+    }
+
     if (!initialLoadDone) {
       // The database is written by date desc and is loaded in chunks. Running
       // the query on every chunk would paint the list in source order first and
       // re-order it visibly once the remaining chunks arrive
       return
     }
-
-    const isQueryChange = lastQuery.current != query
-    lastQuery.current = query
     // Answer the first run and every query change instantly. Only further entry
     // updates are debounced
     const delay = !hasRun.current || isQueryChange ? 0 : ENTRY_UPDATE_DEBOUNCE
