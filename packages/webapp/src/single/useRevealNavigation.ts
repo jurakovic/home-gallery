@@ -38,10 +38,10 @@ type TapStart = {
  * The navigation is remembered while the media view is open. A swipe to the
  * previous or next media keeps it as it is and a clean tap or click toggles it.
  *
- * Every media hides it after an idle time, so a swipe through the media keeps
- * it out of the way. A tap or a click shows it until the next media is shown
- * and the next tap or click hides it right away. A mouse or a keyboard shows it
- * on any input and restarts the idle time.
+ * Every media hides it after an idle time, so a swipe or a keyboard navigation
+ * through the media keeps it out of the way. A tap or a click shows it until
+ * the next media is shown and the next tap or click hides it right away. A
+ * moving mouse shows it as well and restarts the idle time.
  *
  * A playing video hides it to not cover the playback. The mouse reveals it by
  * moving, a tap toggles it and it hides again after a while. The remembered
@@ -120,8 +120,8 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean, mediaI
     idleTimer.current = setTimeout(() => setAutoHiddenState(true), inputIdleTimeout)
   }
 
-  /** An input shows the navigation and restarts its idle time */
-  const onIdleInput = () => {
+  /** A mouse movement shows the navigation and restarts its idle time */
+  const onMouseInput = () => {
     if (mediaRef.current.isPlaying) {
       return
     }
@@ -165,7 +165,7 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean, mediaI
     if (isPlaying) {
       reveal(mouseIdleTimeout)
     } else {
-      onIdleInput()
+      onMouseInput()
     }
   }
 
@@ -234,14 +234,6 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean, mediaI
   useEffect(() => {
     armIdleTimer()
   }, [mediaId])
-
-  // the keyboard navigates the media without a pointer event
-  useEffect(() => {
-    const onKeyDown = () => onIdleInput()
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
 
   useEffect(() => () => {
     clearRevealTimer()
