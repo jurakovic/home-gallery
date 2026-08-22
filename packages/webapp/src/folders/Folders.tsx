@@ -11,6 +11,9 @@ import { toFolderQuery } from './toFolderQuery';
 import { useAppConfig } from '../config/useAppConfig';
 import { getHigherPreviewUrl } from '../utils/preview';
 import { classNames } from '../utils/class-names';
+import { useDeviceType, DeviceType } from '../utils/useDeviceType';
+import { useThumbnailSize } from '../list/useThumbnailLayout';
+import { mobileGridSize, desktopGridSize } from '../list/grid';
 
 type ExpandedMap = {[key: string]: boolean}
 
@@ -19,9 +22,6 @@ const emptyRoot = buildTree([])
 
 /** Rendered size of the folder cover in pixels. It matches the w-10 h-10 box */
 const coverSize = 40
-
-/** Rendered size of the folder cover of a grid cell in pixels */
-const gridCoverSize = 320
 
 const buttonClass = 'flex items-center justify-center gap-2 px-2 py-1 text-gray-500 rounded hover:bg-gray-700 hover:text-gray-300 hover:cursor-pointer'
 
@@ -86,9 +86,9 @@ const FolderItem = ({node, level, showCover, expanded, toggle}: {node: TreeNode,
  * The grid has no folder hierarchy, so the whole path of the folder is shown
  * instead of its name only
  */
-const FolderCard = ({node, showCover}: {node: TreeNode, showCover: boolean}) => {
+const FolderCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boolean, cellSize: number}) => {
   const query = toFolderQuery(node)
-  const coverUrl = getCoverUrl(node, showCover, gridCoverSize)
+  const coverUrl = getCoverUrl(node, showCover, cellSize)
 
   return (
     <li className="min-w-0">
@@ -132,6 +132,12 @@ export const Folders = () => {
   // the grid has no hierarchy and lists the folders of all tree levels
   const gridNodes = useMemo(() => isGrid ? flattenTree(root) : [], [root, isGrid])
 
+  // the squares use the thumbnail size of the media lists, so that the size
+  // controls of the nav bar change both
+  const [ , sizeFactor ] = useThumbnailSize()
+  const [ deviceType ] = useDeviceType()
+  const cellSize = Math.round((deviceType === DeviceType.MOBILE ? mobileGridSize : desktopGridSize) * sizeFactor)
+
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 
   const toggle = (key: string) => setExpanded(expanded => ({...expanded, [key]: !expanded[key]}))
@@ -151,7 +157,7 @@ export const Folders = () => {
 
   return (
     <>
-      <NavBar disableEdit={true} />
+      <NavBar disableEdit={true} showSize={isGrid} />
       <div className="flex flex-wrap items-center justify-between gap-2 m-4">
         <h2 className="text-xl text-gray-400">Folders</h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -176,9 +182,11 @@ export const Folders = () => {
         <p className="m-4 text-gray-500">No media found</p>
       }
       { isGrid ?
-        <ul className="grid grid-cols-2 gap-4 m-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        // the cells fill the width and are at least of the cell size, like the
+        // squared media list. The min() keeps a single column within the width
+        <ul className="grid gap-4 m-4" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
           {gridNodes.map(node => (
-            <FolderCard key={node.key} node={node} showCover={showCover} />
+            <FolderCard key={node.key} node={node} showCover={showCover} cellSize={cellSize} />
           ))}
         </ul> :
         <ul className="m-4">

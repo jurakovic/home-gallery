@@ -11,7 +11,7 @@ import { Scrollbar } from "./scrollbar";
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
-import { grid } from "./grid";
+import { grid, mobileGridSize, desktopGridSize } from "./grid";
 import { useThumbnailLayout, useThumbnailSize } from "./useThumbnailLayout";
 import { useAppConfig } from "../config/useAppConfig";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";
@@ -35,9 +35,6 @@ const useViewHeight = (offset) => {
 
 const mobileRowHeights = {minHeight: 75, maxHeight: 110, maxPotraitHeight: 185}
 const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280}
-
-const mobileGridSize = 110
-const desktopGridSize = 180
 
 const scaleRowHeights = ({minHeight, maxHeight, maxPotraitHeight}, factor: number) => ({
   minHeight: minHeight * factor,
