@@ -20,6 +20,11 @@
       "description": "Initial folder order. It is overruled by the order of the page",
       "enum": ["name", "nameDesc"],
       "default": "name"
+    },
+    "view": {
+      "description": "Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view of the page",
+      "enum": ["list", "grid"],
+      "default": "list"
     }
   }
 }

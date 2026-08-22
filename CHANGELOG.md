@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - query: Order media by their file with `order by file` for the file path or `order by filename` for the base name
 - webapp: Hide the navigation of the media view after an idle time of every media, so that a swipe or a keyboard navigation through the media keeps it out of the way. A tap or a click shows it until the next media is shown
 - webapp: Show a cover thumbnail of every folder on the folders page. A media with a `_cover` file name suffix is preferred. It can be disabled with `webapp.pages.folders.showCover`
+- webapp: Switch the folders page between the folder tree and a grid of squared cover thumbnails. Its initial view can be set with `webapp.pages.folders.view`
 
 ### Fixed
 

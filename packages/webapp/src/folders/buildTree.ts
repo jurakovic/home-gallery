@@ -182,3 +182,12 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false, descendi
 
   return root
 }
+
+/**
+ * Returns all folder nodes of the tree in their display order.
+ *
+ * The nodes are flattened depth first, so a folder is directly followed by its
+ * subfolders. The virtual root itself is not part of the result
+ */
+export const flattenTree = (node: TreeNode): TreeNode[] =>
+  node.children.flatMap(child => [child, ...flattenTree(child)])

@@ -6,7 +6,7 @@ import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { NavBar } from '../navbar/NavBar';
 import { useEntryStore } from '../store/entry-store';
-import { buildTree, type TreeNode } from './buildTree';
+import { buildTree, flattenTree, type TreeNode } from './buildTree';
 import { toFolderQuery } from './toFolderQuery';
 import { useAppConfig } from '../config/useAppConfig';
 import { getHigherPreviewUrl } from '../utils/preview';
@@ -20,14 +20,30 @@ const emptyRoot = buildTree([])
 /** Rendered size of the folder cover in pixels. It matches the w-10 h-10 box */
 const coverSize = 40
 
+/** Rendered size of the folder cover of a grid cell in pixels */
+const gridCoverSize = 320
+
+const buttonClass = 'flex items-center justify-center gap-2 px-2 py-1 text-gray-500 rounded hover:bg-gray-700 hover:text-gray-300 hover:cursor-pointer'
+
+/** Cover url of a folder or false if it has no cover or covers are disabled */
+const getCoverUrl = (node: TreeNode, showCover: boolean, size: number) =>
+  showCover ? getHigherPreviewUrl(node.cover?.previews, size * (window.devicePixelRatio || 1)) : false
+
+/** Fallback icon of a folder without a cover media */
+const getFolderIcon = (node: TreeNode, isExpanded: boolean = false) => {
+  // the index is only shown with the showIndex option, otherwise every node has a path
+  if (!node.path) {
+    return icons.faDatabase
+  }
+  return isExpanded ? icons.faFolderOpen : icons.faFolder
+}
+
 const FolderItem = ({node, level, showCover, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, expanded: ExpandedMap, toggle: (key: string) => void}) => {
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toFolderQuery(node)
-  // only shown with the showIndex option, otherwise every node has a path
-  const isIndex = !node.path
-  const icon = isIndex ? icons.faDatabase : (isExpanded ? icons.faFolderOpen : icons.faFolder)
-  const coverUrl = showCover ? getHigherPreviewUrl(node.cover?.previews, coverSize * (window.devicePixelRatio || 1)) : false
+  const icon = getFolderIcon(node, isExpanded)
+  const coverUrl = getCoverUrl(node, showCover, coverSize)
 
   return (
     <>
@@ -64,6 +80,33 @@ const FolderItem = ({node, level, showCover, expanded, toggle}: {node: TreeNode,
   )
 }
 
+/**
+ * Squared cell of a folder in the grid view.
+ *
+ * The grid has no folder hierarchy, so the whole path of the folder is shown
+ * instead of its name only
+ */
+const FolderCard = ({node, showCover}: {node: TreeNode, showCover: boolean}) => {
+  const query = toFolderQuery(node)
+  const coverUrl = getCoverUrl(node, showCover, gridCoverSize)
+
+  return (
+    <li className="min-w-0">
+      <Link className="group flex flex-col gap-2 text-gray-500 hover:text-gray-300 hover:cursor-pointer"
+        to={`/search/${encodeURIComponent(query)}`}
+        title={`Search for '${query}'`}>
+        <span className="flex items-center justify-center w-full overflow-hidden rounded aspect-square bg-gray-800 group-hover:bg-gray-700">
+          { coverUrl ?
+            <img className="object-cover w-full h-full" src={coverUrl} alt="" loading="lazy" /> :
+            <FontAwesomeIcon className="text-2xl" icon={getFolderIcon(node)} />
+          }
+        </span>
+        <span className="min-w-0 text-sm break-words">{node.path || node.name || '(no index)'} <span className="whitespace-nowrap">({node.count})</span></span>
+      </Link>
+    </li>
+  )
+}
+
 export const Folders = () => {
   const allEntries = useEntryStore(state => state.allEntries);
   const initialLoadDone = useEntryStore(state => state.initialLoadDone);
@@ -72,36 +115,59 @@ export const Folders = () => {
   const showCover = appConfig.pages?.folders?.showCover ?? true
 
   const [searchParams, setSearchParams] = useSearchParams()
-  // the url is the source of truth so that an order can be shared. The config
-  // sets the initial order only
+  // the url is the source of truth so that an order and a view can be shared.
+  // The config sets the initial values only
   const descending = searchParams.has('dir') ?
     searchParams.get('dir') == 'desc' :
     appConfig.pages?.folders?.order == 'nameDesc'
+  const isGrid = searchParams.has('view') ?
+    searchParams.get('view') == 'grid' :
+    appConfig.pages?.folders?.view == 'grid'
 
   // The database is loaded in chunks and the entries of the initial page are
   // only the newest media. Their tree shows a few folders for a moment and is
   // replaced by the full tree once the database is loaded, see useLoadDatabase
   const root = useMemo(() => initialLoadDone ? buildTree(allEntries, showIndex, descending) : emptyRoot, [allEntries, initialLoadDone, showIndex, descending]);
 
+  // the grid has no hierarchy and lists the folders of all tree levels
+  const gridNodes = useMemo(() => isGrid ? flattenTree(root) : [], [root, isGrid])
+
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 
   const toggle = (key: string) => setExpanded(expanded => ({...expanded, [key]: !expanded[key]}))
 
+  // the value is always explicit, otherwise the toggle would fall back to the
+  // configured value again. Other params are kept
+  const setParam = (key: string, value: string) => setSearchParams(params => {
+    params.set(key, value)
+    return params
+  })
+
   // the direction is always explicit, otherwise the toggle would fall back to
   // the configured order again
-  const toggleOrder = () => setSearchParams({dir: descending ? 'asc' : 'desc'})
+  const toggleOrder = () => setParam('dir', descending ? 'asc' : 'desc')
+
+  const toggleView = () => setParam('view', isGrid ? 'list' : 'grid')
 
   return (
     <>
       <NavBar disableEdit={true} />
       <div className="flex flex-wrap items-center justify-between gap-2 m-4">
         <h2 className="text-xl text-gray-400">Folders</h2>
-        <a className="flex items-center justify-center gap-2 px-2 py-1 text-gray-500 rounded hover:bg-gray-700 hover:text-gray-300 hover:cursor-pointer"
-          onClick={toggleOrder}
-          title={descending ? 'Order folders ascending by name' : 'Order folders descending by name'}>
-          <FontAwesomeIcon icon={descending ? icons.faArrowDownWideShort : icons.faArrowUpShortWide} />
-          <span className="text-sm">Name</span>
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <a className={buttonClass}
+            onClick={toggleView}
+            title={isGrid ? 'Show the folders as list' : 'Show the folders as grid'}>
+            <FontAwesomeIcon icon={isGrid ? icons.faTableCellsLarge : icons.faList} />
+            <span className="text-sm">{isGrid ? 'Grid' : 'List'}</span>
+          </a>
+          <a className={buttonClass}
+            onClick={toggleOrder}
+            title={descending ? 'Order folders ascending by name' : 'Order folders descending by name'}>
+            <FontAwesomeIcon icon={descending ? icons.faArrowDownWideShort : icons.faArrowUpShortWide} />
+            <span className="text-sm">Name</span>
+          </a>
+        </div>
       </div>
       { !initialLoadDone &&
         <p className="m-4 text-gray-500">Loading folders ...</p>
@@ -109,11 +175,18 @@ export const Folders = () => {
       { initialLoadDone && !root.children.length &&
         <p className="m-4 text-gray-500">No media found</p>
       }
-      <ul className="m-4">
-        {root.children.map(child => (
-          <FolderItem key={child.key} node={child} level={0} showCover={showCover} expanded={expanded} toggle={toggle} />
-        ))}
-      </ul>
+      { isGrid ?
+        <ul className="grid grid-cols-2 gap-4 m-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {gridNodes.map(node => (
+            <FolderCard key={node.key} node={node} showCover={showCover} />
+          ))}
+        </ul> :
+        <ul className="m-4">
+          {root.children.map(child => (
+            <FolderItem key={child.key} node={child} level={0} showCover={showCover} expanded={expanded} toggle={toggle} />
+          ))}
+        </ul>
+      }
       <p className="m-4 text-sm text-gray-600">Counts show the visible media of a folder and its subfolders.</p>
     </>
   )
