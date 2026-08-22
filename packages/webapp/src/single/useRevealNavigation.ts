@@ -7,8 +7,8 @@ const mouseIdleTimeout = 3000
 const touchIdleTimeout = 5000
 
 /**
- * Time without an input until the navigation of a media is hidden again. A
- * swipe to another media is no input and keeps it hidden
+ * Time until the navigation of a shown media is hidden again. A tap or a click
+ * shows it without that idle time, so it stays until the next media
  */
 const inputIdleTimeout = 3000
 
@@ -38,9 +38,10 @@ type TapStart = {
  * The navigation is remembered while the media view is open. A swipe to the
  * previous or next media keeps it as it is and a clean tap or click toggles it.
  *
- * An idle time without an input hides it and the next input shows it again. A
- * click, a tap or a used navigation restarts that idle time. A swipe to another
- * media is no such input and keeps the navigation as it is.
+ * Every media hides it after an idle time, so a swipe through the media keeps
+ * it out of the way. A tap or a click shows it until the next media is shown
+ * and the next tap or click hides it right away. A mouse or a keyboard shows it
+ * on any input and restarts the idle time.
  *
  * A playing video hides it to not cover the playback. The mouse reveals it by
  * moving, a tap toggles it and it hides again after a while. The remembered
@@ -50,7 +51,7 @@ type TapStart = {
  * capture phase. The native video controls and the Hammer gestures of the
  * media handle their events themselves and would swallow them otherwise
  */
-export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
+export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean, mediaId?: string) => {
   // the remembered visibility outside of a video playback
   const [visible, setVisible] = useState(true)
   // the temporary reveal while a video plays
@@ -128,16 +129,12 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
     armIdleTimer()
   }
 
+  /** An explicit hide or show stays until another media is shown */
   const toggleVisible = () => {
-    if (visibleRef.current && !autoHiddenRef.current) {
-      clearIdleTimer()
-      setVisibleState(false)
-      setAutoHiddenState(false)
-      return
-    }
-    setVisibleState(true)
+    const isShown = visibleRef.current && !autoHiddenRef.current
+    clearIdleTimer()
+    setVisibleState(!isShown)
     setAutoHiddenState(false)
-    armIdleTimer()
   }
 
   const toggle = (start: TapStart) => {
@@ -145,7 +142,8 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
 
     if (start.isControl) {
       // a click on the navigation itself uses it and keeps it visible
-      onIdleInput()
+      clearIdleTimer()
+      setAutoHiddenState(false)
       return
     }
 
@@ -230,6 +228,12 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
     hideReveal()
     armIdleTimer()
   }, [isPlaying])
+
+  // the idle time runs per media, so a swipe or another navigation to a media
+  // hides its navigation again. An already hidden one stays hidden
+  useEffect(() => {
+    armIdleTimer()
+  }, [mediaId])
 
   // the keyboard navigates the media without a pointer event
   useEffect(() => {

@@ -95,7 +95,7 @@ export const MediaView = () => {
 
   const key = current ? current.id : (Math.random() * 100000).toFixed(0);
 
-  const {navVisible, handlers: revealHandlers} = useRevealNavigation(hideNavigation, !!isVideo)
+  const {navVisible, handlers: revealHandlers} = useRevealNavigation(hideNavigation, !!isVideo, id)
 
   useEffect(() => { id && setLastId(id) }, [id])
   // a playing video reports no pause when the media view leaves it
