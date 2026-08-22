@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Show a cover thumbnail of every folder on the folders page. A media with a `_cover` file name suffix is preferred. It can be disabled with `webapp.pages.folders.showCover`
 - webapp: Switch the folders page between the folder tree and a grid of squared cover thumbnails. Its initial view can be set with `webapp.pages.folders.view`
 - webapp: Change the size of the folder squares in the nav bar. It is the thumbnail size of the media lists, so both are changed together
+- webapp: Keep the view of the folders page of the user until it is reset by a shared url
 
 ### Fixed
 

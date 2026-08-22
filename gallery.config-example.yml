@@ -387,7 +387,7 @@
       #
       # default: name
       #order: name # one of: name, nameDesc
-      # Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view of the page
+      # Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view toggle of the page
       #
       # default: list
       #view: list # one of: list, grid

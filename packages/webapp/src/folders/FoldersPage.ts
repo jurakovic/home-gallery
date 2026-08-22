@@ -22,7 +22,7 @@ export interface FoldersPage {
    */
   order?: "name" | "nameDesc";
   /**
-   * Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view of the page
+   * Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view toggle of the page
    */
   view?: "list" | "grid";
   [k: string]: unknown;

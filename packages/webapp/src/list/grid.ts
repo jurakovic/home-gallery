@@ -9,13 +9,6 @@ export interface IGridOptions {
 	minSize: number;
 }
 
-/**
- * Minimum edge length of a squared cell at the default thumbnail size. It is
- * scaled by the size factor of `useThumbnailSize`
- */
-export const mobileGridSize = 110
-export const desktopGridSize = 180
-
 const defaultOptions: IGridOptions = {
 	width: 1024,
 	padding: 10,

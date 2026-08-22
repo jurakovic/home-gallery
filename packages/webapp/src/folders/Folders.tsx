@@ -6,6 +6,7 @@ import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { NavBar } from '../navbar/NavBar';
 import { useEntryStore } from '../store/entry-store';
+import { useFoldersStore, type TFolderView } from '../store/folders-store';
 import { buildTree, flattenTree, type TreeNode } from './buildTree';
 import { toFolderQuery } from './toFolderQuery';
 import { useAppConfig } from '../config/useAppConfig';
@@ -13,7 +14,6 @@ import { getHigherPreviewUrl } from '../utils/preview';
 import { classNames } from '../utils/class-names';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
 import { useThumbnailSize } from '../list/useThumbnailLayout';
-import { mobileGridSize, desktopGridSize } from '../list/grid';
 
 type ExpandedMap = {[key: string]: boolean}
 
@@ -22,6 +22,14 @@ const emptyRoot = buildTree([])
 
 /** Rendered size of the folder cover in pixels. It matches the w-10 h-10 box */
 const coverSize = 40
+
+/**
+ * Minimum edge length of a folder square at the default thumbnail size. It is
+ * scaled by the size factor of the thumbnail size. The mobile size is smaller
+ * than the cell size of the media lists so that three folders fit in a row
+ */
+const mobileCellSize = 100
+const desktopCellSize = 180
 
 const buttonClass = 'flex items-center justify-center gap-2 px-2 py-1 text-gray-500 rounded hover:bg-gray-700 hover:text-gray-300 hover:cursor-pointer'
 
@@ -116,13 +124,18 @@ export const Folders = () => {
 
   const [searchParams, setSearchParams] = useSearchParams()
   // the url is the source of truth so that an order and a view can be shared.
-  // The config sets the initial values only
+  // The config sets the initial order only
   const descending = searchParams.has('dir') ?
     searchParams.get('dir') == 'desc' :
     appConfig.pages?.folders?.order == 'nameDesc'
+  // the view of the user is kept until it is reset by a shared url. The config
+  // sets the view of a user who did not toggle it yet
+  const storeView = useFoldersStore(state => state.view)
+  const setStoreView = useFoldersStore(state => state.setView)
+  const configView: TFolderView = appConfig.pages?.folders?.view == 'grid' ? 'grid' : 'list'
   const isGrid = searchParams.has('view') ?
     searchParams.get('view') == 'grid' :
-    appConfig.pages?.folders?.view == 'grid'
+    (storeView || configView) == 'grid'
 
   // The database is loaded in chunks and the entries of the initial page are
   // only the newest media. Their tree shows a few folders for a moment and is
@@ -136,7 +149,7 @@ export const Folders = () => {
   // controls of the nav bar change both
   const [ , sizeFactor ] = useThumbnailSize()
   const [ deviceType ] = useDeviceType()
-  const cellSize = Math.round((deviceType === DeviceType.MOBILE ? mobileGridSize : desktopGridSize) * sizeFactor)
+  const cellSize = Math.round((deviceType === DeviceType.MOBILE ? mobileCellSize : desktopCellSize) * sizeFactor)
 
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 
@@ -153,7 +166,12 @@ export const Folders = () => {
   // the configured order again
   const toggleOrder = () => setParam('dir', descending ? 'asc' : 'desc')
 
-  const toggleView = () => setParam('view', isGrid ? 'list' : 'grid')
+  // the view is kept in the url as well so that it can be shared
+  const toggleView = () => {
+    const view: TFolderView = isGrid ? 'list' : 'grid'
+    setStoreView(view)
+    setParam('view', view)
+  }
 
   return (
     <>
@@ -184,7 +202,7 @@ export const Folders = () => {
       { isGrid ?
         // the cells fill the width and are at least of the cell size, like the
         // squared media list. The min() keeps a single column within the width
-        <ul className="grid gap-4 m-4" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
+        <ul className="grid gap-2 m-4" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
           {gridNodes.map(node => (
             <FolderCard key={node.key} node={node} showCover={showCover} cellSize={cellSize} />
           ))}
