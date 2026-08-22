@@ -7,9 +7,8 @@ const mouseIdleTimeout = 3000
 const touchIdleTimeout = 5000
 
 /**
- * Time without mouse or keyboard input until the navigation of a media is
- * hidden again. It is only used once such an input was seen, so a touch device
- * keeps its navigation until it is tapped away
+ * Time without an input until the navigation of a media is hidden again. A
+ * swipe to another media is no input and keeps it hidden
  */
 const inputIdleTimeout = 3000
 
@@ -39,9 +38,9 @@ type TapStart = {
  * The navigation is remembered while the media view is open. A swipe to the
  * previous or next media keeps it as it is and a clean tap or click toggles it.
  *
- * A mouse or a keyboard hides it after an idle time and shows it again on the
- * next input. A click shows it and restarts that idle time. Touch input arms
- * no idle time at all, so a tap stays the only way to hide it on a phone.
+ * An idle time without an input hides it and the next input shows it again. A
+ * click, a tap or a used navigation restarts that idle time. A swipe to another
+ * media is no such input and keeps the navigation as it is.
  *
  * A playing video hides it to not cover the playback. The mouse reveals it by
  * moving, a tap toggles it and it hides again after a while. The remembered
@@ -62,8 +61,6 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
 
   const revealTimer = useRef<any>(null)
   const idleTimer = useRef<any>(null)
-  // true once a mouse or a keyboard was used. Touch input arms no idle timer
-  const hasIdleInput = useRef(false)
   const tapTimer = useRef<any>(null)
   const tapStart = useRef<TapStart | null>(null)
   const lastTap = useRef({time: 0, x: 0, y: 0})
@@ -116,15 +113,14 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
 
   const armIdleTimer = () => {
     clearIdleTimer()
-    if (!hasIdleInput.current || mediaRef.current.isPlaying) {
+    if (mediaRef.current.isPlaying) {
       return
     }
     idleTimer.current = setTimeout(() => setAutoHiddenState(true), inputIdleTimeout)
   }
 
-  /** A mouse or keyboard input shows the navigation and restarts its idle time */
+  /** An input shows the navigation and restarts its idle time */
   const onIdleInput = () => {
-    hasIdleInput.current = true
     if (mediaRef.current.isPlaying) {
       return
     }
@@ -148,7 +144,8 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean) => {
     const {isPlaying, isVideo} = mediaRef.current
 
     if (start.isControl) {
-      // a click on the navigation itself uses it and does not hide it
+      // a click on the navigation itself uses it and keeps it visible
+      onIdleInput()
       return
     }
 
