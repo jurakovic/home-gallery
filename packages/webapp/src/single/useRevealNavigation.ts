@@ -7,7 +7,8 @@ const mouseIdleTimeout = 3000
 const touchIdleTimeout = 5000
 
 /**
- * Time until the navigation of a shown media is hidden again. A tap or a click
+ * Time until the navigation of a shown media is hidden again. It runs across
+ * the media, so a swipe through them does not restart it. A tap or a click
  * shows it without that idle time, so it stays until the next media
  */
 const inputIdleTimeout = 3000
@@ -38,10 +39,11 @@ type TapStart = {
  * The navigation is remembered while the media view is open. A swipe to the
  * previous or next media keeps it as it is and a clean tap or click toggles it.
  *
- * Every media hides it after an idle time, so a swipe or a keyboard navigation
- * through the media keeps it out of the way. A tap or a click shows it until
- * the next media is shown and the next tap or click hides it right away. A
- * moving mouse shows it as well and restarts the idle time.
+ * An idle time hides it, so a swipe or a keyboard navigation through the media
+ * keeps it out of the way. It runs across the media and another media does not
+ * restart it, it only starts a new one if none runs. A tap or a click shows it
+ * until the next media is shown and the next tap or click hides it right away.
+ * A moving mouse shows it as well and restarts the idle time.
  *
  * A playing video hides it to not cover the playback. The mouse reveals it by
  * moving, a tap toggles it and it hides again after a while. The remembered
@@ -117,7 +119,22 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean, mediaI
     if (mediaRef.current.isPlaying) {
       return
     }
-    idleTimer.current = setTimeout(() => setAutoHiddenState(true), inputIdleTimeout)
+    idleTimer.current = setTimeout(() => {
+      idleTimer.current = null
+      setAutoHiddenState(true)
+    }, inputIdleTimeout)
+  }
+
+  /**
+   * The idle time of a shown media. It runs across the media, so a swipe or
+   * another navigation to a media keeps the running one and starts a new one
+   * only if the navigation is shown without an idle time
+   */
+  const armMediaIdleTimer = () => {
+    if (idleTimer.current || !visibleRef.current || autoHiddenRef.current) {
+      return
+    }
+    armIdleTimer()
   }
 
   /** A mouse movement shows the navigation and restarts its idle time */
@@ -229,10 +246,9 @@ export const useRevealNavigation = (isPlaying: boolean, isVideo: boolean, mediaI
     armIdleTimer()
   }, [isPlaying])
 
-  // the idle time runs per media, so a swipe or another navigation to a media
-  // hides its navigation again. An already hidden one stays hidden
+  // a swipe or another navigation to a media hides its navigation again
   useEffect(() => {
-    armIdleTimer()
+    armMediaIdleTimer()
   }, [mediaId])
 
   useEffect(() => () => {
