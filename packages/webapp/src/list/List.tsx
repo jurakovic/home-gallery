@@ -12,6 +12,7 @@ import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
 import { grid } from "./grid";
+import { list } from "./list";
 import { useThumbnailLayout, useThumbnailSize } from "./useThumbnailLayout";
 import { useAppConfig } from "../config/useAppConfig";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";
@@ -39,6 +40,9 @@ const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280
 const mobileGridSize = 110
 const desktopGridSize = 180
 
+const mobileListHeight = 56
+const desktopListHeight = 72
+
 /**
  * Height of the file name label below a thumbnail. It is the line height of
  * the text-xs label and its pt-1 padding
@@ -62,13 +66,15 @@ export const List = () => {
   const appConfig = useAppConfig();
   const showScrollbar = appConfig.pages?.list?.scrollbar !== false
   const showFilename = appConfig.pages?.list?.showFilename !== false
-  // the label is part of the row height, so the layouts need to know it
-  const labelHeight = showFilename ? filenameLabelHeight : 0
 
   const { width, height } = useBodyDimensions();
   const [ deviceType ] = useDeviceType();
   const [ layout ] = useThumbnailLayout();
   const [ , sizeFactor ] = useThumbnailSize();
+
+  // the label is part of the row height, so the layouts need to know it. The
+  // list layout shows the file name beside the thumbnail and needs no label
+  const labelHeight = showFilename && layout != 'list' ? filenameLabelHeight : 0
 
   const viewHeight = height - NAV_HEIGHT - BOTTOM_MARGIN
   const padding = 8
@@ -82,6 +88,11 @@ export const List = () => {
 
   const rows = useMemo(() => {
     const isMobile = deviceType === DeviceType.MOBILE
+    if (layout == 'list') {
+      const rowHeight = (isMobile ? mobileListHeight : desktopListHeight) * sizeFactor
+      return list(visibleEntries, {padding, width, rowHeight});
+    }
+
     if (layout == 'square') {
       const minSize = (isMobile ? mobileGridSize : desktopGridSize) * sizeFactor
       return grid(visibleEntries, {padding, width, minSize, labelHeight});
@@ -108,7 +119,7 @@ export const List = () => {
                 pageHeight={viewHeight}
                 topDateItems={topDateItems} />
             )}
-            <FluentList rows={rows} padding={padding} labelHeight={labelHeight} />
+            <FluentList rows={rows} padding={padding} labelHeight={labelHeight} layout={layout} />
           </div>
         </>
       </MultiTagDialogProvider>

@@ -3,21 +3,27 @@ import { useListLayoutStore, type TThumbnailLayout } from '../store/list-layout-
 
 const defaultLayout: TThumbnailLayout = 'fluent'
 
+/** Layouts in the order of the layout toggle */
+export const thumbnailLayouts: TThumbnailLayout[] = ['fluent', 'square', 'list']
+
+const toLayout = (value?: string): TThumbnailLayout =>
+  thumbnailLayouts.find(layout => layout == value) || defaultLayout
+
 /**
  * Thumbnail layout of the media lists.
  *
  * The layout of the config is the initial one. It is overruled as soon as the
- * user toggles the layout
+ * user toggles the layout. The toggle cycles through the layouts
  */
 export const useThumbnailLayout = (): [TThumbnailLayout, () => void] => {
   const appConfig = useAppConfig()
   const layout = useListLayoutStore(state => state.layout)
   const setLayout = useListLayoutStore(state => state.setLayout)
 
-  const configLayout = appConfig.pages?.list?.thumbnails == 'square' ? 'square' : defaultLayout
-  const current = layout || configLayout
+  const current = layout || toLayout(appConfig.pages?.list?.thumbnails)
+  const next = thumbnailLayouts[(thumbnailLayouts.indexOf(current) + 1) % thumbnailLayouts.length]
 
-  return [current, () => setLayout(current == 'square' ? 'fluent' : 'square')]
+  return [current, () => setLayout(next)]
 }
 
 /**

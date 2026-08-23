@@ -4,15 +4,26 @@ import * as icons from '@fortawesome/free-solid-svg-icons'
 import { useThumbnailLayout } from "../list/useThumbnailLayout";
 import { NavItem } from "./NavItem";
 
+const layoutIcons = {
+  fluent: icons.faImages,
+  square: icons.faTableCellsLarge,
+  list: icons.faList,
+}
+
+const layoutNames = {
+  fluent: 'Fluent',
+  square: 'Square',
+  list: 'List',
+}
+
+/** Cycles through the thumbnail layouts and shows the current one */
 export const LayoutToggle = () => {
   const [layout, toggleLayout] = useThumbnailLayout()
 
-  const isSquare = layout == 'square'
-
   return (
     <NavItem
-      icon={isSquare ? icons.faTableCellsLarge : icons.faImages}
-      text={isSquare ? 'Square' : 'Fluent'}
+      icon={layoutIcons[layout]}
+      text={layoutNames[layout]}
       onClick={toggleLayout}
     />
   )

@@ -140,9 +140,12 @@ export const VirtualScroll = ({ref, items, padding, children}) => {
     const result = [];
     for (let index = Math.max(0, start - 2); index < Math.min(end + 5, items.length); index++) {
       const row = rowHeights[index];
+      // the absolute position shrinks a row to its content, so the width is
+      // set for rows which fill the list like the rows of the list layout
       const style = {
         position: 'absolute',
         top: row.top,
+        width: '100%',
         height: row.height
       }
       result.push(<div className="item" key={index} style={style}>{children({row, index, scrollSpeed})}</div>)

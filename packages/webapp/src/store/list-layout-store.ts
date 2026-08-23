@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type TThumbnailLayout = 'fluent' | 'square'
+export type TThumbnailLayout = 'fluent' | 'square' | 'list'
 
 export interface ListLayoutStore {
   /**
