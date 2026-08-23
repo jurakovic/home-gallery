@@ -16,6 +16,11 @@
       "type": "boolean",
       "default": true
     },
+    "thumbnailSize": {
+      "description": "Initial size of the folder thumbnails. Smaller thumbnails show more folders per row in the grid view and shorter rows in the list view. It is overruled by the size controls of the nav bar",
+      "enum": ["xsmall", "small", "medium", "large", "xlarge"],
+      "default": "medium"
+    },
     "order": {
       "description": "Initial folder order. It is overruled by the order of the page",
       "enum": ["name", "nameDesc"],

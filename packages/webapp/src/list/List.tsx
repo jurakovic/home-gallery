@@ -12,7 +12,7 @@ import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
 import { grid } from "./grid";
-import { list } from "./list";
+import { desktopRowHeight, list, mobileRowHeight } from "./list";
 import { useThumbnailLayout, useThumbnailSize } from "./useThumbnailLayout";
 import { useAppConfig } from "../config/useAppConfig";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";
@@ -39,9 +39,6 @@ const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280
 
 const mobileGridSize = 110
 const desktopGridSize = 180
-
-const mobileListHeight = 56
-const desktopListHeight = 72
 
 /**
  * Height of the file name label below a thumbnail. It is the line height of
@@ -89,7 +86,7 @@ export const List = () => {
   const rows = useMemo(() => {
     const isMobile = deviceType === DeviceType.MOBILE
     if (layout == 'list') {
-      const rowHeight = (isMobile ? mobileListHeight : desktopListHeight) * sizeFactor
+      const rowHeight = (isMobile ? mobileRowHeight : desktopRowHeight) * sizeFactor
       return list(visibleEntries, {padding, width, rowHeight});
     }
 

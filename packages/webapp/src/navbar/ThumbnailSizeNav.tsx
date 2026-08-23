@@ -2,14 +2,14 @@ import * as React from "react";
 import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { NavItem } from './NavItem';
-import { maxSizeStep, minSizeStep, useThumbnailSize } from '../list/useThumbnailLayout';
+import { maxSizeStep, minSizeStep, type TThumbnailSize } from '../list/useThumbnailLayout';
 
 /**
- * Thumbnail size controls of the squared cells. They are shared by the media
- * lists and by the grid view of the folders page, so both use the same size
+ * Thumbnail size controls of the given size. The media lists and the folders
+ * page keep their own size, so every nav bar passes its own
  */
-export const ThumbnailSizeNav = () => {
-  const [sizeStep, , setSizeStep] = useThumbnailSize()
+export const ThumbnailSizeNav = ({size}: {size: TThumbnailSize}) => {
+  const [sizeStep, , setSizeStep] = size
 
   const canShrink = sizeStep > minSizeStep
   const canGrow = sizeStep < maxSizeStep

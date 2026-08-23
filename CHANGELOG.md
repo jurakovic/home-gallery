@@ -26,8 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Hide the navigation of the media view after an idle time, so that a swipe or a keyboard navigation through the media keeps it out of the way. The idle time runs across the media and another media does not restart it. A tap or a click shows it until the next media is shown
 - webapp: Show a cover thumbnail of every folder on the folders page. A media with a `_cover` file name suffix is preferred. It can be disabled with `webapp.pages.folders.showCover`
 - webapp: Switch the folders page between the folder tree and a grid of squared cover thumbnails. Its initial view can be set with `webapp.pages.folders.view`
-- webapp: Change the size of the folder squares in the nav bar. It is the thumbnail size of the media lists, so both are changed together
+- webapp: Change the thumbnail size of the folders page in the nav bar. It is the size of the folder squares and of the folder rows. Its initial value can be set with `webapp.pages.folders.thumbnailSize`
 - webapp: Keep the view of the folders page of the user until it is reset by a shared url
+- webapp: Show the folders of the list view as rows of the media list layout with their name and their cover thumbnail, which carries the media count as a badge. The row size follows the thumbnail size of the nav bar
 - webapp: Show the file name of every media below its thumbnail in media lists. It can be disabled with `webapp.pages.list.showFilename`
 - webapp: Add a list layout to the media lists which shows one media per row with its file name, its file size and the duration of a video. It is the third layout of the nav bar toggle and can be set with `webapp.pages.list.thumbnails`
 
@@ -35,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension
-- webapp: Break long folder names at word boundaries on the folders page
+- webapp: Break long folder names at word boundaries in the grid view of the folders page
 - webapp: Fix the PWA manifest scope and icon paths for gallery deployments under a path prefix
 - webapp: Order the media list before its first render to avoid a visible re-order while the database loads
 - webapp: Build the folder tree of the folders page after the initial database load to avoid a short tree of a few folders

@@ -18,6 +18,10 @@ export interface FoldersPage {
    */
   showCover?: boolean;
   /**
+   * Initial size of the folder thumbnails. Smaller thumbnails show more folders per row in the grid view and shorter rows in the list view. It is overruled by the size controls of the nav bar
+   */
+  thumbnailSize?: "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /**
    * Initial folder order. It is overruled by the order of the page
    */
   order?: "name" | "nameDesc";

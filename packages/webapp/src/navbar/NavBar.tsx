@@ -12,10 +12,10 @@ import { EditNavBar } from './EditNavBar';
 import { NavItem } from './NavItem';
 import { ViewNavBar } from './ViewNavBar';
 import { ListNavBar } from './ListNavBar';
-import { ThumbnailSizeNav } from './ThumbnailSizeNav';
+import { FoldersNavBar } from './FoldersNavBar';
 import { SearchInput, SearchButton } from "./SearchInput";
 
-export const DesktopNavBar = ({disableEdit = false, showList = false, showSize = false, showDialog}) => {
+export const DesktopNavBar = ({disableEdit = false, showList = false, showFolders = false, showDialog}) => {
   const viewMode = useEditModeStore(state => state.viewMode);
 
   return (
@@ -33,8 +33,8 @@ export const DesktopNavBar = ({disableEdit = false, showList = false, showSize =
               { showList && viewMode === ViewMode.VIEW && (
                 <ListNavBar />
               )}
-              { showSize && viewMode === ViewMode.VIEW && (
-                <ThumbnailSizeNav />
+              { showFolders && viewMode === ViewMode.VIEW && (
+                <FoldersNavBar />
               )}
             </div>
             <div className="flex pr-2 space-x-4">
@@ -47,7 +47,7 @@ export const DesktopNavBar = ({disableEdit = false, showList = false, showSize =
   )
 }
 
-export const MobileNavBar = ({disableEdit = false, showList = false, showSize = false, showDialog}) => {
+export const MobileNavBar = ({disableEdit = false, showList = false, showFolders = false, showDialog}) => {
   const [showSearch, setShowSearch] = useState(false)
   const viewMode = useEditModeStore(state => state.viewMode);
 
@@ -68,8 +68,8 @@ export const MobileNavBar = ({disableEdit = false, showList = false, showSize = 
                   { showList && viewMode === ViewMode.VIEW && (
                     <ListNavBar />
                   )}
-                  { showSize && viewMode === ViewMode.VIEW && (
-                    <ThumbnailSizeNav />
+                  { showFolders && viewMode === ViewMode.VIEW && (
+                    <FoldersNavBar />
                   )}
                 </div>
                 <div className="flex pr-2 space-x-4">
@@ -98,7 +98,7 @@ export const MobileNavBar = ({disableEdit = false, showList = false, showSize = 
   )
 }
 
-export const NavBar = ({disableEdit = false, showList = false, showSize = false}) => {
+export const NavBar = ({disableEdit = false, showList = false, showFolders = false}) => {
   const [ deviceType ] = useDeviceType();
   const { setDialogVisible, openDialog } = useTagDialog()
 
@@ -120,10 +120,10 @@ export const NavBar = ({disableEdit = false, showList = false, showSize = false}
   return (
     <>
       { deviceType === DeviceType.DESKTOP &&
-        <DesktopNavBar showDialog={showDialog} disableEdit={disableEdit} showList={showList} showSize={showSize} />
+        <DesktopNavBar showDialog={showDialog} disableEdit={disableEdit} showList={showList} showFolders={showFolders} />
       }
       { deviceType === DeviceType.MOBILE &&
-        <MobileNavBar showDialog={showDialog} disableEdit={disableEdit} showList={showList} showSize={showSize} />
+        <MobileNavBar showDialog={showDialog} disableEdit={disableEdit} showList={showList} showFolders={showFolders} />
       }
     </>
   )
