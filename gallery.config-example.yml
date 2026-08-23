@@ -408,6 +408,10 @@
       #
       # default: true
       #scrollbar: true
+      # Show the file name of every media below its thumbnail in media lists. The name is shown without its directory and with its file extension
+      #
+      # default: true
+      #showFilename: true
       # Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, file, filename, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
       #
       # default: 'date desc'

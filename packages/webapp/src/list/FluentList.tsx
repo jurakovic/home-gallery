@@ -14,7 +14,10 @@ import { humanizeDuration } from "../utils/format";
 import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { classNames } from '../utils/class-names'
 
-const Cell = ({height, width, index, item, items}) => {
+/** File name of the main file of a media without its directory */
+const getFilename = (item) => (item.files?.[0]?.filename || '').replace(/.*[\\/]/, '')
+
+const Cell = ({height, width, index, item, items, labelHeight}) => {
   const ref = useRef();
   const location = useLocation();
   const viewMode = useEditModeStore(state => state.viewMode);
@@ -79,13 +82,24 @@ const Cell = ({height, width, index, item, items}) => {
     }
   });
 
+  // the label is no part of the media box, so that the thumbnail keeps its
+  // size and the video duration stays in its corner
+  const filename = labelHeight ? getFilename(item) : ''
+
   return (
-    <div ref={ref} key={id} className={classNames('relative group', {'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
-      <img className={classNames('object-cover')} style={style} src={previewUrl} loading="lazy" />
-      {type == 'video' &&
-        <span className="absolute flex flex-row items-center gap-2 px-2 text-sm text-gray-100 bg-gray-900 rounded bottom-2 right-2 lg:bg-gray-900/60 group-hover:bg-gray-900">
-          <FontAwesomeIcon icon={faPlay} size="sm"/>
-          {humanizeDuration(duration)}
+    <div ref={ref} key={id} className="flex flex-col group" style={{width, height: height + labelHeight}}>
+      <div className={classNames('relative', {'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
+        <img className={classNames('object-cover')} style={style} src={previewUrl} loading="lazy" />
+        {type == 'video' &&
+          <span className="absolute flex flex-row items-center gap-2 px-2 text-sm text-gray-100 bg-gray-900 rounded bottom-2 right-2 lg:bg-gray-900/60 group-hover:bg-gray-900">
+            <FontAwesomeIcon icon={faPlay} size="sm"/>
+            {humanizeDuration(duration)}
+          </span>
+        }
+      </div>
+      {!!labelHeight &&
+        <span className="pt-1 text-xs text-gray-500 truncate group-hover:text-gray-300" style={{height: labelHeight}} title={filename}>
+          {filename}
         </span>
       }
     </div>
@@ -101,7 +115,7 @@ const Row = (props) => {
   const columns = props.columns;
   return (
     <div className="flex w-full item-center" style={style}>
-      {columns.map((cell, index) => <Cell key={index} width={cell.width} height={cell.height} item={cell.item} index={cell.index} items={cell.items} />)}
+      {columns.map((cell, index) => <Cell key={index} width={cell.width} height={cell.height} item={cell.item} index={cell.index} items={cell.items} labelHeight={props.labelHeight} />)}
     </div>
   )
 }
@@ -116,7 +130,7 @@ const findCellById = (rows, id) => {
   return [null, -1]
 }
 
-export const FluentList = ({rows, padding}) => {
+export const FluentList = ({rows, padding, labelHeight = 0}) => {
   const { width } = useBodyDimensions();
 
   const lastViewId = useSingleViewStore(state => state.lastId);
@@ -141,7 +155,7 @@ export const FluentList = ({rows, padding}) => {
   return (
     <div className="relative w-full">
       <VirtualScroll ref={virtualScrollRef} items={rows} padding={padding} >
-        {({row}) => <Row height={row.height} columns={row.columns}></Row>}
+        {({row}) => <Row height={row.height} columns={row.columns} labelHeight={labelHeight}></Row>}
       </VirtualScroll>
     </div>
   )

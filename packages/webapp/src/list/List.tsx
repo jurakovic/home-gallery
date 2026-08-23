@@ -39,6 +39,12 @@ const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280
 const mobileGridSize = 110
 const desktopGridSize = 180
 
+/**
+ * Height of the file name label below a thumbnail. It is the line height of
+ * the text-xs label and its pt-1 padding
+ */
+const filenameLabelHeight = 20
+
 const scaleRowHeights = ({minHeight, maxHeight, maxPotraitHeight}, factor: number) => ({
   minHeight: minHeight * factor,
   maxHeight: maxHeight * factor,
@@ -55,6 +61,9 @@ export const List = () => {
 
   const appConfig = useAppConfig();
   const showScrollbar = appConfig.pages?.list?.scrollbar !== false
+  const showFilename = appConfig.pages?.list?.showFilename !== false
+  // the label is part of the row height, so the layouts need to know it
+  const labelHeight = showFilename ? filenameLabelHeight : 0
 
   const { width, height } = useBodyDimensions();
   const [ deviceType ] = useDeviceType();
@@ -75,12 +84,12 @@ export const List = () => {
     const isMobile = deviceType === DeviceType.MOBILE
     if (layout == 'square') {
       const minSize = (isMobile ? mobileGridSize : desktopGridSize) * sizeFactor
-      return grid(visibleEntries, {padding, width, minSize});
+      return grid(visibleEntries, {padding, width, minSize, labelHeight});
     }
 
     const rowHeights = scaleRowHeights(isMobile ? mobileRowHeights : desktopRowHeights, sizeFactor)
-    return fluent(visibleEntries, {padding, width, ...rowHeights});
-  }, [width, visibleEntries, deviceType, layout, sizeFactor])
+    return fluent(visibleEntries, {padding, width, ...rowHeights, labelHeight});
+  }, [width, visibleEntries, deviceType, layout, sizeFactor, labelHeight])
 
   const topDateItems = useMemo(() => {
     return rows.map(({top, height, columns}) => ({top, height, date: columns[0].item?.date || '1970-01-01T00:00:00', dateValue: '1970'}))
@@ -99,7 +108,7 @@ export const List = () => {
                 pageHeight={viewHeight}
                 topDateItems={topDateItems} />
             )}
-            <FluentList rows={rows} padding={padding} />
+            <FluentList rows={rows} padding={padding} labelHeight={labelHeight} />
           </div>
         </>
       </MultiTagDialogProvider>

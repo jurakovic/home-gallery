@@ -106,6 +106,10 @@ export interface ListPage {
    */
   scrollbar?: boolean;
   /**
+   * Show the file name of every media below its thumbnail in media lists. The name is shown without its directory and with its file extension
+   */
+  showFilename?: boolean;
+  /**
    * Order of media lists without an explicit 'order by' expression in the search query. It is an order key with an optional direction, eg 'date asc', 'filesize desc' or 'count(tags) desc'. Supported keys are date, file, filename, updated, duration, width, height, filesize, random and count(files), count(tags), count(faces), count(objects)
    */
   defaultOrder?: string;

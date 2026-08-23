@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Switch the folders page between the folder tree and a grid of squared cover thumbnails. Its initial view can be set with `webapp.pages.folders.view`
 - webapp: Change the size of the folder squares in the nav bar. It is the thumbnail size of the media lists, so both are changed together
 - webapp: Keep the view of the folders page of the user until it is reset by a shared url
+- webapp: Show the file name of every media below its thumbnail in media lists. It can be disabled with `webapp.pages.list.showFilename`
 
 ### Fixed
 

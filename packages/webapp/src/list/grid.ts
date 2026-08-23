@@ -7,12 +7,15 @@ export interface IGridOptions {
 	padding: number;
 	/** Minimum edge length of a cell. The cells are grown to fill the width */
 	minSize: number;
+	/** Height of the file name label below a cell. It is 0 without a label */
+	labelHeight: number;
 }
 
 const defaultOptions: IGridOptions = {
 	width: 1024,
 	padding: 10,
-	minSize: 180
+	minSize: 180,
+	labelHeight: 0
 }
 
 /**
@@ -24,9 +27,12 @@ const defaultOptions: IGridOptions = {
  * The rows have the same shape as the rows of the fluent layout, so both
  * layouts share the list rendering. The media are cropped to the cell by the
  * `object-cover` style of the thumbnail.
+ *
+ * The file name label is no part of the cell and is added to the row height
+ * only, so that the cells keep their squared shape
  */
 export const grid = (items: any[], options: Partial<IGridOptions>): IFluentRow[] => {
-	const { width, padding, minSize } = Object.assign({}, defaultOptions, options);
+	const { width, padding, minSize, labelHeight } = Object.assign({}, defaultOptions, options);
 
 	const columns = Math.max(1, Math.floor((width - padding) / (minSize + padding)))
 	const size = +((width - (columns + 1) * padding) / columns).toFixed()
@@ -35,7 +41,7 @@ export const grid = (items: any[], options: Partial<IGridOptions>): IFluentRow[]
 	for (let i = 0; i < items.length; i += columns) {
 		const cells: IFluentCell[] = items.slice(i, i + columns)
 			.map((item, column) => ({width: size, height: size, item, index: i + column, items}))
-		rows.push({height: size, top: 0, columns: cells})
+		rows.push({height: size + labelHeight, top: 0, columns: cells})
 	}
 
 	let lastTop = 0

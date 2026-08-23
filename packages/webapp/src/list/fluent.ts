@@ -3,7 +3,8 @@ const defaultOptions : IFluentOptions = {
 	maxHeight: 220,
 	maxPotraitHeight: 250,
 	width: 1024,
-	padding: 10
+	padding: 10,
+	labelHeight: 0
 }
 
 export interface IFluentOptions {
@@ -12,6 +13,8 @@ export interface IFluentOptions {
 	maxPotraitHeight: number;
 	width: number;
 	padding: number;
+	/** Height of the file name label below a cell. It is 0 without a label */
+	labelHeight: number;
 }
 
 export interface IFluentCell {
@@ -98,7 +101,7 @@ class EqualHeightRow {
 }
 
 export const fluent = (items, options) : IFluentRow[] => {
-	const { minHeight, maxHeight, maxPotraitHeight, width, padding } = Object.assign({}, defaultOptions, options);
+	const { minHeight, maxHeight, maxPotraitHeight, width, padding, labelHeight } = Object.assign({}, defaultOptions, options);
 
 	const result : IFluentRow[] = [];
 	let row = new EqualHeightRow(items);
@@ -153,8 +156,11 @@ export const fluent = (items, options) : IFluentRow[] => {
 		result.push(row.getFluentRow(lastTargetHeight));
 	}
 
+	// the file name label is no part of the cells and is added to the row height
+	// only, so that the cells keep the height of their media
 	let lastTop = 0
 	result.forEach(row => {
+		row.height += labelHeight
 		row.top = lastTop
 		lastTop += row.height + padding
 	})
