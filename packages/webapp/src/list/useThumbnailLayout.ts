@@ -1,7 +1,7 @@
 import { useAppConfig } from '../config/useAppConfig'
 import { useListLayoutStore, type TThumbnailLayout } from '../store/list-layout-store'
 
-const defaultLayout: TThumbnailLayout = 'fluent'
+const defaultLayout: TThumbnailLayout = 'list'
 
 /** Layouts in the order of the settings panel */
 export const thumbnailLayouts: TThumbnailLayout[] = ['list', 'grid', 'fluent']

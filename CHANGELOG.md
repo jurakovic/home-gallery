@@ -53,9 +53,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- webapp: Show the media lists in the list layout by default, like the folders page. The fluent layout can be set with `webapp.pages.list.thumbnails`
 - server: Add server.trustProxy option and disable proxy trust by default
 - webapp: Align all folder names to the left and shrink them on mobile on the folders page
-- webapp: Offer the file path order in the order menu of media lists and drop the random and file count order
+- webapp: Offer the file name, the date taken, the duration and the file size as order of media lists and drop the random, the file count and the tag count order
 
 ## [1.21.0] - 2026-03-01
 

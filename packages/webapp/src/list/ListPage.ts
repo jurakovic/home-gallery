@@ -12,7 +12,7 @@ export interface ListPage {
   /**
    * Layout of the media lists. 'fluent' keeps the aspect ratio of the media, 'grid' crops them to a grid of squares and 'list' shows one media per row with its file name beside its thumbnail. It is overruled by the layout toggle of the nav bar
    */
-  thumbnails?: "fluent" | "grid" | "list";
+  thumbnails?: "list" | "grid" | "fluent";
   /**
    * Initial size of the thumbnails. Smaller thumbnails show more media per row. It is overruled by the size controls of the nav bar
    */

@@ -26,8 +26,6 @@ export const orderKeys: TOrderKey[] = [
   {key: 'file', name: 'File name', defaultDirection: 'asc'},
   // the exif date of the media with its file date as fallback
   {key: 'date', name: 'Date taken', defaultDirection: 'desc'},
-  // the timestamp of the database, not the one of the file
-  {key: 'updated', name: 'Indexed', defaultDirection: 'desc'},
   {key: 'duration', name: 'Duration', defaultDirection: 'desc'},
   {key: 'filesize', name: 'File size', defaultDirection: 'desc'},
 ]
