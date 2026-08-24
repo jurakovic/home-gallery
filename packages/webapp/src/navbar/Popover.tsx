@@ -24,7 +24,11 @@ type PopoverProps = {
  *
  * The panel stays open on a click inside of it, so that a control can be used
  * more than once. A control which should close it takes the `close` of the
- * children
+ * children.
+ *
+ * A click outside of it only closes the panel and is not swallowed, so that it
+ * still reaches the media or the folder below it. There is no overlay and the
+ * event keeps its default
  */
 export const Popover = ({trigger, children, panelClass}: PopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -35,18 +39,21 @@ export const Popover = ({trigger, children, panelClass}: PopoverProps) => {
       return
     }
 
-    const onClick = (e: MouseEvent) => {
+    // pointerdown covers a mouse, a touch and a pen alike and is not
+    // suppressed by the touch-action of the media cells, which a compatibility
+    // mousedown of a tap would be
+    const onPointerDown = (e: PointerEvent) => {
       if (!popover.current?.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }
     const onKeyUp = (e: KeyboardEvent) => e.key == 'Escape' && setIsOpen(false)
 
-    document.addEventListener('mousedown', onClick)
+    document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keyup', onKeyUp)
 
     return () => {
-      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('keyup', onKeyUp)
     }
   }, [isOpen])
