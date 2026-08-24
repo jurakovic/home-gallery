@@ -4,8 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSingleViewStore } from '../store/single-view-store'
 import { useEditModeStore, ViewMode } from '../store/edit-mode-store'
 import Hammer from 'hammerjs';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay } from '@fortawesome/free-solid-svg-icons'
 
 import { useLastLocation } from '../utils/lastLocation/useLastLocation'
 import useBodyDimensions from '../utils/useBodyDimensions';
@@ -38,6 +36,18 @@ const FileSize = ({item}) => {
     </>
   )
 }
+
+/**
+ * Duration of a video as a badge of its thumbnail. It has the shape of the
+ * media count badge of the folder thumbnails, so that it still fits on the
+ * smallest thumbnail size
+ */
+const DurationBadge = ({duration}) => (
+  <span className="absolute px-1 text-xs text-gray-100 rounded bottom-1 right-1 bg-gray-900/70 group-hover:bg-gray-900"
+    title="Duration of the video">
+    {humanizeDuration(duration)}
+  </span>
+)
 
 const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   const ref = useRef();
@@ -111,20 +121,16 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   const thumbnail = (
     <div className={classNames('relative', {'flex-shrink-0': isList, 'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
       <img className={classNames('object-cover')} style={style} src={previewUrl} loading="lazy" />
-      {type == 'video' && !isList &&
-        <span className="absolute flex flex-row items-center gap-2 px-2 text-sm text-gray-100 bg-gray-900 rounded bottom-2 right-2 lg:bg-gray-900/60 group-hover:bg-gray-900">
-          <FontAwesomeIcon icon={faPlay} size="sm"/>
-          {humanizeDuration(duration)}
-        </span>
+      {type == 'video' &&
+        <DurationBadge duration={duration} />
       }
     </div>
   )
 
-  // the row of the list layout shows the file name beside the thumbnail. The
-  // duration of a video is no overlay of the thumbnail but its own column
+  // the row of the list layout shows the file name beside the thumbnail
   if (isList) {
     return (
-      <div ref={ref} key={id} className="flex items-center min-w-0 gap-4 rounded group grow hover:bg-gray-700 hover:cursor-pointer" style={{height}}>
+      <div ref={ref} key={id} className="flex items-center min-w-0 gap-4 pr-2 rounded group grow hover:bg-gray-700 hover:cursor-pointer" style={{height}}>
         {thumbnail}
         <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300" title={filename}>
           {filename}
@@ -132,10 +138,6 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
         {/* the columns are dropped on a phone, where the file name needs the width */}
         <span className="flex-shrink-0 hidden w-20 text-sm text-gray-500 md:flex group-hover:text-gray-300">
           <FileSize item={item} />
-        </span>
-        {/* the duration column is kept for an image, so that all rows are aligned */}
-        <span className="flex-shrink-0 hidden w-16 pr-2 text-sm text-right text-gray-500 md:block group-hover:text-gray-300">
-          {type == 'video' ? humanizeDuration(duration) : ''}
         </span>
       </div>
     )
