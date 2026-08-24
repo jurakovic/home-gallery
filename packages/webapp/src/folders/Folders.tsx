@@ -44,6 +44,24 @@ const getFolderIcon = (node: TreeNode, isExpanded: boolean = false) => {
 const countTitle = 'Media of the folder and its subfolders'
 
 /**
+ * Media count of a folder as a badge of its cover thumbnail. It is the badge
+ * of the media lists, which carry the duration of a video
+ */
+const CountBadge = ({count}: {count: number}) => (
+  <span className="absolute px-1 text-xs text-gray-100 rounded bottom-1 right-1 bg-gray-900/70 group-hover:bg-gray-900"
+    title={countTitle}>
+    {count}
+  </span>
+)
+
+/** Name of a folder below its cover thumbnail, like the file name of a media */
+const NameLabel = ({name}: {name: string}) => (
+  <span className="pt-1 text-xs text-gray-500 truncate group-hover:text-gray-300" title={name}>
+    {name}
+  </span>
+)
+
+/**
  * Row of a folder in the list view. It has the shape of a row of the media
  * list layout: the cover thumbnail with the media count as its badge and the
  * folder name
@@ -77,15 +95,11 @@ const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node
                   <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
                   <FontAwesomeIcon icon={icon} />
                 }
-                {/* the count is a badge of the thumbnail like the duration of a video */}
-                <span className="absolute px-1 text-xs text-gray-100 rounded bottom-1 right-1 bg-gray-900/70 group-hover:bg-gray-900"
-                  title={countTitle}>
-                  {node.count}
-                </span>
+                <CountBadge count={node.count} />
               </span> :
               <FontAwesomeIcon className="flex-shrink-0" icon={icon} />
             }
-            <span className="text-sm truncate md:text-base grow">
+            <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300">
               {node.name || '(no index)'}
               { !showCover &&
                 // the count has no thumbnail to be a badge of
@@ -111,19 +125,21 @@ const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node
 const FolderCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boolean, cellSize: number}) => {
   const query = toFolderQuery(node)
   const coverUrl = getCoverUrl(node, showCover, cellSize)
+  const name = node.path || node.name || '(no index)'
 
   return (
     <li className="min-w-0">
-      <Link className="group flex flex-col gap-2 text-gray-500 hover:text-gray-300 hover:cursor-pointer"
+      <Link className="flex flex-col text-gray-500 group hover:cursor-pointer"
         to={`/search/${encodeURIComponent(query)}`}
         title={`Search for '${query}'`}>
-        <span className="flex items-center justify-center w-full overflow-hidden rounded aspect-square bg-gray-800 group-hover:bg-gray-700">
+        <span className="relative flex items-center justify-center w-full overflow-hidden rounded aspect-square bg-gray-800 group-hover:bg-gray-700">
           { coverUrl ?
             <img className="object-cover w-full h-full" src={coverUrl} alt="" loading="lazy" /> :
             <FontAwesomeIcon className="text-2xl" icon={getFolderIcon(node)} />
           }
+          <CountBadge count={node.count} />
         </span>
-        <span className="min-w-0 text-sm break-words">{node.path || node.name || '(no index)'} <span className="whitespace-nowrap">({node.count})</span></span>
+        <NameLabel name={name} />
       </Link>
     </li>
   )
@@ -170,8 +186,8 @@ export const Folders = () => {
       }
       { isGrid ?
         // the cells fill the width and are at least of the cell size, like the
-        // squared media list. The min() keeps a single column within the width
-        <ul className="grid gap-2 m-4" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
+        // grid media list. The min() keeps a single column within the width
+        <ul className="grid gap-2 p-1" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
           {gridNodes.map(node => (
             <FolderCard key={node.key} node={node} showCover={showCover} cellSize={cellSize} />
           ))}

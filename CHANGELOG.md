@@ -37,13 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Show the file name of the media in the upper left corner of the media view. It is the same name as in the media lists and is hidden with the `nav` flag of `webapp.pages.mediaView.disabled`
 - webapp: Move the view controls of the nav bar into one settings menu. It holds the order, the layout and the thumbnail size of the media lists and the order, the view and the thumbnail size of the folders page
 - webapp: Reset the view settings of every page to their configured defaults in the settings menu. The search query and the selection of the edit mode are kept
+- webapp: Show the grid view of the folders page like the grid layout of the media lists. The cells are spaced like the media cells, the media count is a badge of the cover thumbnail and the folder name is the label below it
 
 ### Fixed
 
 - webapp: Copy the share link of the media details on a gallery which is served over http. The clipboard api is only available in a secure context, so the copy command is used as fallback. The link shows whether the url was copied
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension
-- webapp: Break long folder names at word boundaries in the grid view of the folders page
 - webapp: Fix the PWA manifest scope and icon paths for gallery deployments under a path prefix
 - webapp: Order the media list before its first render to avoid a visible re-order while the database loads
 - webapp: Build the folder tree of the folders page after the initial database load to avoid a short tree of a few folders
