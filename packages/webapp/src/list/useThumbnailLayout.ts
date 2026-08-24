@@ -4,7 +4,7 @@ import { useListLayoutStore, type TThumbnailLayout } from '../store/list-layout-
 const defaultLayout: TThumbnailLayout = 'fluent'
 
 /** Layouts in the order of the settings panel */
-export const thumbnailLayouts: TThumbnailLayout[] = ['fluent', 'grid', 'list']
+export const thumbnailLayouts: TThumbnailLayout[] = ['list', 'grid', 'fluent']
 
 const toLayout = (value?: string): TThumbnailLayout =>
   thumbnailLayouts.find(layout => layout == value) || defaultLayout

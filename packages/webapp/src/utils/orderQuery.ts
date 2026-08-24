@@ -22,12 +22,14 @@ export type TOrderKey = {
  * See packages/query/src/query/order-by.js for all supported keys
  */
 export const orderKeys: TOrderKey[] = [
-  {key: 'date', name: 'Date', defaultDirection: 'desc'},
-  {key: 'file', name: 'File path', defaultDirection: 'asc'},
-  {key: 'updated', name: 'Updated', defaultDirection: 'desc'},
-  {key: 'filesize', name: 'File size', defaultDirection: 'desc'},
+  // 'file' is the path of the file, so the media of a folder stay together
+  {key: 'file', name: 'File name', defaultDirection: 'asc'},
+  // the exif date of the media with its file date as fallback
+  {key: 'date', name: 'Date taken', defaultDirection: 'desc'},
+  // the timestamp of the database, not the one of the file
+  {key: 'updated', name: 'Indexed', defaultDirection: 'desc'},
   {key: 'duration', name: 'Duration', defaultDirection: 'desc'},
-  {key: 'count(tags)', name: 'Tag count', defaultDirection: 'desc'},
+  {key: 'filesize', name: 'File size', defaultDirection: 'desc'},
 ]
 
 /**
