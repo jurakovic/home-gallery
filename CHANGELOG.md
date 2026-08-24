@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - webapp: Add albums page to browse media by directory tree
+- webapp: Add 'On This Day' page which lists the media of the current day of the earlier years. It can be disabled with `webapp.pages.disabled: [onThisDay]`
 - webapp: Autoplay videos in the media view. It can be disabled with `webapp.pages.mediaView.autoPlayVideo`
 - webapp: Show the index as root album on the albums page with `webapp.pages.albums.showIndex`
 - webapp: Add order menu to the nav bar of media lists which sets the `order by` expression of the search query

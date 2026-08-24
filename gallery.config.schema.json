@@ -686,6 +686,7 @@
                       "map",
                       "tag",
                       "album",
+                      "onThisDay",
                       "all"
                     ]
                   },

@@ -46,6 +46,12 @@ export const ViewNavBar = ({disableEdit}) => {
       hidden: appConfig.pages?.disabled?.includes('album'),
     },
     {
+      icon: icons.faClockRotateLeft,
+      text: 'On This Day',
+      action: () => navigate('/on-this-day'),
+      hidden: appConfig.pages?.disabled?.includes('onThisDay'),
+    },
+    {
       icon: icons.faPlay,
       text: 'Videos',
       action: () => navigate('/search/type:video'),

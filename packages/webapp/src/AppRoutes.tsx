@@ -11,6 +11,7 @@ import {
 
 import { AllView } from "./list/All";
 import { SearchView } from './list/Search';
+import { OnThisDayView } from './list/OnThisDay';
 import { SimilarView } from './list/Similar';
 import { FacesView } from './list/Faces';
 import { Years, YearView } from './year/Years';
@@ -115,6 +116,7 @@ export const AppRoutes = () => {
       {!appConfig.pages?.disabled?.includes('tag') && <Route path="/tags" element={<Tags />} />}
       {!appConfig.pages?.disabled?.includes('map') && <Route path="/map" element={<Map />} />}
       {!appConfig.pages?.disabled?.includes('album') && <Route path="/albums" element={<Albums />} />}
+      {!appConfig.pages?.disabled?.includes('onThisDay') && <Route path="/on-this-day" element={<OnThisDayView />} />}
 
       {/* Conditional routes */}
       {<Route path="/similar/:id" element={<SimilarView />} />}

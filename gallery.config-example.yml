@@ -360,6 +360,7 @@
       #- map
       #- tag
       #- album
+      #- onThisDay
       #- all
       #- ...any string
     # Initial page of the webapp on its first load. It falls back to the
