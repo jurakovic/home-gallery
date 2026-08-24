@@ -5,7 +5,10 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type MediaViewDisableFlags = (("detail" | "map" | "similar" | "annotation" | "edit") | "nav")[];
+export type MediaViewDisableFlags = (
+  | ("detail" | "map" | "similar" | "annotation" | "edit" | "tag" | "share")
+  | "nav"
+)[];
 
 /**
  * Customize single media view

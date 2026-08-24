@@ -1,6 +1,7 @@
 import * as icons from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { addTags } from '../api/ApiService';
 import { type Tag } from "../api/models";
@@ -12,6 +13,48 @@ import { formatDate, humanizeBytes, humanizeDuration } from "../utils/format";
 import { MediaViewDisableFlags } from "./MediaViewPage";
 import { FeatureFlags } from '../config/AppConfig';
 
+/** State of the share link after it was clicked */
+type CopyState = '' | 'copied' | 'failed'
+
+const shareIcon: {[state in CopyState]: any} = {
+  '': icons.faLink,
+  copied: icons.faCheck,
+  failed: icons.faTriangleExclamation,
+}
+
+const shareText: {[state in CopyState]: string} = {
+  '': 'Share media',
+  copied: 'Link copied',
+  failed: 'Copy failed',
+}
+
+/**
+ * Copies the text by the deprecated copy command. It is the fallback of the
+ * clipboard api, which is only available in a secure context and is missing on
+ * a plain http origin, eg on a gallery which is served in the local network
+ */
+const copyTextByCommand = (text: string) => {
+  const textArea = document.createElement('textarea')
+  textArea.value = text
+  // keep the element out of the view and the scroll position of the page
+  textArea.setAttribute('readonly', '')
+  textArea.style.position = 'fixed'
+  textArea.style.top = '0'
+  textArea.style.opacity = '0'
+  document.body.appendChild(textArea)
+  textArea.select()
+
+  let copied = false
+  try {
+    copied = document.execCommand('copy')
+  } catch {
+    copied = false
+  }
+  document.body.removeChild(textArea)
+
+  return copied
+}
+
 export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
   const appConfig = useAppConfig()
   const disabledFeatures = appConfig.disabled || [] as FeatureFlags
@@ -19,6 +62,15 @@ export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
   const dateFormat = appConfig.format?.date || '%d.%m.%y'
   const timeFormat = appConfig.format?.time || '%H:%M:%S'
   const {openDialog, setDialogVisible} = useTagDialog()
+  const [copyState, setCopyState] = useState<CopyState>('')
+  const copyTimer = useRef<any>(null)
+
+  // the state of another media should not be shown and the timer of a closed
+  // details view should not fire
+  useEffect(() => {
+    setCopyState('')
+    return () => clearTimeout(copyTimer.current)
+  }, [entry?.id])
 
   if (!entry) {
     return (<></>)
@@ -132,9 +184,28 @@ export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
     openDialog({initialTags: origTags, onSubmit})
   }
 
-  function copyShareUrlToClipboard(e) {
-    e.preventDefault();
-    navigator.clipboard.writeText(getShareUrl());
+  const showCopyState = (state: CopyState) => {
+    clearTimeout(copyTimer.current)
+    setCopyState(state)
+    copyTimer.current = setTimeout(() => setCopyState(''), 2000)
+  }
+
+  /**
+   * Copies the share url to the clipboard and shows whether it was copied. The
+   * default of the link is only prevented if the url could be copied, so that
+   * the link opens the share url as a last resort and it can be copied from
+   * the address bar
+   */
+  const copyShareUrlToClipboard = (e: React.MouseEvent) => {
+    const url = getShareUrl()
+
+    if (navigator.clipboard?.writeText) {
+      e.preventDefault()
+      navigator.clipboard.writeText(url).then(() => showCopyState('copied'), () => showCopyState('failed'))
+    } else if (copyTextByCommand(url)) {
+      e.preventDefault()
+      showCopyState('copied')
+    }
   }
 
   function getShareUrl() {
@@ -287,18 +358,21 @@ export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
               </div>
             </div>
           )}
-          <div className="flex">
-            <div className="flex-shrink-0 w-8">
-              <FontAwesomeIcon icon={icons.faShareNodes} className="text-gray-300"/>
-            </div>
-            <div>
-              <p className="inline-flex flex-wrap gap-2">
-                  <a className="flex items-center gap-2 px-1 py-0 text-gray-500 bg-transparent border border-gray-700 rounded group inset-1 hover:bg-gray-700 hover:text-gray-200 hover:cursor-pointer active:bg-gray-600" onClick={copyShareUrlToClipboard} href={getShareUrl()} title={`Click to copy shareable link to clipboard`}>
-                    <span>Share media</span>
+          { !disabledFlags.includes('share') && (
+            <div className="flex">
+              <div className="flex-shrink-0 w-8">
+                <FontAwesomeIcon icon={icons.faShareNodes} className="text-gray-300"/>
+              </div>
+              <div>
+                <p className="inline-flex flex-wrap gap-2">
+                  <a className="flex items-center gap-2 px-2 py-1 text-gray-500 bg-transparent border border-gray-700 rounded group inset-1 hover:bg-gray-700 hover:text-gray-200 hover:cursor-pointer active:bg-gray-600" onClick={copyShareUrlToClipboard} href={getShareUrl()} title={`Click to copy the shareable link to the clipboard`}>
+                    <FontAwesomeIcon icon={shareIcon[copyState]} className="text-gray-500 group-hover:text-gray-300"/>
+                    <span>{shareText[copyState]}</span>
                   </a>
-              </p>
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </>

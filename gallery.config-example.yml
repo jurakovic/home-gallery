@@ -432,6 +432,7 @@
         #- annotation
         #- edit
         #- tag
+        #- share
         # Disables navigation to overview, prev and next
         #- nav
       # Start the video playback when a video is opened. Browsers can still block the autoplay until the site has user interaction

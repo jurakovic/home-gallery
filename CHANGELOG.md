@@ -31,9 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Show the folders of the list view as rows of the media list layout with their name and their cover thumbnail, which carries the media count as a badge. The row size follows the thumbnail size of the nav bar
 - webapp: Show the file name of every media below its thumbnail in media lists. It can be disabled with `webapp.pages.list.showFilename`
 - webapp: Add a list layout to the media lists which shows one media per row with its file name, its file size and the duration of a video. It is the third layout of the nav bar toggle and can be set with `webapp.pages.list.thumbnails`
+- webapp: Hide the share link of the media details with `webapp.pages.mediaView.disabled`
 
 ### Fixed
 
+- webapp: Copy the share link of the media details on a gallery which is served over http. The clipboard api is only available in a secure context, so the copy command is used as fallback. The link shows whether the url was copied
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension
 - webapp: Break long folder names at word boundaries in the grid view of the folders page
