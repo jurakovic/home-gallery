@@ -11,7 +11,7 @@ import { Scrollbar } from "./scrollbar";
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
 import { fluent } from "./fluent";
-import { grid } from "./grid";
+import { desktopGridSize, grid, mobileGridSize } from "./grid";
 import { desktopRowHeight, list, mobileRowHeight } from "./list";
 import { useThumbnailLayout, useThumbnailSize } from "./useThumbnailLayout";
 import { useAppConfig } from "../config/useAppConfig";
@@ -36,9 +36,6 @@ const useViewHeight = (offset) => {
 
 const mobileRowHeights = {minHeight: 75, maxHeight: 110, maxPotraitHeight: 185}
 const desktopRowHeights = {minHeight: 120, maxHeight: 200, maxPotraitHeight: 280}
-
-const mobileGridSize = 110
-const desktopGridSize = 180
 
 /**
  * Height of the file name label below a thumbnail. It is the line height of
@@ -91,7 +88,9 @@ export const List = () => {
     }
 
     if (layout == 'grid') {
-      const minSize = (isMobile ? mobileGridSize : desktopGridSize) * sizeFactor
+      // the size is rounded like the cell size of the folders page, so that
+      // both grids scale to the same amount of columns
+      const minSize = Math.round((isMobile ? mobileGridSize : desktopGridSize) * sizeFactor)
       return grid(visibleEntries, {padding, width, minSize, labelHeight});
     }
 

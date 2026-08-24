@@ -19,6 +19,14 @@ const defaultOptions: IGridOptions = {
 }
 
 /**
+ * Minimum edge length of a cell at the default thumbnail size. It is scaled by
+ * the size factor of the thumbnail size and is shared with the grid view of
+ * the folders page, so that both grids have the same amount of columns
+ */
+export const mobileGridSize = 110
+export const desktopGridSize = 180
+
+/**
  * Layouts the items in a grid of squared cells.
  *
  * The amount of columns is derived from the available width. The cells are
@@ -34,8 +42,11 @@ const defaultOptions: IGridOptions = {
 export const grid = (items: any[], options: Partial<IGridOptions>): IFluentRow[] => {
 	const { width, padding, minSize, labelHeight } = Object.assign({}, defaultOptions, options);
 
-	const columns = Math.max(1, Math.floor((width - padding) / (minSize + padding)))
-	const size = +((width - (columns + 1) * padding) / columns).toFixed()
+	// the row is padded by half the padding on each side, so the space around
+	// the cells is one gap and the columns are counted like the css grid of the
+	// folders page: repeat(auto-fill, minmax(minSize, 1fr))
+	const columns = Math.max(1, Math.floor(width / (minSize + padding)))
+	const size = Math.floor(width / columns - padding)
 
 	const rows: IFluentRow[] = []
 	for (let i = 0; i < items.length; i += columns) {

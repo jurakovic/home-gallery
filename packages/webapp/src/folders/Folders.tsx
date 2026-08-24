@@ -12,20 +12,13 @@ import { useFolderOrder, useFolderThumbnailSize, useFolderView } from './useFold
 import { useAppConfig } from '../config/useAppConfig';
 import { getHigherPreviewUrl } from '../utils/preview';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
+import { desktopGridSize, mobileGridSize } from '../list/grid';
 import { desktopRowHeight, mobileRowHeight } from '../list/list';
 
 type ExpandedMap = {[key: string]: boolean}
 
 /** Empty tree while the initial database load is still pending */
 const emptyRoot = buildTree([])
-
-/**
- * Minimum edge length of a folder square at the default thumbnail size. It is
- * scaled by the size factor of the thumbnail size. The mobile size is smaller
- * than the cell size of the media lists so that three folders fit in a row
- */
-const mobileCellSize = 100
-const desktopCellSize = 180
 
 /** Cover url of a folder or false if it has no cover or covers are disabled */
 const getCoverUrl = (node: TreeNode, showCover: boolean, size: number) =>
@@ -167,7 +160,7 @@ export const Folders = () => {
   const [ , sizeFactor ] = useFolderThumbnailSize()
   const [ deviceType ] = useDeviceType()
   const isMobile = deviceType === DeviceType.MOBILE
-  const cellSize = Math.round((isMobile ? mobileCellSize : desktopCellSize) * sizeFactor)
+  const cellSize = Math.round((isMobile ? mobileGridSize : desktopGridSize) * sizeFactor)
   const rowHeight = Math.round((isMobile ? mobileRowHeight : desktopRowHeight) * sizeFactor)
 
   const [expanded, setExpanded] = useState<ExpandedMap>({})
