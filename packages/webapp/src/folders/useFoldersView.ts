@@ -22,12 +22,12 @@ const useFolderParam = (): [URLSearchParams, (key: string, value: string) => voi
 }
 
 /**
- * View of the folders page and its toggle.
+ * View of the folders page and its setter.
  *
  * The view of the user is kept until it is reset by a shared url. The config
- * sets the view of a user who did not toggle it yet
+ * sets the view of a user who did not pick one yet
  */
-export const useFolderView = (): [boolean, () => void] => {
+export const useFolderView = (): [boolean, (view: TFolderView) => void] => {
   const appConfig = useAppConfig()
   const [searchParams, setParam] = useFolderParam()
   const storeView = useFoldersStore(state => state.view)
@@ -38,20 +38,19 @@ export const useFolderView = (): [boolean, () => void] => {
     searchParams.get('view') == 'grid' :
     (storeView || configView) == 'grid'
 
-  const toggleView = () => {
-    const view: TFolderView = isGrid ? 'list' : 'grid'
+  const setView = (view: TFolderView) => {
     setStoreView(view)
     setParam('view', view)
   }
 
-  return [isGrid, toggleView]
+  return [isGrid, setView]
 }
 
 /**
- * Name order of the folders page and its toggle. The config sets the initial
+ * Name order of the folders page and its setter. The config sets the initial
  * order only
  */
-export const useFolderOrder = (): [boolean, () => void] => {
+export const useFolderOrder = (): [boolean, (descending: boolean) => void] => {
   const appConfig = useAppConfig()
   const [searchParams, setParam] = useFolderParam()
 
@@ -59,7 +58,7 @@ export const useFolderOrder = (): [boolean, () => void] => {
     searchParams.get('dir') == 'desc' :
     appConfig.pages?.folders?.order == 'nameDesc'
 
-  return [descending, () => setParam('dir', descending ? 'asc' : 'desc')]
+  return [descending, (descending: boolean) => setParam('dir', descending ? 'desc' : 'asc')]
 }
 
 /**

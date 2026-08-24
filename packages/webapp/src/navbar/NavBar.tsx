@@ -11,8 +11,7 @@ import { type Tag } from "../api/models";
 import { EditNavBar } from './EditNavBar';
 import { NavItem } from './NavItem';
 import { ViewNavBar } from './ViewNavBar';
-import { ListNavBar } from './ListNavBar';
-import { FoldersNavBar } from './FoldersNavBar';
+import { SettingsMenu } from './SettingsMenu';
 import { SearchInput, SearchButton } from "./SearchInput";
 
 export const DesktopNavBar = ({disableEdit = false, showList = false, showFolders = false, showDialog}) => {
@@ -30,11 +29,8 @@ export const DesktopNavBar = ({disableEdit = false, showList = false, showFolder
               { viewMode === ViewMode.EDIT && (
                 <EditNavBar showDialog={showDialog}/>
               )}
-              { showList && viewMode === ViewMode.VIEW && (
-                <ListNavBar />
-              )}
-              { showFolders && viewMode === ViewMode.VIEW && (
-                <FoldersNavBar />
+              { (showList || showFolders) && viewMode === ViewMode.VIEW && (
+                <SettingsMenu showList={showList} showFolders={showFolders} />
               )}
             </div>
             <div className="flex pr-2 space-x-4">
@@ -65,11 +61,8 @@ export const MobileNavBar = ({disableEdit = false, showList = false, showFolders
                   { viewMode === ViewMode.EDIT && (
                     <EditNavBar showDialog={showDialog}/>
                   )}
-                  { showList && viewMode === ViewMode.VIEW && (
-                    <ListNavBar />
-                  )}
-                  { showFolders && viewMode === ViewMode.VIEW && (
-                    <FoldersNavBar />
+                  { (showList || showFolders) && viewMode === ViewMode.VIEW && (
+                    <SettingsMenu showList={showList} showFolders={showFolders} />
                   )}
                 </div>
                 <div className="flex pr-2 space-x-4">

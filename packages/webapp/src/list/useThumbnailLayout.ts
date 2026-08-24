@@ -3,27 +3,26 @@ import { useListLayoutStore, type TThumbnailLayout } from '../store/list-layout-
 
 const defaultLayout: TThumbnailLayout = 'fluent'
 
-/** Layouts in the order of the layout toggle */
+/** Layouts in the order of the settings panel */
 export const thumbnailLayouts: TThumbnailLayout[] = ['fluent', 'square', 'list']
 
 const toLayout = (value?: string): TThumbnailLayout =>
   thumbnailLayouts.find(layout => layout == value) || defaultLayout
 
 /**
- * Thumbnail layout of the media lists.
+ * Thumbnail layout of the media lists and its setter.
  *
  * The layout of the config is the initial one. It is overruled as soon as the
- * user toggles the layout. The toggle cycles through the layouts
+ * user picks a layout
  */
-export const useThumbnailLayout = (): [TThumbnailLayout, () => void] => {
+export const useThumbnailLayout = (): [TThumbnailLayout, (layout: TThumbnailLayout) => void] => {
   const appConfig = useAppConfig()
   const layout = useListLayoutStore(state => state.layout)
   const setLayout = useListLayoutStore(state => state.setLayout)
 
   const current = layout || toLayout(appConfig.pages?.list?.thumbnails)
-  const next = thumbnailLayouts[(thumbnailLayouts.indexOf(current) + 1) % thumbnailLayouts.length]
 
-  return [current, () => setLayout(next)]
+  return [current, setLayout]
 }
 
 /**
@@ -44,6 +43,12 @@ const configSizeSteps = {
 }
 
 const clampSizeStep = (step: number) => Math.min(maxSizeStep, Math.max(minSizeStep, step))
+
+/** Names of the size steps in the order of the size factors */
+const sizeStepNames = ['XSmall', 'Small', 'Medium', 'Large', 'XLarge']
+
+/** Name of a size step as it is shown in the settings panel */
+export const toSizeStepName = (step: number) => sizeStepNames[step - minSizeStep] || ''
 
 /** Thumbnail size as step, its size factor and the setter of the step */
 export type TThumbnailSize = [number, number, (step: number) => void]
