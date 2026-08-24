@@ -9,7 +9,7 @@ import { useAppConfig } from "../config/useAppConfig";
 import { useTagDialog } from "../dialog/use-tag-dialog";
 import type { Entry } from "../store/entry";
 import { classNames } from "../utils/class-names";
-import { formatDate, humanizeBytes, humanizeDuration } from "../utils/format";
+import { formatDate, getFilename, humanizeBytes, humanizeDuration } from "../utils/format";
 import { MediaViewDisableFlags } from "./MediaViewPage";
 import { FeatureFlags } from '../config/AppConfig';
 
@@ -142,8 +142,7 @@ export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
     ]
   }
 
-  const mainFileData = entry.files[0];
-  const mainFilename = mainFileData.filename.replace(/.*[/\\]/g, '')
+  const mainFilename = getFilename(entry)
 
   const hasAddress = entry => entry.road || entry.city || entry.country
 

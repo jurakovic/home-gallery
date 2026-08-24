@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Hide the share link of the media details with `webapp.pages.mediaView.disabled`
 - webapp: Hide the nav item of all media with the `all` flag of `webapp.pages.disabled`. An unknown or a disabled `webapp.pages.landing` falls back to the first enabled page instead of the page of all media
 - webapp: Show the duration of a video as a badge of its thumbnail in every layout of the media lists. It has the shape of the media count badge of the folder thumbnails, so that it still fits on the smallest thumbnail size
+- webapp: Show the file name of the media in the upper left corner of the media view. It is the same name as in the media lists and is hidden with the `nav` flag of `webapp.pages.mediaView.disabled`
 
 ### Fixed
 

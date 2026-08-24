@@ -1,3 +1,9 @@
+/**
+ * File name of the main file of a media without its directory. The media
+ * lists, the media view and the details view show the same name
+ */
+export const getFilename = entry => (entry?.files?.[0]?.filename || '').replace(/.*[\\/]/, '')
+
 export const humanizeDuration = duration => {
   const hours = duration / 3600
   const min = '' + Math.floor((duration % 3600) / 60)

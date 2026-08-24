@@ -7,6 +7,7 @@ import { useSearchStore } from "../store/search-store";
 import { useAppConfig } from "../config/useAppConfig";
 
 import { getHigherPreviewUrl, getLowerPreviewUrl } from '../utils/preview'
+import { getFilename } from '../utils/format'
 import { usePreviewSize } from "./usePreviewSize";
 import { classNames } from '../utils/class-names'
 import { MediaViewDisableFlags } from "./MediaViewPage";
@@ -52,11 +53,24 @@ export const MediaNav = ({current, prev, next, listLocation, showNavigation, dis
   const itemClass = "md:opacity-40 hover:opacity-100 hover:cursor-pointer"
   const buttonClass = "block flex items-center justify-center rounded w-8 h-8 md:w-12 md:h-12 bg-gray-400/60 md:bg-gray-400/70"
   const iconClass = "md:text-2xl text-gray-800"
+  // the label is no button and keeps the shape of one. It is not clickable, so
+  // it has no pointer cursor
+  const labelClass = "md:opacity-40 hover:opacity-100"
+
+  const filename = getFilename(current)
 
   const hasGeo = current?.latitude && current?.longitude && current.latitude != 0 && current.longitude != 0
 
   return (
     <>
+      {!diabledFlags?.includes('nav') && !!filename &&
+        // the right edge keeps the close button free
+        <div className={classNames('absolute z-10 top-4 left-4 right-14 md:right-20 flex', labelClass)}>
+          <span className="flex items-center h-8 min-w-0 px-2 rounded md:h-12 md:px-3 bg-gray-400/60 md:bg-gray-400/70">
+            <span className="text-sm text-gray-800 truncate md:text-base" title={filename}>{filename}</span>
+          </span>
+        </div>
+      }
       <div className={classNames('absolute z-10 top-4 right-4 flex gap-2', itemClass)}>
         {!diabledFlags?.includes('nav') && 
           <a onClick={() => dispatch({type: 'list'})} className={classNames(buttonClass)} title="Show media stream (ESC)">

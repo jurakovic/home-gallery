@@ -8,12 +8,9 @@ import Hammer from 'hammerjs';
 import { useLastLocation } from '../utils/lastLocation/useLastLocation'
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { VirtualScroll } from "./VirtualScroll";
-import { humanizeBytes, humanizeDuration } from "../utils/format";
+import { getFilename, humanizeBytes, humanizeDuration } from "../utils/format";
 import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { classNames } from '../utils/class-names'
-
-/** File name of the main file of a media without its directory */
-const getFilename = (item) => (item.files?.[0]?.filename || '').replace(/.*[\\/]/, '')
 
 /**
  * File size of the main file of a media. Its value and its fraction with the
