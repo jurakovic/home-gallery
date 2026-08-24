@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { classNames } from "../utils/class-names";
 
@@ -26,45 +26,41 @@ type PopoverProps = {
  * more than once. A control which should close it takes the `close` of the
  * children.
  *
- * A click outside of it only closes the panel and is not swallowed, so that it
- * still reaches the media or the folder below it. There is no overlay and the
- * event keeps its default
+ * A click outside of it only closes the panel. Its backdrop swallows the
+ * click, so that it does not open the media or the folder below the panel as
+ * well
  */
 export const Popover = ({trigger, children, panelClass}: PopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const popover = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isOpen) {
       return
     }
 
-    // pointerdown covers a mouse, a touch and a pen alike and is not
-    // suppressed by the touch-action of the media cells, which a compatibility
-    // mousedown of a tap would be
-    const onPointerDown = (e: PointerEvent) => {
-      if (!popover.current?.contains(e.target as Node)) {
-        setIsOpen(false)
-      }
-    }
     const onKeyUp = (e: KeyboardEvent) => e.key == 'Escape' && setIsOpen(false)
 
-    document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keyup', onKeyUp)
 
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown)
-      document.removeEventListener('keyup', onKeyUp)
-    }
+    return () => document.removeEventListener('keyup', onKeyUp)
   }, [isOpen])
 
   return (
-    <div className="relative" ref={popover}>
+    <div className="relative">
       {trigger({isOpen, toggle: () => setIsOpen(isOpen => !isOpen)})}
       { isOpen &&
-        <div className={classNames('absolute left-0 z-20 mt-1 bg-gray-800 border border-gray-700 rounded shadow-lg top-full', panelClass)}>
-          {children(() => setIsOpen(false))}
-        </div>
+        <>
+          {/*
+            * The backdrop covers the page below the nav bar and takes the
+            * click or the tap which closes the panel. A document listener
+            * could not do that: it would close the panel, but the event would
+            * still reach the media or the folder below it and open it
+            */}
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className={classNames('absolute left-0 z-20 mt-1 bg-gray-800 border border-gray-700 rounded shadow-lg top-full', panelClass)}>
+            {children(() => setIsOpen(false))}
+          </div>
+        </>
       }
     </div>
   )
