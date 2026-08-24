@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import {
   Navigate,
   Routes,
@@ -58,7 +58,11 @@ const findEnabledLandingPage = (disabled: string[]) =>
  * 'Show All' nav item, are left alone.
  *
  * An unknown or a disabled landing page falls back to the first enabled page
- * of the fallback order
+ * of the fallback order.
+ *
+ * The redirect runs in a layout effect like the query of the list views: an
+ * effect would paint the page of all media and start its search before the
+ * configured landing page replaces it
  */
 const useLandingPage = () => {
   const appConfig = useAppConfig()
@@ -67,7 +71,7 @@ const useLandingPage = () => {
   const location = useLocation()
   const isNavigated = useRef(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isNavigated.current) {
       return
     }

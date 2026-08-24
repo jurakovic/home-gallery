@@ -39,10 +39,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Move the view controls of the nav bar into one settings menu. It holds the order, the layout and the thumbnail size of the media lists and the order, the view and the thumbnail size of the albums page
 - webapp: Reset the view settings of every page to their configured defaults in the settings menu. The search query and the selection of the edit mode are kept
 - webapp: Show the grid view of the albums page like the grid layout of the media lists. The cells are spaced like the media cells, the media count is a badge of the cover thumbnail and the album name is the label below it
+- webapp: Render both views of the albums page by the virtual scroll of the media lists, so that a library of many media directories only renders the visible albums
 
 ### Fixed
 
-- webapp: Break long album names at word boundaries in the grid view of the albums page
+- webapp: Break long album names at word boundaries in the grid view of the albums page. A name of more than two lines is clipped and stays readable in its tooltip
+- webapp: Search for a term with a slash, an ampersand or a percent sign. The term is encoded once on its way into the url and is decoded once on its way out
+- webapp: Open the album of a media directory whose name holds a tilde or a quote. Such a name is quoted in the search query now, otherwise the query could not be parsed
+- webapp: List the media of the 'On This Day' page by the same day the date filters read. The day was taken in the local time zone while the filters read the stored UTC date, which shifted the media of the hours around midnight to the neighbour day
 - webapp: Copy the share link of the media details on a gallery which is served over http. The clipboard api is only available in a secure context, so the copy command is used as fallback. The link shows whether the url was copied
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension

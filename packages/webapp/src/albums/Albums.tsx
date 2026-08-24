@@ -10,19 +10,48 @@ import { buildTree, flattenTree, type TreeNode } from './buildTree';
 import { toAlbumQuery } from './toAlbumQuery';
 import { useAlbumOrder, useAlbumThumbnailSize, useAlbumView } from './useAlbumsView';
 import { useAppConfig } from '../config/useAppConfig';
-import { getHigherPreviewUrl } from '../utils/preview';
+import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
-import { desktopGridSize, mobileGridSize } from '../list/grid';
-import { desktopRowHeight, mobileRowHeight } from '../list/list';
+import useBodyDimensions from '../utils/useBodyDimensions';
+import { VirtualScroll } from '../list/VirtualScroll';
+import { desktopGridSize, grid, mobileGridSize } from '../list/grid';
+import { desktopRowHeight, list, mobileRowHeight } from '../list/list';
 
 type ExpandedMap = {[key: string]: boolean}
+
+/** Album of the list view with its depth in the album tree */
+type TAlbumItem = {node: TreeNode, level: number}
 
 /** Empty tree while the initial database load is still pending */
 const emptyRoot = buildTree([])
 
+/**
+ * Space between the album cells and the rows. It is the padding of the media
+ * lists, so both pages are spaced alike
+ */
+const padding = 8
+
+/**
+ * Height of the album name below its cover thumbnail in the grid view. It is
+ * the pt-1 padding and two lines of the text-xs label, which has a line height
+ * of 16px.
+ *
+ * The rows are layouted before they are rendered, so the label needs a fixed
+ * height. Two lines hold the paths of the usual album depths, a longer one is
+ * clipped and stays readable in the title of the label
+ */
+const nameLabelHeight = 4 + 2 * 16
+
 /** Cover url of an album or false if it has no cover or covers are disabled */
-const getCoverUrl = (node: TreeNode, showCover: boolean, size: number) =>
-  showCover ? getHigherPreviewUrl(node.cover?.previews, size * (window.devicePixelRatio || 1)) : false
+const getCoverUrl = (node: TreeNode, showCover: boolean, width: number, height: number) => {
+  if (!showCover) {
+    return false
+  }
+
+  // the cover is cropped to the cell by object-cover, like the media thumbnails
+  const size = getCoverPreviewSize(width, height, node.cover?.width, node.cover?.height)
+  return getHigherPreviewUrl(node.cover?.previews, size * (window.devicePixelRatio || 1))
+}
 
 /** Fallback icon of an album without a cover media */
 const getAlbumIcon = (node: TreeNode, isExpanded: boolean = false) => {
@@ -51,10 +80,15 @@ const CountBadge = ({count}: {count: number}) => (
  * Name of an album below its cover thumbnail. It has the styling of the file
  * name label of the media lists, but wraps at word boundaries instead of being
  * truncated: the grid has no hierarchy and shows the whole path, whose last
- * part names the album and would be the first to be cut off
+ * part names the album and would be the first to be cut off.
+ *
+ * The label keeps the height of `nameLabelHeight`, so a name of more than two
+ * lines is clipped at a full line
  */
 const NameLabel = ({name}: {name: string}) => (
-  <span className="pt-1 text-xs text-gray-500 break-words group-hover:text-gray-300" title={name}>
+  <span className="flex-shrink-0 pt-1 overflow-hidden text-xs text-gray-500 break-words group-hover:text-gray-300"
+    style={{height: nameLabelHeight}}
+    title={name}>
     {name}
   </span>
 )
@@ -69,42 +103,35 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toAlbumQuery(node)
   const icon = getAlbumIcon(node, isExpanded)
-  const coverUrl = getCoverUrl(node, showCover, rowHeight)
+  const coverUrl = getCoverUrl(node, showCover, rowHeight, rowHeight)
   const name = node.name || '(no index)'
 
   return (
-    <>
-      <li>
-        <span className="flex items-center rounded group hover:bg-gray-700" style={{paddingLeft: `${level}rem`, height: rowHeight}}>
-          { isExpandable &&
-            // the expand box is the only space left of the thumbnail
-            <a className="flex items-center justify-center flex-shrink-0 w-8 h-full text-gray-500 rounded hover:bg-gray-600 hover:text-gray-300 hover:cursor-pointer"
-              onClick={() => toggle(node.key)}
-              title={isExpanded ? 'Collapse album' : 'Expand album'}>
-              <FontAwesomeIcon icon={isExpanded ? icons.faAngleDown : icons.faAngleRight} />
-            </a>
+    <span className="flex items-center min-w-0 rounded grow group hover:bg-gray-700" style={{paddingLeft: `${level}rem`, height: rowHeight}}>
+      { isExpandable &&
+        // the expand box is the only space left of the thumbnail
+        <a className="flex items-center justify-center flex-shrink-0 w-8 h-full text-gray-500 rounded hover:bg-gray-600 hover:text-gray-300 hover:cursor-pointer"
+          onClick={() => toggle(node.key)}
+          title={isExpanded ? 'Collapse album' : 'Expand album'}>
+          <FontAwesomeIcon icon={isExpanded ? icons.faAngleDown : icons.faAngleRight} />
+        </a>
+      }
+      <Link className="flex items-center h-full min-w-0 gap-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
+        to={`/search/${encodeURIComponent(query)}`}
+        title={`Search for '${query}'`}>
+        {/* the box keeps the row height of albums without a cover media */}
+        <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
+          { coverUrl ?
+            <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
+            <FontAwesomeIcon icon={icon} />
           }
-          <Link className="flex items-center h-full min-w-0 gap-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
-            to={`/search/${encodeURIComponent(query)}`}
-            title={`Search for '${query}'`}>
-            {/* the box keeps the row height of albums without a cover media */}
-            <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
-              { coverUrl ?
-                <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
-                <FontAwesomeIcon icon={icon} />
-              }
-              <CountBadge count={node.count} />
-            </span>
-            <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300" title={name}>
-              {name}
-            </span>
-          </Link>
+          <CountBadge count={node.count} />
         </span>
-      </li>
-      { isExpanded && node.children.map(child => (
-        <AlbumItem key={child.key} node={child} level={level + 1} showCover={showCover} rowHeight={rowHeight} expanded={expanded} toggle={toggle} />
-      ))}
-    </>
+        <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300" title={name}>
+          {name}
+        </span>
+      </Link>
+    </span>
   )
 }
 
@@ -116,26 +143,53 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
  */
 const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boolean, cellSize: number}) => {
   const query = toAlbumQuery(node)
-  const coverUrl = getCoverUrl(node, showCover, cellSize)
+  const coverUrl = getCoverUrl(node, showCover, cellSize, cellSize)
   const name = node.path || node.name || '(no index)'
 
   return (
-    <li className="min-w-0">
-      <Link className="flex flex-col text-gray-500 group hover:cursor-pointer"
-        to={`/search/${encodeURIComponent(query)}`}
-        title={`Search for '${query}'`}>
-        <span className="relative flex items-center justify-center w-full overflow-hidden rounded aspect-square bg-gray-800 group-hover:bg-gray-700">
-          { coverUrl ?
-            <img className="object-cover w-full h-full" src={coverUrl} alt="" loading="lazy" /> :
-            <FontAwesomeIcon className="text-2xl" icon={getAlbumIcon(node)} />
-          }
-          <CountBadge count={node.count} />
-        </span>
-        <NameLabel name={name} />
-      </Link>
-    </li>
+    <Link className="flex flex-col flex-shrink-0 min-w-0 text-gray-500 group hover:cursor-pointer"
+      style={{width: cellSize, height: cellSize + nameLabelHeight}}
+      to={`/search/${encodeURIComponent(query)}`}
+      title={`Search for '${query}'`}>
+      <span className="relative flex items-center justify-center overflow-hidden rounded bg-gray-800 group-hover:bg-gray-700"
+        style={{width: cellSize, height: cellSize}}>
+        { coverUrl ?
+          <img className="object-cover w-full h-full" src={coverUrl} alt="" loading="lazy" /> :
+          <FontAwesomeIcon className="text-2xl" icon={getAlbumIcon(node)} />
+        }
+        <CountBadge count={node.count} />
+      </span>
+      <NameLabel name={name} />
+    </Link>
   )
 }
+
+/**
+ * Row of the album page. It has the shape of a row of the media lists: the
+ * grid row holds one cell per column, the list row a single cell of the full
+ * width. The row is padded by half the gap, so the space around the cells is
+ * one gap
+ */
+const AlbumRow = ({row, isGrid, showCover, expanded, toggle}: {row: any, isGrid: boolean, showCover: boolean, expanded: ExpandedMap, toggle: (key: string) => void}) => (
+  <div className="flex items-center w-full" style={{gap: padding, padding: padding / 2, height: row.height}}>
+    { row.columns.map((cell: any) => isGrid ?
+      <AlbumCard key={cell.item.key} node={cell.item} showCover={showCover} cellSize={cell.width} /> :
+      <AlbumItem key={cell.item.node.key} node={cell.item.node} level={cell.item.level}
+        showCover={showCover} rowHeight={cell.height} expanded={expanded} toggle={toggle} />
+    )}
+  </div>
+)
+
+/**
+ * Albums of the list view in their display order: an expanded album is
+ * directly followed by its sub-albums, a collapsed one hides them. The virtual
+ * scroll renders a flat list of rows, so the tree is flattened here
+ */
+const flattenVisible = (node: TreeNode, expanded: ExpandedMap, level: number = 0): TAlbumItem[] =>
+  node.children.flatMap(child => [
+    {node: child, level},
+    ...(expanded[child.key] ? flattenVisible(child, expanded, level + 1) : [])
+  ])
 
 export const Albums = () => {
   const allEntries = useEntryStore(state => state.allEntries);
@@ -153,12 +207,10 @@ export const Albums = () => {
   // replaced by the full tree once the database is loaded, see useLoadDatabase
   const root = useMemo(() => initialLoadDone ? buildTree(allEntries, showIndex, descending) : emptyRoot, [allEntries, initialLoadDone, showIndex, descending]);
 
-  // the grid has no hierarchy and lists the albums of all tree levels
-  const gridNodes = useMemo(() => isGrid ? flattenTree(root) : [], [root, isGrid])
-
   // the squares and the rows are scaled by the thumbnail size of the page
   const [ , sizeFactor ] = useAlbumThumbnailSize()
   const [ deviceType ] = useDeviceType()
+  const { width } = useBodyDimensions()
   const isMobile = deviceType === DeviceType.MOBILE
   const cellSize = Math.round((isMobile ? mobileGridSize : desktopGridSize) * sizeFactor)
   const rowHeight = Math.round((isMobile ? mobileRowHeight : desktopRowHeight) * sizeFactor)
@@ -166,6 +218,17 @@ export const Albums = () => {
   const [expanded, setExpanded] = useState<ExpandedMap>({})
 
   const toggle = (key: string) => setExpanded(expanded => ({...expanded, [key]: !expanded[key]}))
+
+  // A library holds an album per media directory, so both views are rendered
+  // by the virtual scroll of the media lists. They share its row layouts, so
+  // the album grid gets the columns and the cell size of the media grid
+  const rows = useMemo(() => {
+    if (isGrid) {
+      // the grid has no hierarchy and lists the albums of all tree levels
+      return grid(flattenTree(root), {width, padding, minSize: cellSize, labelHeight: nameLabelHeight})
+    }
+    return list(flattenVisible(root, expanded), {padding, rowHeight})
+  }, [root, isGrid, expanded, width, cellSize, rowHeight])
 
   return (
     <>
@@ -176,22 +239,13 @@ export const Albums = () => {
       { initialLoadDone && !root.children.length &&
         <p className="m-4 text-gray-500">No media found</p>
       }
-      { isGrid ?
-        // the cells fill the width and are at least of the cell size, like the
-        // grid media list. The min() keeps a single column within the width
-        <ul className="grid gap-2 p-1" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
-          {gridNodes.map(node => (
-            <AlbumCard key={node.key} node={node} showCover={showCover} cellSize={cellSize} />
-          ))}
-        </ul> :
-        // the rows fill the width and are spaced like the rows of the media
-        // list layout
-        <ul className="flex flex-col gap-2 p-1">
-          {root.children.map(child => (
-            <AlbumItem key={child.key} node={child} level={0} showCover={showCover} rowHeight={rowHeight} expanded={expanded} toggle={toggle} />
-          ))}
-        </ul>
-      }
+      <div className="relative z-0 w-full">
+        <VirtualScroll items={rows} padding={padding}>
+          {({row}) => (
+            <AlbumRow row={row} isGrid={isGrid} showCover={showCover} expanded={expanded} toggle={toggle} />
+          )}
+        </VirtualScroll>
+      </div>
     </>
   )
 }

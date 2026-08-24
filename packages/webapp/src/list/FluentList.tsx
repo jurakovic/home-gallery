@@ -161,7 +161,7 @@ const Row = (props) => {
   }
   const columns = props.columns;
   return (
-    <div className="flex w-full item-center" style={style}>
+    <div className="flex items-center w-full" style={style}>
       {columns.map((cell, index) => <Cell key={index} width={cell.width} height={cell.height} item={cell.item} index={cell.index} items={cell.items} labelHeight={props.labelHeight} isList={props.isList} />)}
     </div>
   )

@@ -55,13 +55,18 @@ const getChild = (parent: TreeNode, name: string, index: string, path: string): 
   return node
 }
 
+/**
+ * Compares two names case insensitive and falls back to the case sensitive
+ * order of equal names. It returns 0 for equal names, so that a sort keeps the
+ * order of the ties instead of swapping them
+ */
 const compareName = (a: string, b: string) => {
   const aName = a.toLowerCase()
   const bName = b.toLowerCase()
-  if (aName == bName) {
-    return a < b ? -1 : 1
+  if (aName != bName) {
+    return aName < bName ? -1 : 1
   }
-  return aName < bName ? -1 : 1
+  return a == b ? 0 : (a < b ? -1 : 1)
 }
 
 const byName = (a: TreeNode, b: TreeNode) => compareName(a.name, b.name)
@@ -81,7 +86,8 @@ const addCoverCandidate = (node: TreeNode, entry: Entry, filename: string, candi
   const name = basename(filename)
   const isMarked = coverSuffixPattern.test(name)
   const current = candidates.get(node)
-  if (current && (current.isMarked != isMarked ? current.isMarked : compareName(current.name, name) < 0)) {
+  // an equal name keeps the current candidate, so the first media of a name wins
+  if (current && (current.isMarked != isMarked ? current.isMarked : compareName(current.name, name) <= 0)) {
     return
   }
 

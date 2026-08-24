@@ -1,8 +1,6 @@
 import type { IFluentCell, IFluentRow } from './fluent'
 
 export interface IListOptions {
-	/** Available width of the list */
-	width: number;
 	/** Space between the rows */
 	padding: number;
 	/** Height of a row. It is the edge length of its squared thumbnail, too */
@@ -17,7 +15,6 @@ export const mobileRowHeight = 56
 export const desktopRowHeight = 72
 
 const defaultOptions: IListOptions = {
-	width: 1024,
 	padding: 10,
 	rowHeight: 72
 }
@@ -35,7 +32,7 @@ const defaultOptions: IListOptions = {
 export const list = (items: any[], options: Partial<IListOptions>): IFluentRow[] => {
 	const { padding, rowHeight } = Object.assign({}, defaultOptions, options);
 
-	const size = +rowHeight.toFixed()
+	const size = Math.round(rowHeight)
 
 	const rows: IFluentRow[] = items.map((item, index) => {
 		const cell: IFluentCell = {width: size, height: size, item, index, items}

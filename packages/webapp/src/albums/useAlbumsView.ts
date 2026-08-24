@@ -7,7 +7,11 @@ import { toThumbnailSize, type TThumbnailSize } from '../list/useThumbnailLayout
 /**
  * Search param of the albums page. The url is the source of truth so that a
  * view and an order can be shared. The value is always set explicitly,
- * otherwise a toggle would fall back to the configured value again
+ * otherwise a toggle would fall back to the configured value again.
+ *
+ * The param replaces the current history entry: a toggle is no navigation and
+ * the back button should leave the page instead of walking back through every
+ * view the user tried
  */
 const useAlbumParam = (): [URLSearchParams, (key: string, value: string) => void] => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -16,7 +20,7 @@ const useAlbumParam = (): [URLSearchParams, (key: string, value: string) => void
   const setParam = (key: string, value: string) => setSearchParams(params => {
     params.set(key, value)
     return params
-  })
+  }, {replace: true})
 
   return [searchParams, setParam]
 }
@@ -24,16 +28,28 @@ const useAlbumParam = (): [URLSearchParams, (key: string, value: string) => void
 /**
  * Drops the view and the order params of the albums page, so that the stored
  * and the configured values apply again. They win over the store, so a reset
- * of the view settings has to drop them
+ * of the view settings has to drop them.
+ *
+ * The reset is offered on every page, so it does nothing if the url carries
+ * none of the params. Setting them would push a history entry on a page which
+ * has no album params at all
  */
 export const useResetAlbumParams = () => {
-  const [, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  return () => setSearchParams(params => {
-    params.delete('view')
-    params.delete('dir')
-    return params
-  })
+  const hasParams = searchParams.has('view') || searchParams.has('dir')
+
+  return () => {
+    if (!hasParams) {
+      return
+    }
+
+    setSearchParams(params => {
+      params.delete('view')
+      params.delete('dir')
+      return params
+    }, {replace: true})
+  }
 }
 
 /**

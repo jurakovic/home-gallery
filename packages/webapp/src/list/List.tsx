@@ -84,7 +84,7 @@ export const List = () => {
     const isMobile = deviceType === DeviceType.MOBILE
     if (layout == 'list') {
       const rowHeight = (isMobile ? mobileRowHeight : desktopRowHeight) * sizeFactor
-      return list(visibleEntries, {padding, width, rowHeight});
+      return list(visibleEntries, {padding, rowHeight});
     }
 
     if (layout == 'grid') {

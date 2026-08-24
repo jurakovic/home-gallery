@@ -12,10 +12,11 @@ export const SearchView = () => {
   const params = useParams();
   const search = useSearchStore(state => state.search);
 
-  const term = useMemo(() => params.term, [params])
+  // useParams decodes the path param already, a second decode would break a
+  // query with a percent sign and drop the escapes of a quoted value
+  const term = useMemo(() => params.term || '', [params])
   useLayoutEffect(() => {
-    const value = decodeURIComponent(term);
-    search({type: 'query', value});
+    search({type: 'query', value: term});
   }, [term])
 
   return (

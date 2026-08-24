@@ -155,6 +155,17 @@
                   "type": "boolean",
                   "default": true
                 },
+                "thumbnailSize": {
+                  "description": "Initial size of the album thumbnails. Smaller thumbnails show more albums per row in the grid view and shorter rows in the list view. It is overruled by the size controls of the nav bar",
+                  "enum": [
+                    "xsmall",
+                    "small",
+                    "medium",
+                    "large",
+                    "xlarge"
+                  ],
+                  "default": "medium"
+                },
                 "order": {
                   "description": "Initial album order. It is overruled by the order of the page",
                   "enum": [
@@ -203,6 +214,11 @@
                 },
                 "scrollbar": {
                   "description": "Show the date scrollbar of media lists. It is placed at the right side of the list and jumps to the media of the selected date",
+                  "type": "boolean",
+                  "default": true
+                },
+                "showFilename": {
+                  "description": "Show the file name of every media below its thumbnail in the fluent and in the grid media list. The name is shown without its directory and with its file extension. The list layout shows it beside the thumbnail in any case",
                   "type": "boolean",
                   "default": true
                 },

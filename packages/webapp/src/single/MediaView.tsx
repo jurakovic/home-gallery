@@ -78,7 +78,8 @@ export const MediaView = () => {
   const setShowAnnotations = useSingleViewStore(actions => actions.setShowAnnotations);
   const setShowNavigation = useSingleViewStore(actions => actions.setShowNavigation);
 
-  const [hideNavigation, setHideNavigation] = useState(false)
+  // the play and the pause action of the video report the playback state
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const [zoomFactor, setZoomFactor] = useState(1)
 
   const [hotkeys, hotkeyToAction] = useMediaViewHotkeys();
@@ -95,11 +96,13 @@ export const MediaView = () => {
 
   const key = current ? current.id : (Math.random() * 100000).toFixed(0);
 
-  const {navVisible, handlers: revealHandlers} = useRevealNavigation(hideNavigation, !!isVideo, id)
+  const {navVisible, handlers: revealHandlers} = useRevealNavigation(isVideoPlaying, !!isVideo, id)
 
-  useEffect(() => { id && setLastId(id) }, [id])
-  // a playing video reports no pause when the media view leaves it
-  useEffect(() => { setHideNavigation(false) }, [id])
+  useEffect(() => {
+    id && setLastId(id)
+    // a playing video reports no pause when the media view leaves it
+    setIsVideoPlaying(false)
+  }, [id])
   useEffect(() => { index >= 0 && setLastIndex(index) }, [index])
 
   const viewEntry = (index: number) => {
@@ -136,9 +139,9 @@ export const MediaView = () => {
       search({type: 'none'});
       navigate('/');
     } else if (type == 'play') {
-      setHideNavigation(true);
+      setIsVideoPlaying(true);
     } else if (type == 'pause') {
-      setHideNavigation(false);
+      setIsVideoPlaying(false);
     } else if (type == 'search') {
       navigate(`/search/${encodeUrl(action.query)}`);
     } else if (type == 'map' && current?.latitude && current?.longitude && !disableFlags.includes('map')) {

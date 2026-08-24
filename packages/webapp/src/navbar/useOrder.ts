@@ -38,7 +38,7 @@ export const useOrder = (): [TOrder, (key: string) => void] => {
       {...order, direction: toggleDirection(order.direction)} :
       {key, direction: orderKeys.find(orderKey => orderKey.key == key)?.defaultDirection || ''}
 
-    setOrder(term, next).then(nextTerm => navigateToSearch(encodeURIComponent(nextTerm)))
+    setOrder(term, next).then(nextTerm => navigateToSearch(nextTerm))
   }
 
   return [order, applyKey]
