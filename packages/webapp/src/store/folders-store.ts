@@ -16,6 +16,8 @@ export interface FoldersStore {
    */
   sizeStep: number | ''
   setSizeStep: (sizeStep: number) => void
+  /** Drops the values of the user, so that the configured ones apply again */
+  reset: () => void
 }
 
 export const useFoldersStore = create<
@@ -35,6 +37,10 @@ export const useFoldersStore = create<
 
     setSizeStep: (sizeStep: number) => {
       set((state) => ({...state, sizeStep}))
+    },
+
+    reset: () => {
+      set((state) => ({...state, view: '', sizeStep: ''}))
     },
   }), { name: 'gallery-folders' })
 )

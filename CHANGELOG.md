@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Show the duration of a video as a badge of its thumbnail in every layout of the media lists. It has the shape of the media count badge of the folder thumbnails, so that it still fits on the smallest thumbnail size
 - webapp: Show the file name of the media in the upper left corner of the media view. It is the same name as in the media lists and is hidden with the `nav` flag of `webapp.pages.mediaView.disabled`
 - webapp: Move the view controls of the nav bar into one settings menu. It holds the order, the layout and the thumbnail size of the media lists and the order, the view and the thumbnail size of the folders page
+- webapp: Reset the view settings of every page to their configured defaults in the settings menu. The search query and the selection of the edit mode are kept
 
 ### Fixed
 

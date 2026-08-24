@@ -13,7 +13,8 @@ import {
   useThumbnailSize,
   type TThumbnailSize,
 } from "../list/useThumbnailLayout";
-import { useFolderOrder, useFolderThumbnailSize, useFolderView } from "../folders/useFoldersView";
+import { useFolderOrder, useFolderThumbnailSize, useFolderView, useResetFolderParams } from "../folders/useFoldersView";
+import { resetViewSettings } from "../store/view-settings";
 import { NavItem } from "./NavItem";
 import { Popover } from "./Popover";
 import { useOrder } from "./useOrder";
@@ -163,6 +164,31 @@ const SizeSection = ({size}: {size: TThumbnailSize}) => {
 }
 
 /**
+ * Drops the view settings of every page, not only of the current one, so that
+ * the configured values apply again
+ */
+const ResetSection = ({close}: {close: () => void}) => {
+  const resetFolderParams = useResetFolderParams()
+
+  const reset = () => {
+    resetViewSettings()
+    resetFolderParams()
+    close()
+  }
+
+  return (
+    <Section title="Defaults">
+      <a className="flex items-center gap-2 px-3 py-2 text-gray-500 hover:bg-gray-700 hover:text-gray-300 hover:cursor-pointer"
+        onClick={reset}
+        title="Reset the view settings of every page to their configured defaults">
+        <FontAwesomeIcon icon={icons.faRotateLeft} className="w-4 text-center" />
+        <span className="whitespace-nowrap">Reset view settings</span>
+      </a>
+    </Section>
+  )
+}
+
+/**
  * View controls of the current page in one menu of the nav bar.
  *
  * The media lists and the folders page have controls of their own, so the
@@ -195,6 +221,7 @@ export const SettingsMenu = ({showList = false, showFolders = false}) => {
               <SizeSection size={folderSize} />
             </>
           }
+          <ResetSection close={close} />
         </>
       )}
     </Popover>

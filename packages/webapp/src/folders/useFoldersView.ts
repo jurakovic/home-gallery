@@ -22,6 +22,21 @@ const useFolderParam = (): [URLSearchParams, (key: string, value: string) => voi
 }
 
 /**
+ * Drops the view and the order params of the folders page, so that the stored
+ * and the configured values apply again. They win over the store, so a reset
+ * of the view settings has to drop them
+ */
+export const useResetFolderParams = () => {
+  const [, setSearchParams] = useSearchParams()
+
+  return () => setSearchParams(params => {
+    params.delete('view')
+    params.delete('dir')
+    return params
+  })
+}
+
+/**
  * View of the folders page and its setter.
  *
  * The view of the user is kept until it is reset by a shared url. The config
