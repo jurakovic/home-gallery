@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Align all folder names to the left and shrink them on mobile on the folders page
 - webapp: Offer the file name, the date taken, the duration and the file size as order of media lists and drop the random, the file count and the tag count order
 - webapp: Size the grid layout of the media lists like the grid view of the folders page, so that both show the same amount of columns and the same cell size at the same thumbnail size
+- webapp: Round the corners of the media thumbnails in every layout, like the cover thumbnails of the folders page
 
 ## [1.21.0] - 2026-03-01
 

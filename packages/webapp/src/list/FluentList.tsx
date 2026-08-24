@@ -115,9 +115,10 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   // size and the video duration stays in its corner
   const filename = (labelHeight || isList) ? getFilename(item) : ''
 
+  // the thumbnail is rounded like the cover thumbnail of the folders page
   const thumbnail = (
-    <div className={classNames('relative', {'flex-shrink-0': isList, 'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
-      <img className={classNames('object-cover')} style={style} src={previewUrl} loading="lazy" />
+    <div className={classNames('relative rounded', {'flex-shrink-0': isList, 'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
+      <img className={classNames('object-cover rounded')} style={style} src={previewUrl} loading="lazy" />
       {type == 'video' &&
         <DurationBadge duration={duration} />
       }
@@ -141,7 +142,7 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   }
 
   return (
-    <div ref={ref} key={id} className="flex flex-col group" style={{width, height: height + labelHeight}}>
+    <div ref={ref} key={id} className="flex flex-col group hover:cursor-pointer" style={{width, height: height + labelHeight}}>
       {thumbnail}
       {!!labelHeight &&
         <span className="pt-1 text-xs text-gray-500 truncate group-hover:text-gray-300" style={{height: labelHeight}} title={filename}>
