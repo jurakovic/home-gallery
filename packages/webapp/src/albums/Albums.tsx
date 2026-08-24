@@ -7,8 +7,8 @@ import * as icons from '@fortawesome/free-solid-svg-icons'
 import { NavBar } from '../navbar/NavBar';
 import { useEntryStore } from '../store/entry-store';
 import { buildTree, flattenTree, type TreeNode } from './buildTree';
-import { toFolderQuery } from './toFolderQuery';
-import { useFolderOrder, useFolderThumbnailSize, useFolderView } from './useFoldersView';
+import { toAlbumQuery } from './toAlbumQuery';
+import { useAlbumOrder, useAlbumThumbnailSize, useAlbumView } from './useAlbumsView';
 import { useAppConfig } from '../config/useAppConfig';
 import { getHigherPreviewUrl } from '../utils/preview';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
@@ -20,12 +20,12 @@ type ExpandedMap = {[key: string]: boolean}
 /** Empty tree while the initial database load is still pending */
 const emptyRoot = buildTree([])
 
-/** Cover url of a folder or false if it has no cover or covers are disabled */
+/** Cover url of an album or false if it has no cover or covers are disabled */
 const getCoverUrl = (node: TreeNode, showCover: boolean, size: number) =>
   showCover ? getHigherPreviewUrl(node.cover?.previews, size * (window.devicePixelRatio || 1)) : false
 
-/** Fallback icon of a folder without a cover media */
-const getFolderIcon = (node: TreeNode, isExpanded: boolean = false) => {
+/** Fallback icon of an album without a cover media */
+const getAlbumIcon = (node: TreeNode, isExpanded: boolean = false) => {
   // the index is only shown with the showIndex option, otherwise every node has a path
   if (!node.path) {
     return icons.faDatabase
@@ -33,11 +33,11 @@ const getFolderIcon = (node: TreeNode, isExpanded: boolean = false) => {
   return isExpanded ? icons.faFolderOpen : icons.faFolder
 }
 
-/** Title of the media count of a folder */
-const countTitle = 'Media of the folder and its subfolders'
+/** Title of the media count of an album */
+const countTitle = 'Media of the album and its sub-albums'
 
 /**
- * Media count of a folder as a badge of its cover thumbnail. It is the badge
+ * Media count of an album as a badge of its cover thumbnail. It is the badge
  * of the media lists, which carry the duration of a video
  */
 const CountBadge = ({count}: {count: number}) => (
@@ -48,10 +48,10 @@ const CountBadge = ({count}: {count: number}) => (
 )
 
 /**
- * Name of a folder below its cover thumbnail. It has the styling of the file
+ * Name of an album below its cover thumbnail. It has the styling of the file
  * name label of the media lists, but wraps at word boundaries instead of being
  * truncated: the grid has no hierarchy and shows the whole path, whose last
- * part names the folder and would be the first to be cut off
+ * part names the album and would be the first to be cut off
  */
 const NameLabel = ({name}: {name: string}) => (
   <span className="pt-1 text-xs text-gray-500 break-words group-hover:text-gray-300" title={name}>
@@ -60,15 +60,15 @@ const NameLabel = ({name}: {name: string}) => (
 )
 
 /**
- * Row of a folder in the list view. It has the shape of a row of the media
+ * Row of an album in the list view. It has the shape of a row of the media
  * list layout: the cover thumbnail with the media count as its badge and the
- * folder name
+ * album name
  */
-const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, rowHeight: number, expanded: ExpandedMap, toggle: (key: string) => void}) => {
+const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, rowHeight: number, expanded: ExpandedMap, toggle: (key: string) => void}) => {
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
-  const query = toFolderQuery(node)
-  const icon = getFolderIcon(node, isExpanded)
+  const query = toAlbumQuery(node)
+  const icon = getAlbumIcon(node, isExpanded)
   const coverUrl = getCoverUrl(node, showCover, rowHeight)
   const name = node.name || '(no index)'
 
@@ -80,14 +80,14 @@ const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node
             // the expand box is the only space left of the thumbnail
             <a className="flex items-center justify-center flex-shrink-0 w-8 h-full text-gray-500 rounded hover:bg-gray-600 hover:text-gray-300 hover:cursor-pointer"
               onClick={() => toggle(node.key)}
-              title={isExpanded ? 'Collapse folder' : 'Expand folder'}>
+              title={isExpanded ? 'Collapse album' : 'Expand album'}>
               <FontAwesomeIcon icon={isExpanded ? icons.faAngleDown : icons.faAngleRight} />
             </a>
           }
           <Link className="flex items-center h-full min-w-0 gap-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
-            {/* the box keeps the row height of folders without a cover media */}
+            {/* the box keeps the row height of albums without a cover media */}
             <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
               { coverUrl ?
                 <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
@@ -102,20 +102,20 @@ const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node
         </span>
       </li>
       { isExpanded && node.children.map(child => (
-        <FolderItem key={child.key} node={child} level={level + 1} showCover={showCover} rowHeight={rowHeight} expanded={expanded} toggle={toggle} />
+        <AlbumItem key={child.key} node={child} level={level + 1} showCover={showCover} rowHeight={rowHeight} expanded={expanded} toggle={toggle} />
       ))}
     </>
   )
 }
 
 /**
- * Squared cell of a folder in the grid view.
+ * Squared cell of an album in the grid view.
  *
- * The grid has no folder hierarchy, so the whole path of the folder is shown
+ * The grid has no album hierarchy, so the whole path of the album is shown
  * instead of its name only
  */
-const FolderCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boolean, cellSize: number}) => {
-  const query = toFolderQuery(node)
+const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boolean, cellSize: number}) => {
+  const query = toAlbumQuery(node)
   const coverUrl = getCoverUrl(node, showCover, cellSize)
   const name = node.path || node.name || '(no index)'
 
@@ -127,7 +127,7 @@ const FolderCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boo
         <span className="relative flex items-center justify-center w-full overflow-hidden rounded aspect-square bg-gray-800 group-hover:bg-gray-700">
           { coverUrl ?
             <img className="object-cover w-full h-full" src={coverUrl} alt="" loading="lazy" /> :
-            <FontAwesomeIcon className="text-2xl" icon={getFolderIcon(node)} />
+            <FontAwesomeIcon className="text-2xl" icon={getAlbumIcon(node)} />
           }
           <CountBadge count={node.count} />
         </span>
@@ -137,27 +137,27 @@ const FolderCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boo
   )
 }
 
-export const Folders = () => {
+export const Albums = () => {
   const allEntries = useEntryStore(state => state.allEntries);
   const initialLoadDone = useEntryStore(state => state.initialLoadDone);
   const appConfig = useAppConfig()
-  const showIndex = !!appConfig.pages?.folders?.showIndex
-  const showCover = appConfig.pages?.folders?.showCover ?? true
+  const showIndex = !!appConfig.pages?.albums?.showIndex
+  const showCover = appConfig.pages?.albums?.showCover ?? true
 
   // the view and the order are toggled in the nav bar
-  const [isGrid] = useFolderView()
-  const [descending] = useFolderOrder()
+  const [isGrid] = useAlbumView()
+  const [descending] = useAlbumOrder()
 
   // The database is loaded in chunks and the entries of the initial page are
-  // only the newest media. Their tree shows a few folders for a moment and is
+  // only the newest media. Their tree shows a few albums for a moment and is
   // replaced by the full tree once the database is loaded, see useLoadDatabase
   const root = useMemo(() => initialLoadDone ? buildTree(allEntries, showIndex, descending) : emptyRoot, [allEntries, initialLoadDone, showIndex, descending]);
 
-  // the grid has no hierarchy and lists the folders of all tree levels
+  // the grid has no hierarchy and lists the albums of all tree levels
   const gridNodes = useMemo(() => isGrid ? flattenTree(root) : [], [root, isGrid])
 
   // the squares and the rows are scaled by the thumbnail size of the page
-  const [ , sizeFactor ] = useFolderThumbnailSize()
+  const [ , sizeFactor ] = useAlbumThumbnailSize()
   const [ deviceType ] = useDeviceType()
   const isMobile = deviceType === DeviceType.MOBILE
   const cellSize = Math.round((isMobile ? mobileGridSize : desktopGridSize) * sizeFactor)
@@ -169,9 +169,9 @@ export const Folders = () => {
 
   return (
     <>
-      <NavBar disableEdit={true} showFolders={true} />
+      <NavBar disableEdit={true} showAlbums={true} />
       { !initialLoadDone &&
-        <p className="m-4 text-gray-500">Loading folders ...</p>
+        <p className="m-4 text-gray-500">Loading albums ...</p>
       }
       { initialLoadDone && !root.children.length &&
         <p className="m-4 text-gray-500">No media found</p>
@@ -181,14 +181,14 @@ export const Folders = () => {
         // grid media list. The min() keeps a single column within the width
         <ul className="grid gap-2 p-1" style={{gridTemplateColumns: `repeat(auto-fill, minmax(min(${cellSize}px, 100%), 1fr))`}}>
           {gridNodes.map(node => (
-            <FolderCard key={node.key} node={node} showCover={showCover} cellSize={cellSize} />
+            <AlbumCard key={node.key} node={node} showCover={showCover} cellSize={cellSize} />
           ))}
         </ul> :
         // the rows fill the width and are spaced like the rows of the media
         // list layout
         <ul className="flex flex-col gap-2 p-1">
           {root.children.map(child => (
-            <FolderItem key={child.key} node={child} level={0} showCover={showCover} rowHeight={rowHeight} expanded={expanded} toggle={toggle} />
+            <AlbumItem key={child.key} node={child} level={0} showCover={showCover} rowHeight={rowHeight} expanded={expanded} toggle={toggle} />
           ))}
         </ul>
       }

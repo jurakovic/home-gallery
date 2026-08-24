@@ -41,9 +41,9 @@ export const ViewNavBar = ({disableEdit}) => {
     },
     {
       icon: icons.faFolderTree,
-      text: 'Folders',
-      action: () => navigate('/folders'),
-      hidden: appConfig.pages?.disabled?.includes('folder'),
+      text: 'Albums',
+      action: () => navigate('/albums'),
+      hidden: appConfig.pages?.disabled?.includes('album'),
     },
     {
       icon: icons.faPlay,

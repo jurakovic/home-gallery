@@ -9,10 +9,10 @@
  * Customize pages
  */
 export interface Pages {
-  disabled?: (("edit" | "date" | "video" | "map" | "tag" | "folder" | "all") | string)[];
+  disabled?: (("edit" | "date" | "video" | "map" | "tag" | "album" | "all") | string)[];
   /**
    * Initial page of the webapp on its first load. It falls back to the page of all media if the configured page is disabled
    */
-  landing?: "all" | "folders" | "years" | "tags" | "map";
+  landing?: "all" | "albums" | "years" | "tags" | "map";
   [k: string]: unknown;
 }

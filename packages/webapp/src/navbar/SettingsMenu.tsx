@@ -13,7 +13,7 @@ import {
   useThumbnailSize,
   type TThumbnailSize,
 } from "../list/useThumbnailLayout";
-import { useFolderOrder, useFolderThumbnailSize, useFolderView, useResetFolderParams } from "../folders/useFoldersView";
+import { useAlbumOrder, useAlbumThumbnailSize, useAlbumView, useResetAlbumParams } from "../albums/useAlbumsView";
 import { resetViewSettings } from "../store/view-settings";
 import { NavItem } from "./NavItem";
 import { Popover } from "./Popover";
@@ -95,9 +95,9 @@ const LayoutSection = () => {
   )
 }
 
-/** Name order of the folders page. It has one key, so it toggles its direction */
-const FolderOrderSection = () => {
-  const [descending, setDescending] = useFolderOrder()
+/** Name order of the albums page. It has one key, so it toggles its direction */
+const AlbumOrderSection = () => {
+  const [descending, setDescending] = useAlbumOrder()
 
   return (
     <Section title="Order by">
@@ -110,18 +110,18 @@ const FolderOrderSection = () => {
   )
 }
 
-/** View of the folders page */
-const FolderViewSection = () => {
-  const [isGrid, setView] = useFolderView()
+/** View of the albums page */
+const AlbumViewSection = () => {
+  const [isGrid, setView] = useAlbumView()
 
   return (
     <Section title="View">
       <Option name="List" icon={icons.faList} isCurrent={!isGrid}
         onClick={() => setView('list')}
-        title="Show the folder tree" />
+        title="Show the album tree" />
       <Option name="Grid" icon={icons.faTableCellsLarge} isCurrent={isGrid}
         onClick={() => setView('grid')}
-        title="Show the folders as squared cover thumbnails" />
+        title="Show the albums as squared cover thumbnails" />
     </Section>
   )
 }
@@ -168,11 +168,11 @@ const SizeSection = ({size}: {size: TThumbnailSize}) => {
  * the configured values apply again
  */
 const ResetSection = ({close}: {close: () => void}) => {
-  const resetFolderParams = useResetFolderParams()
+  const resetAlbumParams = useResetAlbumParams()
 
   const reset = () => {
     resetViewSettings()
-    resetFolderParams()
+    resetAlbumParams()
     close()
   }
 
@@ -191,12 +191,12 @@ const ResetSection = ({close}: {close: () => void}) => {
 /**
  * View controls of the current page in one menu of the nav bar.
  *
- * The media lists and the folders page have controls of their own, so the
+ * The media lists and the albums page have controls of their own, so the
  * panel shows the sections of the page it is rendered on
  */
-export const SettingsMenu = ({showList = false, showFolders = false}) => {
+export const SettingsMenu = ({showList = false, showAlbums = false}) => {
   const listSize = useThumbnailSize()
-  const folderSize = useFolderThumbnailSize()
+  const albumSize = useAlbumThumbnailSize()
 
   return (
     <Popover
@@ -214,11 +214,11 @@ export const SettingsMenu = ({showList = false, showFolders = false}) => {
               <SizeSection size={listSize} />
             </>
           }
-          { showFolders &&
+          { showAlbums &&
             <>
-              <FolderOrderSection />
-              <FolderViewSection />
-              <SizeSection size={folderSize} />
+              <AlbumOrderSection />
+              <AlbumViewSection />
+              <SizeSection size={albumSize} />
             </>
           }
           <ResetSection close={close} />

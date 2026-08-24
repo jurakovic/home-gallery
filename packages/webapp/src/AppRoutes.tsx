@@ -15,7 +15,7 @@ import { SimilarView } from './list/Similar';
 import { FacesView } from './list/Faces';
 import { Years, YearView } from './year/Years';
 import { Tags } from './tags/Tags';
-import { Folders } from './folders/Folders';
+import { Albums } from './albums/Albums';
 import { Map } from './map';
 import { MediaView } from './single/MediaView';
 import { useLogger } from "./AppContext";
@@ -30,7 +30,7 @@ const defaultLandingPage = 'all'
  */
 const landingPages = {
   all: {route: '/', pageFlag: 'all'},
-  folders: {route: '/folders', pageFlag: 'folder'},
+  albums: {route: '/albums', pageFlag: 'album'},
   tags: {route: '/tags', pageFlag: 'tag'},
   years: {route: '/years', pageFlag: 'date'},
   map: {route: '/map', pageFlag: 'map'},
@@ -114,7 +114,7 @@ export const AppRoutes = () => {
       {!appConfig.pages?.disabled?.includes('date') && <Route path="/years/:year" element={<YearView />} />}
       {!appConfig.pages?.disabled?.includes('tag') && <Route path="/tags" element={<Tags />} />}
       {!appConfig.pages?.disabled?.includes('map') && <Route path="/map" element={<Map />} />}
-      {!appConfig.pages?.disabled?.includes('folder') && <Route path="/folders" element={<Folders />} />}
+      {!appConfig.pages?.disabled?.includes('album') && <Route path="/albums" element={<Albums />} />}
 
       {/* Conditional routes */}
       {<Route path="/similar/:id" element={<SimilarView />} />}

@@ -88,7 +88,7 @@ export const List = () => {
     }
 
     if (layout == 'grid') {
-      // the size is rounded like the cell size of the folders page, so that
+      // the size is rounded like the cell size of the albums page, so that
       // both grids scale to the same amount of columns
       const minSize = Math.round((isMobile ? mobileGridSize : desktopGridSize) * sizeFactor)
       return grid(visibleEntries, {padding, width, minSize, labelHeight});

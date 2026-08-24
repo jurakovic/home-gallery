@@ -22,7 +22,7 @@ export type TOrderKey = {
  * See packages/query/src/query/order-by.js for all supported keys
  */
 export const orderKeys: TOrderKey[] = [
-  // 'file' is the path of the file, so the media of a folder stay together
+  // 'file' is the path of the file, so the media of an album stay together
   {key: 'file', name: 'File name', defaultDirection: 'asc'},
   // the exif date of the media with its file date as fallback
   {key: 'date', name: 'Date taken', defaultDirection: 'desc'},

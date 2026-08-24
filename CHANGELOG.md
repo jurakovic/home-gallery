@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- webapp: Add folders page to browse media by directory tree
+- webapp: Add albums page to browse media by directory tree
 - webapp: Autoplay videos in the media view. It can be disabled with `webapp.pages.mediaView.autoPlayVideo`
-- webapp: Show the index as root folder on the folders page with `webapp.pages.folders.showIndex`
+- webapp: Show the index as root album on the albums page with `webapp.pages.albums.showIndex`
 - webapp: Add order menu to the nav bar of media lists which sets the `order by` expression of the search query
-- webapp: Add ascending and descending name order to the folders page. Its initial order can be set with `webapp.pages.folders.order`
+- webapp: Add ascending and descending name order to the albums page. Its initial order can be set with `webapp.pages.albums.order`
 - webapp: Add grid thumbnail layout to the media lists which crops the media to squares. It can be picked in the nav bar and its initial value can be set with `webapp.pages.list.thumbnails`
 - webapp: Set the order of media lists without an explicit `order by` expression with `webapp.pages.list.defaultOrder`
 - webapp: Reveal the hidden navigation of a playing video by the mouse or by a tap without pausing it
@@ -24,41 +24,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Set the initial page of the webapp with `webapp.pages.landing`
 - query: Order media by their file with `order by file` for the file path or `order by filename` for the base name
 - webapp: Hide the navigation of the media view after an idle time, so that a swipe or a keyboard navigation through the media keeps it out of the way. The idle time runs across the media and another media does not restart it. A tap or a click shows it until the next media is shown
-- webapp: Show a cover thumbnail of every folder on the folders page. A media with a `_cover` file name suffix is preferred. It can be disabled with `webapp.pages.folders.showCover`
-- webapp: Switch the folders page between the folder tree and a grid of squared cover thumbnails. Its initial view can be set with `webapp.pages.folders.view`
-- webapp: Change the thumbnail size of the folders page in the nav bar. It is the size of the folder squares and of the folder rows. Its initial value can be set with `webapp.pages.folders.thumbnailSize`
-- webapp: Keep the view of the folders page of the user until it is reset by a shared url
-- webapp: Show the folders of the list view as rows of the media list layout with their name and their cover thumbnail, which carries the media count as a badge. The row size follows the thumbnail size of the nav bar
+- webapp: Show a cover thumbnail of every album on the albums page. A media with a `_cover` file name suffix is preferred. It can be disabled with `webapp.pages.albums.showCover`
+- webapp: Switch the albums page between the album tree and a grid of squared cover thumbnails. Its initial view can be set with `webapp.pages.albums.view`
+- webapp: Change the thumbnail size of the albums page in the nav bar. It is the size of the album squares and of the album rows. Its initial value can be set with `webapp.pages.albums.thumbnailSize`
+- webapp: Keep the view of the albums page of the user until it is reset by a shared url
+- webapp: Show the albums of the list view as rows of the media list layout with their name and their cover thumbnail, which carries the media count as a badge. The row size follows the thumbnail size of the nav bar
 - webapp: Show the file name of every media below its thumbnail in media lists. It can be disabled with `webapp.pages.list.showFilename`
 - webapp: Add a list layout to the media lists which shows one media per row with its file name and its file size. It is the third layout of the nav bar toggle and can be set with `webapp.pages.list.thumbnails`
 - webapp: Hide the share link of the media details with `webapp.pages.mediaView.disabled`
 - webapp: Hide the nav item of all media with the `all` flag of `webapp.pages.disabled`. An unknown or a disabled `webapp.pages.landing` falls back to the first enabled page instead of the page of all media
-- webapp: Show the duration of a video as a badge of its thumbnail in every layout of the media lists. It has the shape of the media count badge of the folder thumbnails, so that it still fits on the smallest thumbnail size
+- webapp: Show the duration of a video as a badge of its thumbnail in every layout of the media lists. It has the shape of the media count badge of the album thumbnails, so that it still fits on the smallest thumbnail size
 - webapp: Show the file name of the media in the upper left corner of the media view. It is the same name as in the media lists and is hidden with the `nav` flag of `webapp.pages.mediaView.disabled`
-- webapp: Move the view controls of the nav bar into one settings menu. It holds the order, the layout and the thumbnail size of the media lists and the order, the view and the thumbnail size of the folders page
+- webapp: Move the view controls of the nav bar into one settings menu. It holds the order, the layout and the thumbnail size of the media lists and the order, the view and the thumbnail size of the albums page
 - webapp: Reset the view settings of every page to their configured defaults in the settings menu. The search query and the selection of the edit mode are kept
-- webapp: Show the grid view of the folders page like the grid layout of the media lists. The cells are spaced like the media cells, the media count is a badge of the cover thumbnail and the folder name is the label below it
+- webapp: Show the grid view of the albums page like the grid layout of the media lists. The cells are spaced like the media cells, the media count is a badge of the cover thumbnail and the album name is the label below it
 
 ### Fixed
 
-- webapp: Break long folder names at word boundaries in the grid view of the folders page
+- webapp: Break long album names at word boundaries in the grid view of the albums page
 - webapp: Copy the share link of the media details on a gallery which is served over http. The clipboard api is only available in a secure context, so the copy command is used as fallback. The link shows whether the url was copied
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension
 - webapp: Fix the PWA manifest scope and icon paths for gallery deployments under a path prefix
 - webapp: Order the media list before its first render to avoid a visible re-order while the database loads
-- webapp: Build the folder tree of the folders page after the initial database load to avoid a short tree of a few folders
+- webapp: Build the album tree of the albums page after the initial database load to avoid a short tree of a few albums
 - webapp: Start a media list of another query at the top instead of keeping the scroll position of the previous page
 - webapp: Clear a media list on a query change so that the media of the previous query are not shown for a moment
 
 ### Changed
 
-- webapp: Show the media lists in the list layout by default, like the folders page. The fluent layout can be set with `webapp.pages.list.thumbnails`
+- webapp: Show the media lists in the list layout by default, like the albums page. The fluent layout can be set with `webapp.pages.list.thumbnails`
 - server: Add server.trustProxy option and disable proxy trust by default
-- webapp: Align all folder names to the left and shrink them on mobile on the folders page
+- webapp: Align all album names to the left and shrink them on mobile on the albums page
 - webapp: Offer the file name, the date taken, the duration and the file size as order of media lists and drop the random, the file count and the tag count order
-- webapp: Size the grid layout of the media lists like the grid view of the folders page, so that both show the same amount of columns and the same cell size at the same thumbnail size
-- webapp: Round the corners of the media thumbnails in every layout, like the cover thumbnails of the folders page
+- webapp: Size the grid layout of the media lists like the grid view of the albums page, so that both show the same amount of columns and the same cell size at the same thumbnail size
+- webapp: Round the corners of the media thumbnails in every layout, like the cover thumbnails of the albums page
 
 ## [1.21.0] - 2026-03-01
 

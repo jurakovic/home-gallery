@@ -1,15 +1,15 @@
 import { useSearchParams } from 'react-router-dom'
 
 import { useAppConfig } from '../config/useAppConfig'
-import { useFoldersStore, type TFolderView } from '../store/folders-store'
+import { useAlbumsStore, type TAlbumView } from '../store/albums-store'
 import { toThumbnailSize, type TThumbnailSize } from '../list/useThumbnailLayout'
 
 /**
- * Search param of the folders page. The url is the source of truth so that a
+ * Search param of the albums page. The url is the source of truth so that a
  * view and an order can be shared. The value is always set explicitly,
  * otherwise a toggle would fall back to the configured value again
  */
-const useFolderParam = (): [URLSearchParams, (key: string, value: string) => void] => {
+const useAlbumParam = (): [URLSearchParams, (key: string, value: string) => void] => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   // other params of the page are kept
@@ -22,11 +22,11 @@ const useFolderParam = (): [URLSearchParams, (key: string, value: string) => voi
 }
 
 /**
- * Drops the view and the order params of the folders page, so that the stored
+ * Drops the view and the order params of the albums page, so that the stored
  * and the configured values apply again. They win over the store, so a reset
  * of the view settings has to drop them
  */
-export const useResetFolderParams = () => {
+export const useResetAlbumParams = () => {
   const [, setSearchParams] = useSearchParams()
 
   return () => setSearchParams(params => {
@@ -37,23 +37,23 @@ export const useResetFolderParams = () => {
 }
 
 /**
- * View of the folders page and its setter.
+ * View of the albums page and its setter.
  *
  * The view of the user is kept until it is reset by a shared url. The config
  * sets the view of a user who did not pick one yet
  */
-export const useFolderView = (): [boolean, (view: TFolderView) => void] => {
+export const useAlbumView = (): [boolean, (view: TAlbumView) => void] => {
   const appConfig = useAppConfig()
-  const [searchParams, setParam] = useFolderParam()
-  const storeView = useFoldersStore(state => state.view)
-  const setStoreView = useFoldersStore(state => state.setView)
+  const [searchParams, setParam] = useAlbumParam()
+  const storeView = useAlbumsStore(state => state.view)
+  const setStoreView = useAlbumsStore(state => state.setView)
 
-  const configView: TFolderView = appConfig.pages?.folders?.view == 'grid' ? 'grid' : 'list'
+  const configView: TAlbumView = appConfig.pages?.albums?.view == 'grid' ? 'grid' : 'list'
   const isGrid = searchParams.has('view') ?
     searchParams.get('view') == 'grid' :
     (storeView || configView) == 'grid'
 
-  const setView = (view: TFolderView) => {
+  const setView = (view: TAlbumView) => {
     setStoreView(view)
     setParam('view', view)
   }
@@ -62,31 +62,31 @@ export const useFolderView = (): [boolean, (view: TFolderView) => void] => {
 }
 
 /**
- * Name order of the folders page and its setter. The config sets the initial
+ * Name order of the albums page and its setter. The config sets the initial
  * order only
  */
-export const useFolderOrder = (): [boolean, (descending: boolean) => void] => {
+export const useAlbumOrder = (): [boolean, (descending: boolean) => void] => {
   const appConfig = useAppConfig()
-  const [searchParams, setParam] = useFolderParam()
+  const [searchParams, setParam] = useAlbumParam()
 
   const descending = searchParams.has('dir') ?
     searchParams.get('dir') == 'desc' :
-    appConfig.pages?.folders?.order == 'nameDesc'
+    appConfig.pages?.albums?.order == 'nameDesc'
 
   return [descending, (descending: boolean) => setParam('dir', descending ? 'desc' : 'asc')]
 }
 
 /**
- * Thumbnail size of the folders page. It is the size of the folder squares of
+ * Thumbnail size of the albums page. It is the size of the album squares of
  * the grid view and the row height of the list view.
  *
- * The page keeps a size of its own, so that the folders and the media lists
+ * The page keeps a size of its own, so that the albums and the media lists
  * can have different sizes
  */
-export const useFolderThumbnailSize = (): TThumbnailSize => {
+export const useAlbumThumbnailSize = (): TThumbnailSize => {
   const appConfig = useAppConfig()
-  const sizeStep = useFoldersStore(state => state.sizeStep)
-  const setSizeStep = useFoldersStore(state => state.setSizeStep)
+  const sizeStep = useAlbumsStore(state => state.sizeStep)
+  const setSizeStep = useAlbumsStore(state => state.setSizeStep)
 
-  return toThumbnailSize(sizeStep, setSizeStep, appConfig.pages?.folders?.thumbnailSize)
+  return toThumbnailSize(sizeStep, setSizeStep, appConfig.pages?.albums?.thumbnailSize)
 }

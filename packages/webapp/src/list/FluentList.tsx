@@ -36,7 +36,7 @@ const FileSize = ({item}) => {
 
 /**
  * Duration of a video as a badge of its thumbnail. It has the shape of the
- * media count badge of the folder thumbnails, so that it still fits on the
+ * media count badge of the album thumbnails, so that it still fits on the
  * smallest thumbnail size
  */
 const DurationBadge = ({duration}) => (
@@ -115,7 +115,7 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   // size and the video duration stays in its corner
   const filename = (labelHeight || isList) ? getFilename(item) : ''
 
-  // the thumbnail is rounded like the cover thumbnail of the folders page
+  // the thumbnail is rounded like the cover thumbnail of the albums page
   const thumbnail = (
     <div className={classNames('relative rounded', {'flex-shrink-0': isList, 'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
       <img className={classNames('object-cover rounded')} style={style} src={previewUrl} loading="lazy" />

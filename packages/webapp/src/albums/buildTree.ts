@@ -93,8 +93,8 @@ const addCoverCandidate = (node: TreeNode, entry: Entry, filename: string, candi
  * Sets the cover of all nodes without an own cover media.
  *
  * Such a node inherits the cover of its first subdirectory by name. The name
- * order is independent from the folder order so that the cover of a node stays
- * the same if the folder order is reversed
+ * order is independent from the album order so that the cover of a node stays
+ * the same if the album order is reversed
  */
 const inheritCovers = (node: TreeNode) => {
   node.children.forEach(inheritCovers)
@@ -117,7 +117,7 @@ const sortChildren = (node: TreeNode, compare: (a: TreeNode, b: TreeNode) => num
  * files can live in other directories than the main file and would double count
  * entries otherwise.
  *
- * The folders of every level are ordered by their name, `descending` reverses
+ * The albums of every level are ordered by their name, `descending` reverses
  * the order.
  *
  * The tree levels are the index relative directories of the media files. An
@@ -184,10 +184,10 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false, descendi
 }
 
 /**
- * Returns all folder nodes of the tree in their display order.
+ * Returns all album nodes of the tree in their display order.
  *
- * The nodes are flattened depth first, so a folder is directly followed by its
- * subfolders. The virtual root itself is not part of the result
+ * The nodes are flattened depth first, so an album is directly followed by its
+ * sub-albums. The virtual root itself is not part of the result
  */
 export const flattenTree = (node: TreeNode): TreeNode[] =>
   node.children.flatMap(child => [child, ...flattenTree(child)])

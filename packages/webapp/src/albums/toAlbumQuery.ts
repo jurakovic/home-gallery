@@ -21,7 +21,7 @@ const queryTerm = (key: string, value: string, op: string = ':') => `${key}${op}
  * the match is a substring match on the directory name: `path~2019/Sommer` also
  * matches `archive/2019/Sommer`.
  */
-export const toFolderQuery = (node: TreeNode) => {
+export const toAlbumQuery = (node: TreeNode) => {
   const terms = [queryTerm('index', node.index)]
   if (node.path) {
     terms.push(queryTerm('path', node.path, '~'))

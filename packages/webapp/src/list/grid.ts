@@ -21,7 +21,7 @@ const defaultOptions: IGridOptions = {
 /**
  * Minimum edge length of a cell at the default thumbnail size. It is scaled by
  * the size factor of the thumbnail size and is shared with the grid view of
- * the folders page, so that both grids have the same amount of columns
+ * the albums page, so that both grids have the same amount of columns
  */
 export const mobileGridSize = 110
 export const desktopGridSize = 180
@@ -44,7 +44,7 @@ export const grid = (items: any[], options: Partial<IGridOptions>): IFluentRow[]
 
 	// the row is padded by half the padding on each side, so the space around
 	// the cells is one gap and the columns are counted like the css grid of the
-	// folders page: repeat(auto-fill, minmax(minSize, 1fr))
+	// albums page: repeat(auto-fill, minmax(minSize, 1fr))
 	const columns = Math.max(1, Math.floor(width / (minSize + padding)))
 	const size = Math.floor(width / columns - padding)
 

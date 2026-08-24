@@ -60,38 +60,38 @@ export interface PluginManager {
  * Customize pages
  */
 export interface Pages {
-  disabled?: (("edit" | "date" | "video" | "map" | "tag" | "folder" | "all") | string)[];
+  disabled?: (("edit" | "date" | "video" | "map" | "tag" | "album" | "all") | string)[];
   /**
    * Initial page of the webapp on its first load. It falls back to the page of all media if the configured page is disabled
    */
-  landing?: "all" | "folders" | "years" | "tags" | "map";
-  folders?: FoldersPage;
+  landing?: "all" | "albums" | "years" | "tags" | "map";
+  albums?: AlbumsPage;
   list?: ListPage;
   mediaView?: MediaViewPage;
   [k: string]: unknown;
 }
 /**
- * Customize folders page
+ * Customize albums page
  */
-export interface FoldersPage {
+export interface AlbumsPage {
   /**
-   * Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed
+   * Show the index as root album. An index is a media source directory and is the parent of all its albums. By default only its subdirectories are listed
    */
   showIndex?: boolean;
   /**
-   * Show a cover thumbnail of the folder. The cover is the first media of the folder or of its first subfolder. A media whose file name ends with '_cover' before its extension is preferred
+   * Show a cover thumbnail of the album. The cover is the first media of the album or of its first sub-album. A media whose file name ends with '_cover' before its extension is preferred
    */
   showCover?: boolean;
   /**
-   * Initial size of the folder thumbnails. Smaller thumbnails show more folders per row in the grid view and shorter rows in the list view. It is overruled by the size controls of the nav bar
+   * Initial size of the album thumbnails. Smaller thumbnails show more albums per row in the grid view and shorter rows in the list view. It is overruled by the size controls of the nav bar
    */
   thumbnailSize?: "xsmall" | "small" | "medium" | "large" | "xlarge";
   /**
-   * Initial folder order. It is overruled by the order of the page
+   * Initial album order. It is overruled by the order of the page
    */
   order?: "name" | "nameDesc";
   /**
-   * Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view toggle of the page
+   * Initial album view. The list view shows the album tree, the grid view shows all albums as squared cover thumbnails. It is overruled by the view toggle of the page
    */
   view?: "list" | "grid";
   [k: string]: unknown;

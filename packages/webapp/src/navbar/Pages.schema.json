@@ -10,14 +10,14 @@
       "type": "array",
       "items": {
         "anyOf": [
-          { "enum": ["edit", "date", "video", "map", "tag", "folder", "all"] },
+          { "enum": ["edit", "date", "video", "map", "tag", "album", "all"] },
           { "type": "string", "minLength": 0 }
         ]
       }
     },
     "landing": {
       "description": "Initial page of the webapp on its first load. It falls back to the page of all media if the configured page is disabled",
-      "enum": ["all", "folders", "years", "tags", "map"],
+      "enum": ["all", "albums", "years", "tags", "map"],
       "default": "all"
     }
   }

@@ -1,4 +1,4 @@
-import { useFoldersStore } from './folders-store'
+import { useAlbumsStore } from './albums-store'
 import { useListLayoutStore } from './list-layout-store'
 import { useSingleViewStore } from './single-view-store'
 
@@ -11,6 +11,6 @@ import { useSingleViewStore } from './single-view-store'
  */
 export const resetViewSettings = () => {
   useListLayoutStore.getState().reset()
-  useFoldersStore.getState().reset()
+  useAlbumsStore.getState().reset()
   useSingleViewStore.getState().reset()
 }

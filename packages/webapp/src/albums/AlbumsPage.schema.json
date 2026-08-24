@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/xemle/home-gallery/master/gallery.config.schema.json#webapp.pages.albums",
+  "title": "AlbumsPage",
+  "description": "Customize albums page",
+  "default": [],
+  "type": "object",
+  "properties": {
+    "showIndex": {
+      "description": "Show the index as root album. An index is a media source directory and is the parent of all its albums. By default only its subdirectories are listed",
+      "type": "boolean",
+      "default": false
+    },
+    "showCover": {
+      "description": "Show a cover thumbnail of the album. The cover is the first media of the album or of its first sub-album. A media whose file name ends with '_cover' before its extension is preferred",
+      "type": "boolean",
+      "default": true
+    },
+    "thumbnailSize": {
+      "description": "Initial size of the album thumbnails. Smaller thumbnails show more albums per row in the grid view and shorter rows in the list view. It is overruled by the size controls of the nav bar",
+      "enum": ["xsmall", "small", "medium", "large", "xlarge"],
+      "default": "medium"
+    },
+    "order": {
+      "description": "Initial album order. It is overruled by the order of the page",
+      "enum": ["name", "nameDesc"],
+      "default": "name"
+    },
+    "view": {
+      "description": "Initial album view. The list view shows the album tree, the grid view shows all albums as squared cover thumbnails. It is overruled by the view toggle of the page",
+      "enum": ["list", "grid"],
+      "default": "list"
+    }
+  }
+}

@@ -11,7 +11,7 @@ export interface IListOptions {
 
 /**
  * Height of a row of the list layout. It is shared with the list view of the
- * folders page, so that both lists have the same rows
+ * albums page, so that both lists have the same rows
  */
 export const mobileRowHeight = 56
 export const desktopRowHeight = 72

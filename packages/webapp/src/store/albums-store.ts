@@ -1,15 +1,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type TFolderView = 'list' | 'grid'
+export type TAlbumView = 'list' | 'grid'
 
-export interface FoldersStore {
+export interface AlbumsStore {
   /**
-   * Folder view of the user. It is empty as long as the user did not toggle
+   * Album view of the user. It is empty as long as the user did not toggle
    * the view, than the configured view is used
    */
-  view: TFolderView | ''
-  setView: (view: TFolderView) => void
+  view: TAlbumView | ''
+  setView: (view: TAlbumView) => void
   /**
    * Thumbnail size of the user as step around the default size. It is empty as
    * long as the user did not change the size, than the configured size is used
@@ -20,16 +20,16 @@ export interface FoldersStore {
   reset: () => void
 }
 
-export const useFoldersStore = create<
-  FoldersStore,
+export const useAlbumsStore = create<
+  AlbumsStore,
   [
-    ["zustand/persist", FoldersStore]
+    ["zustand/persist", AlbumsStore]
   ]
   >(
   persist((set) => ({
     view: '',
 
-    setView: (view: TFolderView) => {
+    setView: (view: TAlbumView) => {
       set((state) => ({...state, view}))
     },
 
@@ -42,5 +42,5 @@ export const useFoldersStore = create<
     reset: () => {
       set((state) => ({...state, view: '', sizeStep: ''}))
     },
-  }), { name: 'gallery-folders' })
+  }), { name: 'gallery-albums' })
 )

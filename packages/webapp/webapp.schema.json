@@ -114,7 +114,7 @@
                       "video",
                       "map",
                       "tag",
-                      "folder",
+                      "album",
                       "all"
                     ]
                   },
@@ -129,33 +129,33 @@
               "description": "Initial page of the webapp on its first load. It falls back to the page of all media if the configured page is disabled",
               "enum": [
                 "all",
-                "folders",
+                "albums",
                 "years",
                 "tags",
                 "map"
               ],
               "default": "all"
             },
-            "folders": {
+            "albums": {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "$id": "https://raw.githubusercontent.com/xemle/home-gallery/master/gallery.config.schema.json#webapp.pages.folders",
-              "title": "FoldersPage",
-              "description": "Customize folders page",
+              "$id": "https://raw.githubusercontent.com/xemle/home-gallery/master/gallery.config.schema.json#webapp.pages.albums",
+              "title": "AlbumsPage",
+              "description": "Customize albums page",
               "default": [],
               "type": "object",
               "properties": {
                 "showIndex": {
-                  "description": "Show the index as root folder. An index is a media source directory and is the parent of all its folders. By default only its subdirectories are listed",
+                  "description": "Show the index as root album. An index is a media source directory and is the parent of all its albums. By default only its subdirectories are listed",
                   "type": "boolean",
                   "default": false
                 },
                 "showCover": {
-                  "description": "Show a cover thumbnail of the folder. The cover is the first media of the folder or of its first subfolder. A media whose file name ends with '_cover' before its extension is preferred",
+                  "description": "Show a cover thumbnail of the album. The cover is the first media of the album or of its first sub-album. A media whose file name ends with '_cover' before its extension is preferred",
                   "type": "boolean",
                   "default": true
                 },
                 "order": {
-                  "description": "Initial folder order. It is overruled by the order of the page",
+                  "description": "Initial album order. It is overruled by the order of the page",
                   "enum": [
                     "name",
                     "nameDesc"
@@ -163,7 +163,7 @@
                   "default": "name"
                 },
                 "view": {
-                  "description": "Initial folder view. The list view shows the folder tree, the grid view shows all folders as squared cover thumbnails. It is overruled by the view toggle of the page",
+                  "description": "Initial album view. The list view shows the album tree, the grid view shows all albums as squared cover thumbnails. It is overruled by the view toggle of the page",
                   "enum": [
                     "list",
                     "grid"

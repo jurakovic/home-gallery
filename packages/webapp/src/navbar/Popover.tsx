@@ -27,7 +27,7 @@ type PopoverProps = {
  * children.
  *
  * A click outside of it only closes the panel. Its backdrop swallows the
- * click, so that it does not open the media or the folder below the panel as
+ * click, so that it does not open the media or the album below the panel as
  * well
  */
 export const Popover = ({trigger, children, panelClass}: PopoverProps) => {
@@ -54,7 +54,7 @@ export const Popover = ({trigger, children, panelClass}: PopoverProps) => {
             * The backdrop covers the page below the nav bar and takes the
             * click or the tap which closes the panel. A document listener
             * could not do that: it would close the panel, but the event would
-            * still reach the media or the folder below it and open it
+            * still reach the media or the album below it and open it
             */}
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className={classNames('absolute left-0 z-20 mt-1 bg-gray-800 border border-gray-700 rounded shadow-lg top-full', panelClass)}>
