@@ -77,6 +77,7 @@ const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node
   const query = toFolderQuery(node)
   const icon = getFolderIcon(node, isExpanded)
   const coverUrl = getCoverUrl(node, showCover, rowHeight)
+  const name = node.name || '(no index)'
 
   return (
     <>
@@ -93,23 +94,16 @@ const FolderItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node
           <Link className="flex items-center h-full min-w-0 gap-4 text-gray-500 grow group-hover:text-gray-300 hover:cursor-pointer"
             to={`/search/${encodeURIComponent(query)}`}
             title={`Search for '${query}'`}>
-            { showCover ?
-              // the box keeps the row height of folders without a cover media
-              <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
-                { coverUrl ?
-                  <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
-                  <FontAwesomeIcon icon={icon} />
-                }
-                <CountBadge count={node.count} />
-              </span> :
-              <FontAwesomeIcon className="flex-shrink-0" icon={icon} />
-            }
-            <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300">
-              {node.name || '(no index)'}
-              { !showCover &&
-                // the count has no thumbnail to be a badge of
-                <span className="whitespace-nowrap" title={countTitle}> ({node.count})</span>
+            {/* the box keeps the row height of folders without a cover media */}
+            <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
+              { coverUrl ?
+                <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
+                <FontAwesomeIcon icon={icon} />
               }
+              <CountBadge count={node.count} />
+            </span>
+            <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300" title={name}>
+              {name}
             </span>
           </Link>
         </span>
