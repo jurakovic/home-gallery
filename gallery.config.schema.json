@@ -685,7 +685,8 @@
                       "video",
                       "map",
                       "tag",
-                      "folder"
+                      "folder",
+                      "all"
                     ]
                   },
                   {

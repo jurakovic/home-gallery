@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webapp: Show the file name of every media below its thumbnail in media lists. It can be disabled with `webapp.pages.list.showFilename`
 - webapp: Add a list layout to the media lists which shows one media per row with its file name, its file size and the duration of a video. It is the third layout of the nav bar toggle and can be set with `webapp.pages.list.thumbnails`
 - webapp: Hide the share link of the media details with `webapp.pages.mediaView.disabled`
+- webapp: Hide the nav item of all media with the `all` flag of `webapp.pages.disabled`. An unknown or a disabled `webapp.pages.landing` falls back to the first enabled page instead of the page of all media
 
 ### Fixed
 

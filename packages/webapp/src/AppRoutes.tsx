@@ -23,18 +23,41 @@ import { useAppConfig } from "./config/useAppConfig";
 
 const defaultLandingPage = 'all'
 
+/**
+ * Landing pages by their config value with the page flag which disables them.
+ * Their order is the fallback order of a disabled landing page and follows the
+ * nav bar
+ */
 const landingPages = {
-  all: {route: '/', pageFlag: ''},
+  all: {route: '/', pageFlag: 'all'},
   folders: {route: '/folders', pageFlag: 'folder'},
-  years: {route: '/years', pageFlag: 'date'},
   tags: {route: '/tags', pageFlag: 'tag'},
+  years: {route: '/years', pageFlag: 'date'},
   map: {route: '/map', pageFlag: 'map'},
 }
+
+type TLandingPage = keyof typeof landingPages
+
+/** True if the page is known and is not disabled by `webapp.pages.disabled` */
+const isEnabled = (name: string, disabled: string[]) => {
+  const page = landingPages[name as TLandingPage]
+  return !!page && !disabled.includes(page.pageFlag)
+}
+
+/**
+ * First enabled page of the fallback order. It is undefined if every page is
+ * disabled
+ */
+const findEnabledLandingPage = (disabled: string[]) =>
+  (Object.keys(landingPages) as TLandingPage[]).find(name => isEnabled(name, disabled))
 
 /**
  * Navigates once to the page of `webapp.pages.landing` if the app is opened on
  * the root path. Deep links and later navigations to the root path, eg by the
- * 'Show All' nav item, are left alone
+ * 'Show All' nav item, are left alone.
+ *
+ * An unknown or a disabled landing page falls back to the first enabled page
+ * of the fallback order
  */
 const useLandingPage = () => {
   const appConfig = useAppConfig()
@@ -49,15 +72,24 @@ const useLandingPage = () => {
     }
     isNavigated.current = true
 
+    if (location.pathname != '/') {
+      return
+    }
+
+    const disabled = appConfig.pages?.disabled || []
     const landing = appConfig.pages?.landing || defaultLandingPage
-    const page = landingPages[landing]
-    if (!page) {
-      log.warn(`Unknown page '${landing}' of webapp.pages.landing. Show page ${defaultLandingPage} instead`)
-      return
-    } else if (page.pageFlag && appConfig.pages?.disabled?.includes(page.pageFlag)) {
-      log.warn(`Page '${landing}' of webapp.pages.landing is disabled by webapp.pages.disabled. Show page ${defaultLandingPage} instead`)
-      return
-    } else if (landing == defaultLandingPage || location.pathname != '/') {
+
+    let name: TLandingPage | undefined = landing
+    if (!isEnabled(landing, disabled)) {
+      const reason = landingPages[landing] ? 'is disabled by webapp.pages.disabled' : 'is unknown'
+      name = findEnabledLandingPage(disabled)
+      log.warn(`Page '${landing}' of webapp.pages.landing ${reason}. Show ${name ? `page '${name}'` : 'the page of all media'} instead`)
+    }
+
+    // the page of all media is the root path itself and every page can be
+    // disabled, which leaves the root path as the last resort
+    const page = name && landingPages[name]
+    if (!page || page.route == location.pathname) {
       return
     }
 

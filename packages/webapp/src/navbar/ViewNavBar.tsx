@@ -37,6 +37,7 @@ export const ViewNavBar = ({disableEdit}) => {
         navigate('/')
         search({type: 'none'});
       },
+      hidden: appConfig.pages?.disabled?.includes('all'),
     },
     {
       icon: icons.faFolderTree,

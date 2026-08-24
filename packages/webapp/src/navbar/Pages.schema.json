@@ -10,7 +10,7 @@
       "type": "array",
       "items": {
         "anyOf": [
-          { "enum": ["edit", "date", "video", "map", "tag", "folder"] },
+          { "enum": ["edit", "date", "video", "map", "tag", "folder", "all"] },
           { "type": "string", "minLength": 0 }
         ]
       }
