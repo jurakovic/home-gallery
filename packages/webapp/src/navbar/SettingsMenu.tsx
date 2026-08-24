@@ -23,13 +23,13 @@ const directionIcon = (direction: string) => direction == 'asc' ? icons.faArrowU
 
 const layoutIcons = {
   fluent: icons.faImages,
-  square: icons.faTableCellsLarge,
+  grid: icons.faTableCellsLarge,
   list: icons.faList,
 }
 
 const layoutNames = {
   fluent: 'Fluent',
-  square: 'Square',
+  grid: 'Grid',
   list: 'List',
 }
 

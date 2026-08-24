@@ -90,7 +90,7 @@ export const List = () => {
       return list(visibleEntries, {padding, width, rowHeight});
     }
 
-    if (layout == 'square') {
+    if (layout == 'grid') {
       const minSize = (isMobile ? mobileGridSize : desktopGridSize) * sizeFactor
       return grid(visibleEntries, {padding, width, minSize, labelHeight});
     }

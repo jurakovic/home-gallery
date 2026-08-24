@@ -7,8 +7,8 @@
   "type": "object",
   "properties": {
     "thumbnails": {
-      "description": "Layout of the media lists. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares and 'list' shows one media per row with its file name beside its thumbnail. It is overruled by the layout toggle of the nav bar",
-      "enum": ["fluent", "square", "list"],
+      "description": "Layout of the media lists. 'fluent' keeps the aspect ratio of the media, 'grid' crops them to a grid of squares and 'list' shows one media per row with its file name beside its thumbnail. It is overruled by the layout toggle of the nav bar",
+      "enum": ["fluent", "grid", "list"],
       "default": "fluent"
     },
     "thumbnailSize": {
@@ -22,7 +22,7 @@
       "default": true
     },
     "showFilename": {
-      "description": "Show the file name of every media below its thumbnail in the fluent and in the squared media list. The name is shown without its directory and with its file extension. The list layout shows it beside the thumbnail in any case",
+      "description": "Show the file name of every media below its thumbnail in the fluent and in the grid media list. The name is shown without its directory and with its file extension. The list layout shows it beside the thumbnail in any case",
       "type": "boolean",
       "default": true
     },

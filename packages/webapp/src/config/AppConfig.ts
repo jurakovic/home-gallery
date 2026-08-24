@@ -101,9 +101,9 @@ export interface FoldersPage {
  */
 export interface ListPage {
   /**
-   * Layout of the media lists. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares and 'list' shows one media per row with its file name beside its thumbnail. It is overruled by the layout toggle of the nav bar
+   * Layout of the media lists. 'fluent' keeps the aspect ratio of the media, 'grid' crops them to a grid of squares and 'list' shows one media per row with its file name beside its thumbnail. It is overruled by the layout toggle of the nav bar
    */
-  thumbnails?: "fluent" | "square" | "list";
+  thumbnails?: "fluent" | "grid" | "list";
   /**
    * Initial size of the thumbnails. Smaller thumbnails show more media per row. It is overruled by the size controls of the nav bar
    */
@@ -113,7 +113,7 @@ export interface ListPage {
    */
   scrollbar?: boolean;
   /**
-   * Show the file name of every media below its thumbnail in the fluent and in the squared media list. The name is shown without its directory and with its file extension. The list layout shows it beside the thumbnail in any case
+   * Show the file name of every media below its thumbnail in the fluent and in the grid media list. The name is shown without its directory and with its file extension. The list layout shows it beside the thumbnail in any case
    */
   showFilename?: boolean;
   /**

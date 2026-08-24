@@ -4,7 +4,7 @@ import { useListLayoutStore, type TThumbnailLayout } from '../store/list-layout-
 const defaultLayout: TThumbnailLayout = 'fluent'
 
 /** Layouts in the order of the settings panel */
-export const thumbnailLayouts: TThumbnailLayout[] = ['fluent', 'square', 'list']
+export const thumbnailLayouts: TThumbnailLayout[] = ['fluent', 'grid', 'list']
 
 const toLayout = (value?: string): TThumbnailLayout =>
   thumbnailLayouts.find(layout => layout == value) || defaultLayout
@@ -69,7 +69,7 @@ export const toThumbnailSize = (sizeStep: number | '', setSizeStep: (step: numbe
 
 /**
  * Thumbnail size of the media lists as step around the default size. The
- * returned factor scales the cell size of the squared layout, the row heights
+ * returned factor scales the cell size of the grid layout, the row heights
  * of the fluent layout and the rows of the list layout
  */
 export const useThumbnailSize = (): TThumbnailSize => {

@@ -181,10 +181,11 @@
               "type": "object",
               "properties": {
                 "thumbnails": {
-                  "description": "Shape of the thumbnails. 'fluent' keeps the aspect ratio of the media, 'square' crops them to a grid of squares. It is overruled by the layout toggle of the nav bar",
+                  "description": "Layout of the media lists. 'fluent' keeps the aspect ratio of the media, 'grid' crops them to a grid of squares and 'list' shows one media per row with its file name beside its thumbnail. It is overruled by the layout toggle of the nav bar",
                   "enum": [
                     "fluent",
-                    "square"
+                    "grid",
+                    "list"
                   ],
                   "default": "fluent"
                 },
