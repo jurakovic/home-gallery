@@ -54,9 +54,14 @@ const CountBadge = ({count}: {count: number}) => (
   </span>
 )
 
-/** Name of a folder below its cover thumbnail, like the file name of a media */
+/**
+ * Name of a folder below its cover thumbnail. It has the styling of the file
+ * name label of the media lists, but wraps at word boundaries instead of being
+ * truncated: the grid has no hierarchy and shows the whole path, whose last
+ * part names the folder and would be the first to be cut off
+ */
 const NameLabel = ({name}: {name: string}) => (
-  <span className="pt-1 text-xs text-gray-500 truncate group-hover:text-gray-300" title={name}>
+  <span className="pt-1 text-xs text-gray-500 break-words group-hover:text-gray-300" title={name}>
     {name}
   </span>
 )

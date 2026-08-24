@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- webapp: Break long folder names at word boundaries in the grid view of the folders page
 - webapp: Copy the share link of the media details on a gallery which is served over http. The clipboard api is only available in a secure context, so the copy command is used as fallback. The link shows whether the url was copied
 - server: Escape social media title and description agains injections
 - server: Fix social media dimension
