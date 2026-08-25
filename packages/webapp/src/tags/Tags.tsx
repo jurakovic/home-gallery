@@ -6,8 +6,11 @@ import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { NavBar } from '../navbar/NavBar';
 import { useEntryStore } from '../store/entry-store';
+import { useScrollToTop } from '../utils/useScrollToTop';
 
 export const Tags = () => {
+  // the page is opened from a scrolled media list and starts at its first tag
+  useScrollToTop()
 
   const allEntries = useEntryStore(state => state.allEntries);
 

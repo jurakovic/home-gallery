@@ -18,6 +18,14 @@ export const useScrollTop = () => {
       }
     }
     window.addEventListener('scroll', scroll)
+
+    // The state starts at the top while the browser keeps the scroll position
+    // of the previous page. Reading the position after the mount catches up
+    // with the browser, which has clamped it to the height of the new content
+    // by now, so that the rendered rows match the viewport even if the page is
+    // not scrolled afterwards
+    setScrollTop(document.documentElement.scrollTop)
+
     return () => window.removeEventListener('scroll', scroll)
   }, []);
 
@@ -134,7 +142,9 @@ export const VirtualScroll = ({ref, items, padding, children}) => {
       end++;
     }
     return {start, end}
-  }, [items, scrollTop])
+    // the window height decides how many rows fill the viewport, so a resize
+    // needs to widen the rendered range as well
+  }, [items, scrollTop, height])
 
   const renderItems = useMemo(() => {
     const result = [];

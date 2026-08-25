@@ -13,6 +13,7 @@ import { useAppConfig } from '../config/useAppConfig';
 import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
 import useBodyDimensions from '../utils/useBodyDimensions';
+import { useScrollToTop } from '../utils/useScrollToTop';
 import { VirtualScroll } from '../list/VirtualScroll';
 import { desktopGridSize, grid, mobileGridSize } from '../list/grid';
 import { desktopRowHeight, list, mobileRowHeight } from '../list/list';
@@ -192,6 +193,9 @@ const flattenVisible = (node: TreeNode, expanded: ExpandedMap, level: number = 0
   ])
 
 export const Albums = () => {
+  // the page is opened from a scrolled media list and starts at its first album
+  useScrollToTop()
+
   const allEntries = useEntryStore(state => state.allEntries);
   const initialLoadDone = useEntryStore(state => state.initialLoadDone);
   const appConfig = useAppConfig()

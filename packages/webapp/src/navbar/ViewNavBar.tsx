@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
-  useNavigate
+  useNavigate,
+  type NavigateOptions
 } from "react-router-dom";
 import * as icons from '@fortawesome/free-solid-svg-icons'
 
@@ -29,12 +30,25 @@ export const ViewNavBar = ({disableEdit}) => {
   const listLocation = useListLocation()
   const appConfig = useAppConfig()
 
+  /**
+   * Navigates to a page and starts it at its top.
+   *
+   * The nav item of the current page navigates to the page again, which keeps
+   * it mounted and keeps its scroll position with it. The scroll is therefore
+   * reset on the click and not only on the mount of the page, see the
+   * useScrollToTop hook of the pages
+   */
+  const navigateToTop = (to: string, options?: NavigateOptions) => {
+    navigate(to, options)
+    window.scrollTo(0, 0)
+  }
+
   const items: TNavItem[] = [
     {
       icon: icons.faGlobe,
       text: 'Show All',
       action: () => {
-        navigate('/')
+        navigateToTop('/')
         search({type: 'none'});
       },
       hidden: appConfig.pages?.disabled?.includes('all'),
@@ -42,19 +56,19 @@ export const ViewNavBar = ({disableEdit}) => {
     {
       icon: icons.faFolderTree,
       text: 'Albums',
-      action: () => navigate('/albums'),
+      action: () => navigateToTop('/albums'),
       hidden: appConfig.pages?.disabled?.includes('album'),
     },
     {
       icon: icons.faClockRotateLeft,
       text: 'On This Day',
-      action: () => navigate('/on-this-day'),
+      action: () => navigateToTop('/on-this-day'),
       hidden: appConfig.pages?.disabled?.includes('onThisDay'),
     },
     {
       icon: icons.faPlay,
       text: 'Videos',
-      action: () => navigate('/search/type:video'),
+      action: () => navigateToTop('/search/type:video'),
       hidden: appConfig.pages?.disabled?.includes('video'),
     },
     {
@@ -72,19 +86,19 @@ export const ViewNavBar = ({disableEdit}) => {
     {
       icon: icons.faTags,
       text: 'Tags',
-      action: () => navigate('/tags'),
+      action: () => navigateToTop('/tags'),
       hidden: appConfig.pages?.disabled?.includes('tag'),
     },
     {
       icon: icons.faClock,
       text: 'Years',
-      action: () => navigate('/years'),
+      action: () => navigateToTop('/years'),
       hidden: appConfig.pages?.disabled?.includes('date'),
     },
     {
       icon: icons.faMap,
       text: 'Map',
-      action: () => navigate('/map', {state: {listLocation}}),
+      action: () => navigateToTop('/map', {state: {listLocation}}),
       hidden: appConfig.pages?.disabled?.includes('map'),
     },
   ]

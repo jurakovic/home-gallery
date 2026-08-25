@@ -14,6 +14,7 @@ import { NavBar } from '../navbar/NavBar';
 import { List } from '../list/List';
 import { useEntryStore } from '../store/entry-store'
 import { useSearchStore } from '../store/search-store'
+import { useScrollToTop } from '../utils/useScrollToTop'
 
 interface YearInfo {
   year: number,
@@ -23,6 +24,9 @@ interface YearInfo {
 }
 
 export const Years = () => {
+  // the page is opened from a scrolled media list and starts at its first year
+  useScrollToTop()
+
   const allEntries = useEntryStore(state => state.allEntries);
   const navigate = useNavigate();
 
