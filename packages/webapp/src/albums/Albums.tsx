@@ -14,6 +14,7 @@ import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useScrollToTop } from '../utils/useScrollToTop';
+import { useRetainedImage } from '../utils/useRetainedImage';
 import { VirtualScroll } from '../list/VirtualScroll';
 import { desktopGridSize, grid, mobileGridSize } from '../list/grid';
 import { desktopRowHeight, list, mobileRowHeight } from '../list/list';
@@ -107,6 +108,10 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
   const coverUrl = getCoverUrl(node, showCover, rowHeight, rowHeight)
   const name = node.name || '(no index)'
 
+  // the row is unmounted while it scrolls out of the view, so its cover is kept
+  // in the memory of the browser for the next visit
+  useRetainedImage(coverUrl)
+
   return (
     <span className="flex items-center min-w-0 rounded grow group hover:bg-gray-700" style={{paddingLeft: `${level}rem`, height: rowHeight}}>
       { isExpandable &&
@@ -123,7 +128,7 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
         {/* the box keeps the row height of albums without a cover media */}
         <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
           { coverUrl ?
-            <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" loading="lazy" /> :
+            <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" /> :
             <FontAwesomeIcon icon={icon} />
           }
           <CountBadge count={node.count} />
@@ -147,6 +152,8 @@ const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: bool
   const coverUrl = getCoverUrl(node, showCover, cellSize, cellSize)
   const name = node.path || node.name || '(no index)'
 
+  useRetainedImage(coverUrl)
+
   return (
     <Link className="flex flex-col flex-shrink-0 min-w-0 text-gray-500 group hover:cursor-pointer"
       style={{width: cellSize, height: cellSize + nameLabelHeight}}
@@ -155,7 +162,7 @@ const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: bool
       <span className="relative flex items-center justify-center overflow-hidden rounded bg-gray-800 group-hover:bg-gray-700"
         style={{width: cellSize, height: cellSize}}>
         { coverUrl ?
-          <img className="object-cover w-full h-full" src={coverUrl} alt="" loading="lazy" /> :
+          <img className="object-cover w-full h-full" src={coverUrl} alt="" /> :
           <FontAwesomeIcon className="text-2xl" icon={getAlbumIcon(node)} />
         }
         <CountBadge count={node.count} />

@@ -10,6 +10,7 @@ import useBodyDimensions from '../utils/useBodyDimensions';
 import { VirtualScroll } from "./VirtualScroll";
 import { getFilename, humanizeBytes, humanizeDuration } from "../utils/format";
 import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
+import { useRetainedImage } from '../utils/useRetainedImage';
 import { classNames } from '../utils/class-names'
 
 /**
@@ -60,6 +61,10 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
 
   const previewSize = getCoverPreviewSize(width, height, item.width, item.height);
   const previewUrl = getHigherPreviewUrl(previews, previewSize * (window.devicePixelRatio || 1));
+
+  // the cell is unmounted with every query and every scroll, so its thumbnail
+  // is kept in the memory of the browser for the next visit
+  useRetainedImage(previewUrl);
 
   const showImage = () => {
     navigate(`/view/${shortId}`, {state: {listLocation: location, index}});
@@ -118,7 +123,10 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   // the thumbnail is rounded like the cover thumbnail of the albums page
   const thumbnail = (
     <div className={classNames('relative rounded', {'flex-shrink-0': isList, 'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
-      <img className={classNames('object-cover rounded')} style={style} src={previewUrl} loading="lazy" />
+      {/* the virtual scroll renders the visible rows only, so the thumbnail is
+          loaded eagerly: a lazy load would defer even a cached file to the next
+          frame and paint the cell blank until then */}
+      <img className={classNames('object-cover rounded')} style={style} src={previewUrl} />
       {type == 'video' &&
         <DurationBadge duration={duration} />
       }
