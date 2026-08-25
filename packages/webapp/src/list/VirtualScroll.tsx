@@ -139,6 +139,7 @@ export const VirtualScroll = ({ref, items, padding, children}) => {
   const [scrollTop, setScrollTop] = useScrollTop();
   const height = useHeight();
   const scrollSpeed = useScrollSpeed();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const rowHeights: IVirtualScrollRow[] = useMemo(() => {
     let top = 0;
@@ -185,22 +186,39 @@ export const VirtualScroll = ({ref, items, padding, children}) => {
     height: `${lastRow ? lastRow.top + lastRow.height : 0}px`
   } as React.CSSProperties;
 
+  const scrollTo = (scrollToY: number) => {
+    const y = Math.max(0, scrollToY)
+    window.scrollTo(0, y);
+    setScrollTop(y);
+  }
+
   useImperativeHandle(ref, () => ({
-    scrollToRow: ({rowIndex}) => {
+    /**
+     * Shows the row of the list.
+     *
+     * A `scrollTop` of zero or above is a remembered position of the list and
+     * is restored as it is, which leaves the list exactly as the user left it.
+     * The row is scrolled into the middle of the view otherwise
+     */
+    scrollToRow: ({rowIndex, scrollTop = -1}) => {
       if (!rowHeights.length || rowIndex < 0) {
         return;
       }
-      const index = Math.min(rowIndex, rowHeights.length);
+      if (scrollTop >= 0) {
+        scrollTo(scrollTop);
+        return;
+      }
+
+      const index = Math.min(rowIndex, rowHeights.length - 1);
       const row = rowHeights[index];
-      const scrollToY = row.top + (row.height / 2) - (height / 2);
-      console.log(`scrollToRow() to row ${rowIndex} (${index}) with scrollToY ${scrollToY}`);
-      window.scrollTo(0, Math.max(0, scrollToY));
-      setScrollTop(scrollToY);
+      // the rows are placed in the container, which starts below the nav bar
+      const containerTop = containerRef.current ? containerRef.current.getBoundingClientRect().top + window.scrollY : 0
+      scrollTo(containerTop + row.top + (row.height / 2) - (height / 2));
     }
   }));
 
   return (
-    <div style={style}>
+    <div ref={containerRef} style={style}>
       {renderItems}
     </div>
   )

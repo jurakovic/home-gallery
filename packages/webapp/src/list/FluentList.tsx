@@ -71,6 +71,9 @@ const Cell = ({height, width, index, item, items, labelHeight, isList, scrollSpe
   const imageProps = useThumbnailImage(previewUrl, isFastScroll(scrollSpeed));
 
   const showImage = () => {
+    // the media view shrinks the page and the browser drops the scroll position
+    // of the list, so it is remembered for the way back, see FluentList
+    useSingleViewStore.getState().setListScroll(shortId, window.scrollY)
     navigate(`/view/${shortId}`, {state: {listLocation: location, index}});
   }
 
@@ -206,7 +209,12 @@ export const FluentList = ({rows, padding, labelHeight = 0, layout = 'fluent'}) 
     const [cell, rowIndex] = findCellById(rows, lastViewId)
     if (cell && lastRowIndex != rowIndex) {
       console.log(`MediaFluent:useLayoutEffect scroll to ${lastViewId} in row ${rowIndex}`)
-      virtualScrollRef.current.scrollToRow({rowIndex});
+      // The list keeps its position if the media view is left with the media it
+      // was opened with: the media is then where the user clicked it. Another
+      // media of the media view is scrolled into the middle of the list instead
+      const {listScrollId, listScrollTop} = useSingleViewStore.getState()
+      const keepPosition = listScrollId == lastViewId
+      virtualScrollRef.current.scrollToRow({rowIndex, scrollTop: keepPosition ? listScrollTop : -1});
       setLastRowIndex(rowIndex)
     } else if (!cell) {
       console.log(`MediaFluent:useLayoutEffect could not find entry with ${lastViewId}`)
