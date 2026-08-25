@@ -2,6 +2,7 @@ import { createReadStream } from 'fs'
 import { access } from 'fs/promises'
 import { pipeline, Readable } from 'stream'
 import { pipeline as pipelineAsync } from 'stream/promises'
+import { StringDecoder } from 'string_decoder'
 import { createGunzip } from 'zlib'
 import { through, toList, write } from '@home-gallery/stream'
 
@@ -65,9 +66,17 @@ export const createEntrySplitter = (filename) => {
   let isFirstChunk = true
   let data = ''
   let totalPos = 0
+  /**
+   * The chunks of the unzipped file break at any byte, so a character of more
+   * than one byte can span two of them. Decoding a chunk on its own would turn
+   * its half of the character into a replacement character and would corrupt
+   * the text of the entry, eg the filename of a directory with diacritics.
+   * The decoder holds an incomplete character back until its chunk arrives
+   */
+  const decoder = new StringDecoder('utf8')
 
   const stream = through(function(chunk, enc, cb) {
-    data += chunk.toString('utf8')
+    data += typeof chunk == 'string' ? chunk : decoder.write(chunk)
     let pos = 0
     if (isFirstChunk) {
       const [err, end, header] = findHeader(data)
@@ -99,6 +108,8 @@ export const createEntrySplitter = (filename) => {
     cb()
 
   }, function(cb) {
+    // an incomplete character of the last chunk is a broken file
+    data += decoder.end()
     if (isFirstChunk) {
       return cb(new Error(`Could not find database header`))
     } else if (data == ']}') {

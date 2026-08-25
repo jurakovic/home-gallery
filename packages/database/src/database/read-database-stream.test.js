@@ -183,6 +183,34 @@ t.test('createEntrySplitter', async t => {
     t.same(entries.length, 2)
   })
 
+  t.test('entry with a multi byte character across two buffers', async t => {
+    // the filename holds a two byte character which is split by the buffers
+    let data = '{"type":"home-gallery/database@1.3","created":"2024-07-10T20:07:25.084Z","data":['
+    data += '{"id":"4b157a9dc0e4baf45ab0ef65c32832566ab0d1e5","hash":"99e61930141e8afff0d6d8c52997ec7295d62fd2","type":"image","files":[{"id":"4b157a9dc0e4baf45ab0ef65c32832566ab0d1e5","index":"files","filename":"maškare/2026.jpg"}],"previews":["4b/15/7a9dc0e-image-preview-1920.jpg"],"width":4000,"height":3000}'
+    data += ']}'
+    const buffer = Buffer.from(data)
+    const splitPos = buffer.indexOf(Buffer.from('š')) + 1
+    const buffers = [
+      buffer.subarray(0, splitPos),
+      buffer.subarray(splitPos)
+    ]
+    const entries = []
+
+
+    await pipeline(
+      Readable.from(buffers),
+      createEntrySplitter(),
+      through(function(entry, _, cb) {
+        entries.push(entry)
+        cb()
+      })
+    )
+
+
+    t.same(entries.length, 1)
+    t.same(entries[0].files[0].filename, 'maškare/2026.jpg')
+  })
+
   t.test('two entries with splitted buffer', async t => {
     const buffers = [
       Buffer.from('{"type":"home-gallery/database@1.3","created":"2024-07-10T2'),
