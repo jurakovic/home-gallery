@@ -9,6 +9,7 @@ import { useAppConfig } from "../config/useAppConfig";
 import { useTagDialog } from "../dialog/use-tag-dialog";
 import type { Entry } from "../store/entry";
 import { classNames } from "../utils/class-names";
+import { toDirectoryQuery } from "../utils/searchQuery";
 import { formatDate, getFilename, humanizeBytes, humanizeDuration } from "../utils/format";
 import { MediaViewDisableFlags } from "./MediaViewPage";
 import { FeatureFlags } from '../config/AppConfig';
@@ -112,7 +113,6 @@ export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
   }
 
   const mapFile = file => {
-    const indexTerm = queryTerm('index', file.index)
     const isDownloadable = !!appConfig.sources?.find((source) => source.downloadable && source.indexName === file.index);
 
     const filename = file.filename
@@ -121,8 +121,9 @@ export const Details = ({entry, dispatch}: {entry: Entry, dispatch: any}) => {
     filename.replace(/[\\/]/g, (sep, pos) => {
       const name = filename.substring(lastPos, pos)
       const path = filename.substring(0, pos)
-      const pathTerm = queryTerm('path', path, '~')
-      links.push(searchLink(name, `${indexTerm} ${pathTerm}`))
+      // the directory of the breadcrumb holds its subdirectories as well, like
+      // the album of the albums page
+      links.push(searchLink(name, toDirectoryQuery(file.index, path)))
       links.push(sepSpan(sep))
       lastPos = pos + 1
     })
