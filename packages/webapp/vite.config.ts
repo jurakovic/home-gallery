@@ -70,6 +70,36 @@ export default defineConfig(() => {
         },
         workbox: {
           navigateFallbackDenylist: [/\/api\//, /\/files\//],
+          // The image previews are addressed by the checksum of their media and
+          // never change, so a cached file is always valid. The browser cache
+          // holds them for the two days of the server and drops them by its own
+          // strategy, the service worker keeps them until its budget is reached:
+          // a revisited list paints from the cache and an installed app shows
+          // its thumbnails offline.
+          //
+          // The entries cover the previews of the thumbnails and of the media
+          // view, whose sizes are configured by extractor.image.previewSizes. A
+          // budget of 3000 files is a few hundred megabytes at the usual sizes
+          // and is purged as a whole if the storage quota of the browser is hit.
+          // The video previews are left out: they are large and are requested in
+          // ranges, which a cache first strategy would not serve
+          runtimeCaching: [
+            {
+              urlPattern: ({url}) => /\/files\/.*image-preview-\d+\.jpg$/.test(url.pathname),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'gallery-image-previews',
+                expiration: {
+                  maxEntries: 3000,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                  purgeOnQuotaError: true
+                },
+                cacheableResponse: {
+                  statuses: [200]
+                }
+              }
+            }
+          ]
         }
       }),
       pwaConditionalPlugin({ disabled: false }),
