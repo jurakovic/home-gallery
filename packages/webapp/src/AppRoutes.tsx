@@ -53,9 +53,24 @@ const findEnabledLandingPage = (disabled: string[]) =>
   (Object.keys(landingPages) as TLandingPage[]).find(name => isEnabled(name, disabled))
 
 /**
+ * True if the app was opened newly.
+ *
+ * A reload or a back and forward navigation restores the page the user is on
+ * and is no fresh start of the app. The page of all media is the root path
+ * itself, so its reload would look like an opened app and would be replaced by
+ * the landing page otherwise
+ */
+const isNewVisit = () => {
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+  // the entry is missing on browsers without the navigation timings, where
+  // every visit counts as a new one
+  return !navigation || navigation.type == 'navigate'
+}
+
+/**
  * Navigates once to the page of `webapp.pages.landing` if the app is opened on
- * the root path. Deep links and later navigations to the root path, eg by the
- * 'Show All' nav item, are left alone.
+ * the root path. Deep links, reloads and later navigations to the root path, eg
+ * by the 'Show All' nav item, are left alone.
  *
  * An unknown or a disabled landing page falls back to the first enabled page
  * of the fallback order.
@@ -78,6 +93,11 @@ const useLandingPage = () => {
     isNavigated.current = true
 
     if (location.pathname != '/') {
+      return
+    }
+
+    // the user reloads the page of all media and stays on it
+    if (!isNewVisit()) {
       return
     }
 
