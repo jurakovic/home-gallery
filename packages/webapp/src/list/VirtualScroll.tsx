@@ -91,7 +91,7 @@ export const useScrollSpeed = () => {
       lastScrollTop = scrollTop;
 
       if (timerRef.current) {
-        clearTimeout(ref.current);
+        clearTimeout(timerRef.current);
       }
       timerRef.current = setTimeout(() => {
         setScrollSpeed(0);
@@ -104,6 +104,20 @@ export const useScrollSpeed = () => {
 
   return scrollSpeed;
 }
+
+/**
+ * Scroll speed in view heights per second up to which a row loads its
+ * previews.
+ *
+ * A faster scroll is a fling to another part of the list: its rows are mounted
+ * for a few frames only and their requests would queue up in the browser, block
+ * the previews of the rows the user stops at and keep loading long after the
+ * scroll ended. Three view heights per second are still followed by the eye
+ */
+const maxLoadScrollSpeed = 3
+
+/** True if the list scrolls too fast to load the previews of its rows */
+export const isFastScroll = (scrollSpeed: number) => Math.abs(scrollSpeed) > maxLoadScrollSpeed
 
 interface IVirtualScrollRow {
   top: number;
@@ -161,7 +175,9 @@ export const VirtualScroll = ({ref, items, padding, children}) => {
       result.push(<div className="item" key={index} style={style}>{children({row, index, scrollSpeed})}</div>)
     }
     return result;
-  }, [start, end, items]);
+    // the scroll speed decides whether a row loads its previews, so a change of
+    // the speed has to reach the rows
+  }, [start, end, items, scrollSpeed]);
 
   const lastRow = rowHeights[rowHeights.length - 1];
   const style = {

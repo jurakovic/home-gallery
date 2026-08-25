@@ -14,8 +14,8 @@ import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
 import { useDeviceType, DeviceType } from '../utils/useDeviceType';
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useScrollToTop } from '../utils/useScrollToTop';
-import { useRetainedImage } from '../utils/useRetainedImage';
-import { VirtualScroll } from '../list/VirtualScroll';
+import { useThumbnailImage } from '../utils/useThumbnailImage';
+import { VirtualScroll, isFastScroll } from '../list/VirtualScroll';
 import { desktopGridSize, grid, mobileGridSize } from '../list/grid';
 import { desktopRowHeight, list, mobileRowHeight } from '../list/list';
 
@@ -100,7 +100,7 @@ const NameLabel = ({name}: {name: string}) => (
  * list layout: the cover thumbnail with the media count as its badge and the
  * album name
  */
-const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, rowHeight: number, expanded: ExpandedMap, toggle: (key: string) => void}) => {
+const AlbumItem = ({node, level, showCover, rowHeight, scrollSpeed, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, rowHeight: number, scrollSpeed: number, expanded: ExpandedMap, toggle: (key: string) => void}) => {
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toAlbumQuery(node)
@@ -109,8 +109,9 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
   const name = node.name || '(no index)'
 
   // the row is unmounted while it scrolls out of the view, so its cover is kept
-  // in the memory of the browser for the next visit
-  useRetainedImage(coverUrl)
+  // in the memory of the browser for the next visit and a pending load is
+  // aborted with the row, see useThumbnailImage
+  const imageProps = useThumbnailImage(coverUrl, isFastScroll(scrollSpeed))
 
   return (
     <span className="flex items-center min-w-0 rounded grow group hover:bg-gray-700" style={{paddingLeft: `${level}rem`, height: rowHeight}}>
@@ -128,7 +129,7 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
         {/* the box keeps the row height of albums without a cover media */}
         <span className="relative flex items-center justify-center flex-shrink-0 h-full rounded bg-gray-800" style={{width: rowHeight}}>
           { coverUrl ?
-            <img className="object-cover w-full h-full rounded" src={coverUrl} alt="" /> :
+            <img {...imageProps} className="object-cover w-full h-full rounded" alt="" /> :
             <FontAwesomeIcon icon={icon} />
           }
           <CountBadge count={node.count} />
@@ -147,12 +148,12 @@ const AlbumItem = ({node, level, showCover, rowHeight, expanded, toggle}: {node:
  * The grid has no album hierarchy, so the whole path of the album is shown
  * instead of its name only
  */
-const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: boolean, cellSize: number}) => {
+const AlbumCard = ({node, showCover, cellSize, scrollSpeed}: {node: TreeNode, showCover: boolean, cellSize: number, scrollSpeed: number}) => {
   const query = toAlbumQuery(node)
   const coverUrl = getCoverUrl(node, showCover, cellSize, cellSize)
   const name = node.path || node.name || '(no index)'
 
-  useRetainedImage(coverUrl)
+  const imageProps = useThumbnailImage(coverUrl, isFastScroll(scrollSpeed))
 
   return (
     <Link className="flex flex-col flex-shrink-0 min-w-0 text-gray-500 group hover:cursor-pointer"
@@ -162,7 +163,7 @@ const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: bool
       <span className="relative flex items-center justify-center overflow-hidden rounded bg-gray-800 group-hover:bg-gray-700"
         style={{width: cellSize, height: cellSize}}>
         { coverUrl ?
-          <img className="object-cover w-full h-full" src={coverUrl} alt="" /> :
+          <img {...imageProps} className="object-cover w-full h-full" alt="" /> :
           <FontAwesomeIcon className="text-2xl" icon={getAlbumIcon(node)} />
         }
         <CountBadge count={node.count} />
@@ -178,12 +179,12 @@ const AlbumCard = ({node, showCover, cellSize}: {node: TreeNode, showCover: bool
  * width. The row is padded by half the gap, so the space around the cells is
  * one gap
  */
-const AlbumRow = ({row, isGrid, showCover, expanded, toggle}: {row: any, isGrid: boolean, showCover: boolean, expanded: ExpandedMap, toggle: (key: string) => void}) => (
+const AlbumRow = ({row, isGrid, showCover, scrollSpeed, expanded, toggle}: {row: any, isGrid: boolean, showCover: boolean, scrollSpeed: number, expanded: ExpandedMap, toggle: (key: string) => void}) => (
   <div className="flex items-center w-full" style={{gap: padding, padding: padding / 2, height: row.height}}>
     { row.columns.map((cell: any) => isGrid ?
-      <AlbumCard key={cell.item.key} node={cell.item} showCover={showCover} cellSize={cell.width} /> :
+      <AlbumCard key={cell.item.key} node={cell.item} showCover={showCover} cellSize={cell.width} scrollSpeed={scrollSpeed} /> :
       <AlbumItem key={cell.item.node.key} node={cell.item.node} level={cell.item.level}
-        showCover={showCover} rowHeight={cell.height} expanded={expanded} toggle={toggle} />
+        showCover={showCover} rowHeight={cell.height} scrollSpeed={scrollSpeed} expanded={expanded} toggle={toggle} />
     )}
   </div>
 )
@@ -252,8 +253,8 @@ export const Albums = () => {
       }
       <div className="relative z-0 w-full">
         <VirtualScroll items={rows} padding={padding}>
-          {({row}) => (
-            <AlbumRow row={row} isGrid={isGrid} showCover={showCover} expanded={expanded} toggle={toggle} />
+          {({row, scrollSpeed}) => (
+            <AlbumRow row={row} isGrid={isGrid} showCover={showCover} scrollSpeed={scrollSpeed} expanded={expanded} toggle={toggle} />
           )}
         </VirtualScroll>
       </div>

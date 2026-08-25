@@ -7,10 +7,10 @@ import Hammer from 'hammerjs';
 
 import { useLastLocation } from '../utils/lastLocation/useLastLocation'
 import useBodyDimensions from '../utils/useBodyDimensions';
-import { VirtualScroll } from "./VirtualScroll";
+import { VirtualScroll, isFastScroll } from "./VirtualScroll";
 import { getFilename, humanizeBytes, humanizeDuration } from "../utils/format";
 import { getCoverPreviewSize, getHigherPreviewUrl } from '../utils/preview';
-import { useRetainedImage } from '../utils/useRetainedImage';
+import { useThumbnailImage } from '../utils/useThumbnailImage';
 import { classNames } from '../utils/class-names'
 
 /**
@@ -47,7 +47,7 @@ const DurationBadge = ({duration}) => (
   </span>
 )
 
-const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
+const Cell = ({height, width, index, item, items, labelHeight, isList, scrollSpeed}) => {
   const ref = useRef();
   const location = useLocation();
   const viewMode = useEditModeStore(state => state.viewMode);
@@ -62,9 +62,13 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   const previewSize = getCoverPreviewSize(width, height, item.width, item.height);
   const previewUrl = getHigherPreviewUrl(previews, previewSize * (window.devicePixelRatio || 1));
 
-  // the cell is unmounted with every query and every scroll, so its thumbnail
-  // is kept in the memory of the browser for the next visit
-  useRetainedImage(previewUrl);
+  // The cell is unmounted with every query and every scroll, so its thumbnail
+  // is kept in the memory of the browser for the next visit and a pending load
+  // is aborted with the cell.
+  //
+  // A row of a fast scroll loads nothing at all: it is replaced within a few
+  // frames and its request would only delay the rows the user stops at
+  const imageProps = useThumbnailImage(previewUrl, isFastScroll(scrollSpeed));
 
   const showImage = () => {
     navigate(`/view/${shortId}`, {state: {listLocation: location, index}});
@@ -123,10 +127,12 @@ const Cell = ({height, width, index, item, items, labelHeight, isList}) => {
   // the thumbnail is rounded like the cover thumbnail of the albums page
   const thumbnail = (
     <div className={classNames('relative rounded', {'flex-shrink-0': isList, 'outline outline-4 outline-primary-300 outline-offset-[-0.25rem] brightness-110 saturate-[1.3]': isSelected()})} style={style}>
-      {/* the virtual scroll renders the visible rows only, so the thumbnail is
-          loaded eagerly: a lazy load would defer even a cached file to the next
-          frame and paint the cell blank until then */}
-      <img className={classNames('object-cover rounded')} style={style} src={previewUrl} />
+      {/* the virtual scroll renders the visible rows only and skips the rows of
+          a fast scroll, so the thumbnail is loaded eagerly: a lazy load would
+          defer even a cached file to the next frame and paint the cell blank
+          until then. The cell keeps the vibrant color of its media until the
+          preview is loaded */}
+      <img {...imageProps} className={classNames('object-cover rounded')} style={style} />
       {type == 'video' &&
         <DurationBadge duration={duration} />
       }
@@ -170,7 +176,7 @@ const Row = (props) => {
   const columns = props.columns;
   return (
     <div className="flex items-center w-full" style={style}>
-      {columns.map((cell, index) => <Cell key={index} width={cell.width} height={cell.height} item={cell.item} index={cell.index} items={cell.items} labelHeight={props.labelHeight} isList={props.isList} />)}
+      {columns.map((cell, index) => <Cell key={index} width={cell.width} height={cell.height} item={cell.item} index={cell.index} items={cell.items} labelHeight={props.labelHeight} isList={props.isList} scrollSpeed={props.scrollSpeed} />)}
     </div>
   )
 }
@@ -210,7 +216,7 @@ export const FluentList = ({rows, padding, labelHeight = 0, layout = 'fluent'}) 
   return (
     <div className="relative w-full">
       <VirtualScroll ref={virtualScrollRef} items={rows} padding={padding} >
-        {({row}) => <Row height={row.height} columns={row.columns} labelHeight={labelHeight} isList={layout == 'list'}></Row>}
+        {({row, scrollSpeed}) => <Row height={row.height} columns={row.columns} labelHeight={labelHeight} isList={layout == 'list'} scrollSpeed={scrollSpeed}></Row>}
       </VirtualScroll>
     </div>
   )
