@@ -6,6 +6,7 @@ import { RunStep, Mapping, readConfig, Target } from './config.js'
 import type { BundleConfig, Package } from './config.js'
 import { runSimple } from './run.js'
 import { matchPlatformArch, getFilter } from './filter.js'
+import { toPosixPath } from './utils.js'
 import { writeArchive } from './archive.js'
 import { pack } from './caxa.js'
 import { updateHash } from './update-hash.js'
@@ -107,7 +108,7 @@ export const bundle = async (options: BundleOptions): Promise<void> => {
     const targetPackages = filterPackages(packages, target.platform, target.arch)
     const packageResolver = new PackageReolver(dir)
     await packageResolver.addPackages(targetPackages, dir, {platform: toPackagePlatform(target.platform), arch: target.arch})
-    const packageFiles = (await packageResolver.files).map(file => path.relative(dir, file))
+    const packageFiles = (await packageResolver.files).map(file => toPosixPath(path.relative(dir, file)))
     log.info(`Require ${packageResolver.packageCount} packages with ${packageFiles.length} files for ${targetPackages.length} main packages`)
 
     const filter = getFilter(packageFiles, includes, excludes, target.platform, target.arch)

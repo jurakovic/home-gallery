@@ -5,6 +5,7 @@ import { createGzip } from 'zlib'
 import tar from 'tar-fs'
 
 import { FilterFunction } from './filter.js'
+import { toPosixPath } from './utils.js'
 import { logger } from './log.js'
 
 export interface MapFunction {
@@ -16,7 +17,9 @@ const log = logger('archive')
 export const writeArchive = async (dir: string, filter: FilterFunction, mapName: MapFunction, archivePrefix: string, outputFilename: string) => {
   const tarStream = tar.pack(dir, {
     ignore: (name: string) => {
-      const relative = path.relative(dir, name)
+      // tar-fs calls ignore() with the platform native path while the filter
+      // patterns and the resolved package files use posix separators
+      const relative = toPosixPath(path.relative(dir, name))
       const allow = filter(relative)
       allow ? log.debug(`Filter: + ${relative}`) : log.trace(`Filter: - ${relative}`)
       return !allow
