@@ -43,10 +43,12 @@ export class PackageReolver {
     return fs.access(packageFilename)
       .then(() => this.loadPackage(packageDir))
       .catch(() => {
-        if (!dir || dir == '/') {
+        // `dirname` is a fixed point at the filesystem root, `/` on posix but
+        // also `D:\` on Windows where the walk up would never end
+        const dirname = path.dirname(dir)
+        if (!dir || dirname == dir) {
           throw new Error(`Could not find package ${name} in ${dir}`)
         }
-        const dirname = path.dirname(dir)
         return this.findPackage(dirname, name)
       })
   }
