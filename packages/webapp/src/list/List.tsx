@@ -10,9 +10,9 @@ import { Scrollbar } from "./scrollbar";
 
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useDeviceType, DeviceType } from "../utils/useDeviceType";
-import { fluent } from "./fluent";
-import { desktopGridSize, grid, mobileGridSize } from "./grid";
-import { desktopRowHeight, list, mobileRowHeight } from "./list";
+import { fluent } from "./layout/fluent";
+import { desktopGridSize, grid, mobileGridSize } from "./layout/grid";
+import { desktopRowHeight, list, mobileRowHeight } from "./layout/list";
 import { useThumbnailLayout, useThumbnailSize } from "./useThumbnailLayout";
 import { useAppConfig } from "../config/useAppConfig";
 import { MultiTagDialogProvider } from "../dialog/tag-dialog-provider";

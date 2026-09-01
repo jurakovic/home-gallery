@@ -16,8 +16,8 @@ import useBodyDimensions from '../utils/useBodyDimensions';
 import { useScrollToTop } from '../utils/useScrollToTop';
 import { useThumbnailImage } from '../utils/useThumbnailImage';
 import { VirtualScroll, isFastScroll } from '../list/VirtualScroll';
-import { desktopGridSize, grid, mobileGridSize } from '../list/grid';
-import { desktopRowHeight, list, mobileRowHeight } from '../list/list';
+import { desktopGridSize, grid, mobileGridSize } from '../list/layout/grid';
+import { desktopRowHeight, list, mobileRowHeight } from '../list/layout/list';
 
 type ExpandedMap = {[key: string]: boolean}
 
