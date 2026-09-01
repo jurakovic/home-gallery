@@ -15,3 +15,5 @@ gallery.config.yml
 latest-e2e
 *.tsbuildinfo
 brun.sh
+/node
+.build.json

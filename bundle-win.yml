@@ -1,0 +1,38 @@
+# Bundle configuration for a local Windows x64 archive, driven by
+# `scripts/bundle-win.sh`. It is a stripped down `bundle.yml`:
+#
+# * only the win-x64 target and `command: false`, so the caxa stub is skipped
+#   and only the `tar.gz` archive is written
+# * no `before` and `run` steps, `scripts/bundle-win.sh` prepares the tree
+# * `bundle-run.sh` is mapped to the archive root as `run.sh` launcher
+#
+# Keep in sync with `bundle.yml` when the upstream bundle changes
+targets:
+  - platform: win
+    arch: x64
+    command: false
+packages:
+  - './packages/cli'
+includes:
+  - ./package.json
+  - ./CHANGELOG.md
+  - ./README.md
+  - ./LICENSE
+  - ./gallery.js
+  - ./gallery.config-example.yml
+  - ./.build.json
+  - ./bundle-run.sh
+  - node/win-x64
+excludes:
+  - node_modules/.bin/*
+  - '*/node_modules/.bin/*'
+  - node_modules/.cache/*
+  - '*/node_modules/.cache/*'
+map:
+  - packages/: node_modules/@home-gallery/
+  - bundle-run.sh: run.sh
+  - node/win-x64: node
+output:
+  dir: dist
+  name: home-gallery
+  prefix: home-gallery/

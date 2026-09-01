@@ -1,0 +1,2 @@
+# Shell scripts must keep LF endings, they run in Git Bash and inside the bundle
+*.sh text eol=lf
