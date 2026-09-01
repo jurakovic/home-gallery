@@ -1,11 +1,24 @@
 ---
 name: 'build binaries'
 
-on: push
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: 'Platform-arch targets, e.g. win-x64 or linux-x64,win-x64. Empty builds all'
+        type: string
+        required: false
+        default: 'win-x64'
 
 jobs:
   docker:
     runs-on: ubuntu-latest
+    env:
+      # A step `if` can not read the secrets context, a job env can
+      DEPLOY_HOST: ${{ secrets.SSH_HOSTNAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -54,12 +67,31 @@ jobs:
 
       - name: Build packages
         id: build
+        env:
+          BUNDLE_FILTER: ${{ inputs.filter }}
         run: |
           npx pnpm --filter '*bundle' build
-          node scripts/bundle.js "--version=${{ steps.prepare.outputs.VERSION }}" "--snapshot=${{ steps.prepare.outputs.SNAPSHOT }}"
+          args=("--version=${{ steps.prepare.outputs.VERSION }}" "--snapshot=${{ steps.prepare.outputs.SNAPSHOT }}")
+          # Empty on a tag push, which builds every target of bundle.yml
+          if [ -n "$BUNDLE_FILTER" ]; then
+            args+=("--filter=$BUNDLE_FILTER")
+          fi
+          node scripts/bundle.js "${args[@]}"
+
+      # The caxa binaries stay behind, only the archives are attached
+      - name: Upload archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-gallery-${{ steps.prepare.outputs.VERSION }}${{ steps.prepare.outputs.SNAPSHOT }}
+          path: |
+            dist/${{ steps.prepare.outputs.VERSION }}/*.tar.gz*
+            dist/${{ steps.prepare.outputs.VERSION }}/sha256sums.txt
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Deploy via rsync
         id: deploy
+        if: env.DEPLOY_HOST != ''
         uses: up9cloud/action-rsync@master
         env:
           HOST: ${{secrets.SSH_HOSTNAME}}
