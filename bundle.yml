@@ -17,18 +17,12 @@ targets:
 before:
   - npm run clean
   - npm run build
-  - npm install --force --no-save @ffmpeg-installer/linux-x64 @ffmpeg-installer/win32-x64 @ffmpeg-installer/darwin-x64 @ffprobe-installer/linux-x64 @ffprobe-installer/win32-x64 @ffprobe-installer/darwin-x64 exiftool-vendored.exe exiftool-vendored.pl
+  # Native modules of all bundle targets: the vendor packages of ffmpeg,
+  # ffprobe and exiftool and the prebuilt binaries of sharp. npm installs only
+  # the ones of the build host, the bundler picks the matching ones per target
+  # by their `os` and `cpu` properties
+  - node scripts/install-native-deps.js --platforms=linux-x64,darwin-x64,win-x64 @ffmpeg-installer/linux-x64 @ffmpeg-installer/win32-x64 @ffmpeg-installer/darwin-x64 @ffprobe-installer/linux-x64 @ffprobe-installer/win32-x64 @ffprobe-installer/darwin-x64 exiftool-vendored.exe exiftool-vendored.pl
   - node scripts/download-nodejs.js --version=24.14.0 --platforms=linux-x64,darwin-x64,win-x64 --targetDir=node
-run:
-  - npx rimraf node_modules/sharp/{build,vendor,platform.json}
-  - command: npm --prefix=node_modules/sharp --platform=linux --arch=x64 --sharp-install-force run install
-    platformArch: linux-x64
-  #- command: npm --prefix=node_modules/sharp --platform=linux --arch=arm64 --sharp-install-force run install
-  #  platformArch: linux-arm64
-  - command: npm --prefix=node_modules/sharp --platform=darwin --arch=x64 run install
-    platformArch: darwin-x64
-  - command: npm --prefix=node_modules/sharp --platform=win32 --arch=x64 run install
-    platformArch: win-x64
 packages:
   - './packages/cli'
 includes:
