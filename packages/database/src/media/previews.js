@@ -1,6 +1,6 @@
 import os from 'os'
 
-const isWindows = os.platform == 'win32'
+const isWindows = os.platform() == 'win32'
 
 const toUrlPath = isWindows ? p => p.split('\\').join('/') : p => p
 

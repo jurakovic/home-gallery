@@ -6,7 +6,7 @@ import Logger from '@home-gallery/logger'
 
 const log = Logger('cli.config.find')
 
-const isWindows = os.platform == 'win32'
+const isWindows = os.platform() == 'win32'
 const env = process.env
 const cwd = path.resolve(process.cwd())
 const homeDir = os.homedir() || cwd
