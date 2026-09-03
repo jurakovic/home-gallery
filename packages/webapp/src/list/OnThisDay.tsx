@@ -11,17 +11,23 @@ import { useSearchStore } from '../store/search-store'
  * The current year is excluded, so that the page looks back only: the media of
  * today are the newest ones of the media lists already.
  *
+ * The day is read in the local time zone, which is the day the user calls today
+ * and the day the app prints below its media, see utils/format.ts. Reading it in
+ * UTC showed the previous day to everyone east of UTC in the hours after
+ * midnight, and the next day west of it in the hours before.
+ *
  * The date of an entry is stored in UTC, see packages/database/src/media/date.js,
- * and the year, month and day filters slice that UTC string. The day is read in
- * UTC as well, otherwise the media of the hours around midnight would fall on
- * the neighbour day of every user who is not on UTC.
+ * and the year, month and day filters slice that UTC string, so a media taken in
+ * the hours around midnight is matched on its neighbour day. Its local hour is
+ * lost with the time zone offset of the entry date, so the query cannot correct
+ * that shift.
  *
  * The newest year comes first. Every media of the list shares its day, so the
  * date order keeps the media of a year together. The list itself draws no year
  * headings, the date scrollbar labels the years instead
  */
 export const toOnThisDayQuery = (today: Date) =>
-  `month:${today.getUTCMonth() + 1} day:${today.getUTCDate()} year<${today.getUTCFullYear()} order by date desc`
+  `month:${today.getMonth() + 1} day:${today.getDate()} year<${today.getFullYear()} order by date desc`
 
 /**
  * Media of the current day of the earlier years.
