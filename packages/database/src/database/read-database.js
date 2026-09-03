@@ -11,11 +11,16 @@ export function readDatabase(filename, cb) {
   });
 }
 
-export const initDatabase = (entries) => {
+/**
+ * @param {object[]} entries
+ * @param {string} [timezone] Time zone of the media dates, see database.timezone
+ */
+export const initDatabase = (entries, timezone) => {
   const databaseFileType = getDatabaseFileType()
   return {
     type: databaseFileType.toString(),
     created: new Date().toISOString(),
+    ...(timezone ? {timezone} : {}),
     data: entries
   }
 }

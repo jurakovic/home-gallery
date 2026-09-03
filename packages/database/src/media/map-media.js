@@ -2,7 +2,7 @@ import Logger from '@home-gallery/logger'
 
 const log = Logger('database.media')
 
-import { getEntryDate } from './date.js'
+import { getEntryDate, getTimezone, toFileDate } from './date.js'
 import { getVibrantColors } from './vibrant-colors.js'
 import { exifMapper } from './exif.js'
 import { getVideo } from './video.js'
@@ -18,8 +18,8 @@ import { objectMapper } from './objects.js';
 import { faceMapper } from './faces.js';
 import { iptcMapper } from './iptc.js'
 
-const createMedia = (entry, orig = {}) => {
-  const date = getEntryDate(entry) || entry.date
+const createMedia = (entry, orig = {}, timezone) => {
+  const date = getEntryDate(entry, timezone) || toFileDate(entry.date, timezone)
   const files = getFiles(entry)
   const previews = getPreviews(entry)
   const vibrantColors = getVibrantColors(entry)
@@ -42,8 +42,8 @@ const createMedia = (entry, orig = {}) => {
 
 const baseDatabaseMapper = {
   name: 'baseMapper',
-  mapEntry(entry, media) {
-    return createMedia(entry, media)
+  mapEntry(entry, media, config) {
+    return createMedia(entry, media, getTimezone(config))
   }
 }
 

@@ -2,6 +2,7 @@ import type { Event, EventListener } from '@home-gallery/events'
 import { fetchJsonWorker } from '../utils/fetch-json-worker'
 import { byPreviewSize } from '../utils/preview'
 import { toAbsoluteUrl } from '../utils/toAbsoluteUrl'
+import { setDatabaseTimezone } from '../utils/database-timezone'
 
 export const mapEntriesForBrowser = entry => {
   entry.shortId = entry.id.substring(0, 12)
@@ -49,6 +50,9 @@ export const fetchAll = async (limits, onChunk) => {
     let chunkStart = Date.now()
     return await fetchJsonWorker(url)
       .then(database => {
+        // Every chunk carries the database header. The time zone of the media
+        // dates is required before the first entry is shown
+        setDatabaseTimezone(database.timezone)
         if (!database.data || !database.data.length) {
           return;
         }

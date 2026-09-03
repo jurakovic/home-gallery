@@ -16,7 +16,9 @@ export const injectState = (database, dir, basePath, disableEdit, cb) => {
     }
     const state = {
       disabled,
-      entries: database.data.slice(0, 50)
+      entries: database.data.slice(0, 50),
+      // Time zone of the media dates, see the database.timezone config
+      timezone: database.timezone,
     };
     return data.replace('window.__homeGallery={}', `window.__homeGallery=${JSON.stringify(state)}`);
   }, (err) => {

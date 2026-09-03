@@ -3,7 +3,7 @@ import path from 'path'
 import { pipeline } from 'stream/promises'
 
 import Logger from '@home-gallery/logger'
-import { createOrEmptyReadableStream } from '@home-gallery/database';
+import { createOrEmptyReadableStream, readDatabaseHeader } from '@home-gallery/database';
 import { createWriteStream } from '@home-gallery/database';
 import { each, filter, through } from '@home-gallery/stream';
 import { filterEntriesByQuery, createStringifyEntryCache } from '@home-gallery/query'
@@ -39,11 +39,19 @@ export const filterDatabaseByQuery = async (database, query) => {
  * @param {import('./types').Remote} remote
  */
 export const mergeRemoteDatabase = async (databaseFilename, remoteDatabase, storageDir, remote) => {
+  // The merge rewrites the database, so its time zone is kept. The dates of the
+  // remote entries are in the time zone of the remote gallery
+  const header = await readDatabaseHeader(databaseFilename)
+  const timezone = header ? header.timezone : remoteDatabase.timezone
+  if (header && remoteDatabase.timezone != header.timezone) {
+    log.warn(`Remote database has media dates in the '${remoteDatabase.timezone || 'utc'}' time zone but the local database in the '${header.timezone || 'utc'}' one. The dates of the fetched media are off by their offset`)
+  }
+
   const readable = await createOrEmptyReadableStream(databaseFilename)
   const removableStream = createRemovableStream(remoteDatabase.data, remote.deleteLocal)
   const insertStream = createInsertStream(remoteDatabase.data)
   const downloadAllStream = createDownloadAllStream(remoteDatabase, storageDir, remote)
-  const writeable = await createWriteStream(databaseFilename)
+  const writeable = await createWriteStream(databaseFilename, {timezone})
 
   const t0 = Date.now()
   let origCount = 0

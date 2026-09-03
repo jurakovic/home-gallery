@@ -1,3 +1,5 @@
+import { isUtcDates } from './database-timezone'
+
 /**
  * File name of the main file of a media without its directory. The media
  * lists, the media view and the details view show the same name
@@ -20,27 +22,50 @@ const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 const shortWeekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
+/**
+ * Fields of a media date, read in the time zone of the database. The local
+ * getters return the wall clock of a date without an offset unchanged, see
+ * utils/database-timezone.ts
+ */
+export const getDateFields = (date: Date) => isUtcDates() ? {
+  year: date.getUTCFullYear(),
+  month: date.getUTCMonth(),
+  day: date.getUTCDate(),
+  weekDay: date.getUTCDay(),
+  hour: date.getUTCHours(),
+  minute: date.getUTCMinutes(),
+  second: date.getUTCSeconds(),
+} : {
+  year: date.getFullYear(),
+  month: date.getMonth(),
+  day: date.getDate(),
+  weekDay: date.getDay(),
+  hour: date.getHours(),
+  minute: date.getMinutes(),
+  second: date.getSeconds(),
+}
+
 export const formatDate = (format, date) => {
   if (!date) {
     return 'Unkown'
   }
-  const d = new Date(date)
+  const d = getDateFields(new Date(date))
   return format.replace(/%([YymbdHIlPpMSaA])/g, (_, code) => {
     switch (code) {
-      case 'Y': return '' + d.getFullYear()
-      case 'y': return ('' + d.getFullYear()).substring(2, 4)
-      case 'm': return pad2(d.getMonth() + 1)
-      case 'b': return shortMonths[d.getMonth()]
-      case 'd': return pad2(d.getDate())
-      case 'H': return pad2(d.getHours())
-      case 'I': return pad2(d.getHours() % 12 || 12)
-      case 'l': return '' + (d.getHours() % 12 || 12) 
-      case 'P': return d.getHours() >= 12 ? 'pm' : 'am'
-      case 'p': return d.getHours() >= 12 ? 'PM' : 'AM'
-      case 'M': return pad2(d.getMinutes())
-      case 'S': return pad2(d.getSeconds())
-      case 'a': return shortWeekDays[d.getDay()]
-      case 'A': return weekDays[d.getDay()]
+      case 'Y': return '' + d.year
+      case 'y': return ('' + d.year).substring(2, 4)
+      case 'm': return pad2(d.month + 1)
+      case 'b': return shortMonths[d.month]
+      case 'd': return pad2(d.day)
+      case 'H': return pad2(d.hour)
+      case 'I': return pad2(d.hour % 12 || 12)
+      case 'l': return '' + (d.hour % 12 || 12) 
+      case 'P': return d.hour >= 12 ? 'pm' : 'am'
+      case 'p': return d.hour >= 12 ? 'PM' : 'AM'
+      case 'M': return pad2(d.minute)
+      case 'S': return pad2(d.second)
+      case 'a': return shortWeekDays[d.weekDay]
+      case 'A': return weekDays[d.weekDay]
       default: return ''
     }
   })

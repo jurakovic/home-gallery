@@ -153,6 +153,14 @@
             "rawImage",
             "video"
           ]
+        },
+        "timezone": {
+          "description": "Time zone of the media dates in the database\n\n'local' keeps the wall clock of the camera, eg 2004-10-19T10:34:17. A media\nkeeps the day and the hour it was taken at, on every device which shows the\ngallery.\n\n'utc' converts the media date to UTC, eg 2004-10-19T08:34:17Z, and the\ngallery shows and filters the UTC time. Media without a time zone offset in\ntheir meta data are taken as UTC.\n\nThe value is written to the database header. Changing it requires a full\nrebuild by 'gallery database', which reuses the extracted meta data and does\nnot run the extractor again",
+          "enum": [
+            "local",
+            "utc"
+          ],
+          "default": "local"
         }
       }
     },

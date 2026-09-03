@@ -167,7 +167,7 @@ const command = {
                 log.debug(`Skip write of database due dry run`)
                 return database
               }
-              return asyncWriteDatabase(options.config.database.file, database.data)
+              return asyncWriteDatabase(options.config.database.file, database.data, database.timezone)
             })
             .then(database => {
               log.info(t0, `Database rewritten with ${database.data?.length} entries to ${options.config.database.file}`)

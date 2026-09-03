@@ -3,8 +3,12 @@ import fs from 'fs';
 import { writeJsonGzip, writeSafe } from '@home-gallery/common';
 import { initDatabase } from './read-database.js'
 
-export const writeDatabase = (filename, entries, cb) => {
-  const database = initDatabase(entries);
+/**
+ * The time zone of the media dates is a property of the database, so a rewrite
+ * has to carry it over, see database.timezone
+ */
+export const writeDatabase = (filename, entries, timezone, cb) => {
+  const database = initDatabase(entries, timezone);
 
   const tmp = `${filename}.tmp`;
   writeJsonGzip(tmp, database, err => {
@@ -15,8 +19,8 @@ export const writeDatabase = (filename, entries, cb) => {
   });
 }
 
-export const writeDatabasePlain = (filename, entries, cb) => {
-  const database = initDatabase(entries);
+export const writeDatabasePlain = (filename, entries, timezone, cb) => {
+  const database = initDatabase(entries, timezone);
   const data = JSON.stringify(database);
 
   const tmp = `${filename}.tmp`;

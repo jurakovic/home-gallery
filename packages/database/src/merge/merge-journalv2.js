@@ -12,7 +12,7 @@ const log = Logger('database.mergeJournal');
 
 const readJournalAsync = promisify(readJournal)
 
-export const mergeFromJournal = async (indexFilenames, journal, databaseFilename, slimEntries, storage) => {
+export const mergeFromJournal = async (indexFilenames, journal, databaseFilename, slimEntries, storage, timezone) => {
   const journals = await readJournals(indexFilenames, journal)
 
   if (hasAnyChanges(slimEntries, journals)) {
@@ -24,7 +24,7 @@ export const mergeFromJournal = async (indexFilenames, journal, databaseFilename
   const readable = await createOrEmptyReadableStream(databaseFilename)
   const removeStream = await createRemoveStream(journals)
   const insertStream = await createInsertStream(slimEntries, storage)
-  const writeStream = await createWriteStream(databaseFilename)
+  const writeStream = await createWriteStream(databaseFilename, {timezone})
 
   let prevCount = 0
   let totalCount = 0

@@ -73,7 +73,7 @@ export const mergeFromJournal = (indexFilenames, journal, databaseFilename, entr
       log.info(t1, `Merged ${entries.length} new and ${removedFiles.length} removed entries from journals to ${mergedEntries.length} entries (${diffCount(mergedEntries, database.data)}) to the database`)
 
       const t2 = Date.now()
-      writeDatabase(databaseFilename, mergedEntries, (err, database) => {
+      writeDatabase(databaseFilename, mergedEntries, database.timezone, (err, database) => {
         if (err) {
           return cb(err)
         }

@@ -46,6 +46,9 @@ export async function webappMiddleware(context) {
         ...staticState,
         disabled: !!req.username ? [...staticState.disabled, 'pwa'] : staticState.disabled,
         entries,
+        // Time zone of the media dates, read from the database header. The web
+        // app needs it before its first date is shown
+        timezone: context.database.read()?.timezone,
       }
     }
 

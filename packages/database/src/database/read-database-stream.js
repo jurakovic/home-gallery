@@ -48,6 +48,32 @@ export const createOrEmptyReadableStream = async (databaseFilename) => {
     })
 }
 
+/**
+ * Header of a database without reading its entries. False if the database does
+ * not exist yet
+ *
+ * @param {string} filename
+ * @returns {Promise<DatabaseHeader|false>}
+ */
+export const readDatabaseHeader = async (filename) => {
+  const readable = await createReadableStream(filename)
+    .catch(err => err.code == 'ENOENT' ? false : Promise.reject(err))
+  if (!readable) {
+    return false
+  }
+
+  return new Promise((resolve, reject) => {
+    readable.on('header:migration', header => {
+      resolve(header)
+      readable.destroy()
+    })
+    // An empty database has no entries but still emits its header
+    readable.on('end', () => resolve(false))
+    readable.on('error', reject)
+    readable.resume()
+  })
+}
+
 export const readDatabaseStreamed = async (filename) => {
   const readable = await createReadableStream(filename)
 
