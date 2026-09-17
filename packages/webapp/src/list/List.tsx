@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, type ReactNode } from "react";
 
 import { useEntryStore } from "../store/entry-store";
 import { useEditModeStore } from '../store/edit-mode-store';
@@ -49,7 +49,13 @@ const scaleRowHeights = ({minHeight, maxHeight, maxPotraitHeight}, factor: numbe
   maxPotraitHeight: maxPotraitHeight * factor
 })
 
-export const List = () => {
+/**
+ * Media list of a query with the nav bar on top.
+ *
+ * The header is placed between the nav bar and the media, e.g. for page
+ * controls. It scrolls with the page, the nav bar stays
+ */
+export const List = ({header}: {header?: ReactNode}) => {
   const entries = useEntryStore(state => state.entries)
 
   const showSelected = useEditModeStore(state => state.showSelected);
@@ -108,6 +114,7 @@ export const List = () => {
       <MultiTagDialogProvider>
         <>
           <NavBar showList={true} />
+          {header}
           <div className="relative z-0">
             {showScrollbar && (
               <Scrollbar containerRef={containerRef}
