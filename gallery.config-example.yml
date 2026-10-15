@@ -219,6 +219,22 @@
     #- ...any string
   #excludeFromFile: '{configDir}/excludes'
   #supportedTypes: image # one of: image, rawImage, video
+  # Time zone of the media dates in the database
+  #
+  # 'local' keeps the wall clock of the camera, eg 2004-10-19T10:34:17. A media
+  # keeps the day and the hour it was taken at, on every device which shows the
+  # gallery.
+  #
+  # 'utc' converts the media date to UTC, eg 2004-10-19T08:34:17Z, and the
+  # gallery shows and filters the UTC time. Media without a time zone offset in
+  # their meta data are taken as UTC.
+  #
+  # The value is written to the database header. Changing it requires a full
+  # rebuild by 'gallery database', which reuses the extracted meta data and does
+  # not run the extractor again
+  #
+  # default: local
+  #timezone: local # one of: local, utc
 
 #events:
   # default: '{configDir}/{configPrefix}events.db'
@@ -363,15 +379,10 @@
       #- onThisDay
       #- all
       #- ...any string
-    # Initial page of the webapp on its first load. It falls back to the
-    # page of all media if the configured page is disabled
+    # Initial page of the webapp on its first load. It falls back to the page of all media if the configured page is disabled
     #
     # default: all
-    #landing: all
-    #landing: albums
-    #landing: years
-    #landing: tags
-    #landing: map
+    #landing: all # one of: all, albums, years, tags, map
     #
     # Customize albums page
     #
@@ -397,6 +408,10 @@
       #
       # default: list
       #view: list # one of: list, grid
+      # Mark albums whose media were added to the gallery within this amount of days. An album with only recently added media is marked as new, an album with some of them as updated. 0 disables the marks. A media is added when the file index finds its file the first time, so all albums of a new gallery are new for these days. A database which was built by an older version needs a rebuild by 'gallery database'
+      #
+      # default: 3
+      #recentDays: 3
     #
     # Customize media lists
     #

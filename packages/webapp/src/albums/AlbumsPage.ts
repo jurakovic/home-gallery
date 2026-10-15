@@ -29,5 +29,9 @@ export interface AlbumsPage {
    * Initial album view. The list view shows the album tree, the grid view shows all albums as squared cover thumbnails. It is overruled by the view toggle of the page
    */
   view?: "list" | "grid";
+  /**
+   * Mark albums whose media were added to the gallery within this amount of days. An album with only recently added media is marked as new, an album with some of them as updated. 0 disables the marks. A media is added when the file index finds its file the first time, so all albums of a new gallery are new for these days. A database which was built by an older version needs a rebuild by 'gallery database'
+   */
+  recentDays?: number;
   [k: string]: unknown;
 }

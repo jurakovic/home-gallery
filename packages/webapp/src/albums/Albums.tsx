@@ -6,7 +6,7 @@ import * as icons from '@fortawesome/free-solid-svg-icons'
 
 import { NavBar } from '../navbar/NavBar';
 import { useEntryStore } from '../store/entry-store';
-import { buildTree, flattenTree, type TreeNode } from './buildTree';
+import { buildTree, flattenTree, getRecentMark, type RecentMark, type TreeNode } from './buildTree';
 import { toAlbumQuery } from './toAlbumQuery';
 import { useAlbumOrder, useAlbumThumbnailSize, useAlbumView } from './useAlbumsView';
 import { useAppConfig } from '../config/useAppConfig';
@@ -15,6 +15,7 @@ import { useDeviceType, DeviceType } from '../utils/useDeviceType';
 import useBodyDimensions from '../utils/useBodyDimensions';
 import { useScrollToTop } from '../utils/useScrollToTop';
 import { useThumbnailImage } from '../utils/useThumbnailImage';
+import { classNames } from '../utils/class-names';
 import { VirtualScroll, isFastScroll } from '../list/VirtualScroll';
 import { desktopGridSize, grid, mobileGridSize } from '../list/layout/grid';
 import { desktopRowHeight, list, mobileRowHeight } from '../list/layout/list';
@@ -78,6 +79,28 @@ const CountBadge = ({count}: {count: number}) => (
   </span>
 )
 
+/** Default of the recentDays option of the albums page */
+const defaultRecentDays = 3
+
+const dayMs = 24 * 60 * 60 * 1000
+
+/**
+ * Mark of an album with recently added media. The grid view shows it on the
+ * cover thumbnail, the list view beside the album name: its thumbnail is too
+ * small for the mark and the count badge
+ */
+const RecentBadge = ({mark, className}: {mark: RecentMark, className?: string}) => {
+  if (!mark) {
+    return null
+  }
+  return (
+    <span className={classNames('px-1 text-xs rounded text-gray-100 bg-primary-700', className)}
+      title={mark == 'new' ? 'All media of the album were added recently' : 'Media were added to the album recently'}>
+      {mark == 'new' ? 'New' : 'Updated'}
+    </span>
+  )
+}
+
 /**
  * Name of an album below its cover thumbnail. It has the styling of the file
  * name label of the media lists, but wraps at word boundaries instead of being
@@ -100,7 +123,7 @@ const NameLabel = ({name}: {name: string}) => (
  * list layout: the cover thumbnail with the media count as its badge and the
  * album name
  */
-const AlbumItem = ({node, level, showCover, rowHeight, scrollSpeed, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, rowHeight: number, scrollSpeed: number, expanded: ExpandedMap, toggle: (key: string) => void}) => {
+const AlbumItem = ({node, level, showCover, rowHeight, scrollSpeed, mark, expanded, toggle}: {node: TreeNode, level: number, showCover: boolean, rowHeight: number, scrollSpeed: number, mark: RecentMark, expanded: ExpandedMap, toggle: (key: string) => void}) => {
   const isExpandable = node.children.length > 0
   const isExpanded = isExpandable && !!expanded[node.key]
   const query = toAlbumQuery(node)
@@ -137,6 +160,7 @@ const AlbumItem = ({node, level, showCover, rowHeight, scrollSpeed, expanded, to
         <span className="text-sm text-gray-400 truncate md:text-base grow group-hover:text-gray-300" title={name}>
           {name}
         </span>
+        <RecentBadge mark={mark} className="flex-shrink-0 mr-2" />
       </Link>
     </span>
   )
@@ -148,7 +172,7 @@ const AlbumItem = ({node, level, showCover, rowHeight, scrollSpeed, expanded, to
  * The grid has no album hierarchy, so the whole path of the album is shown
  * instead of its name only
  */
-const AlbumCard = ({node, showCover, cellSize, scrollSpeed}: {node: TreeNode, showCover: boolean, cellSize: number, scrollSpeed: number}) => {
+const AlbumCard = ({node, showCover, cellSize, scrollSpeed, mark}: {node: TreeNode, showCover: boolean, cellSize: number, scrollSpeed: number, mark: RecentMark}) => {
   const query = toAlbumQuery(node)
   const coverUrl = getCoverUrl(node, showCover, cellSize, cellSize)
   const name = node.path || node.name || '(no index)'
@@ -166,6 +190,7 @@ const AlbumCard = ({node, showCover, cellSize, scrollSpeed}: {node: TreeNode, sh
           <img {...imageProps} className="object-cover w-full h-full" alt="" /> :
           <FontAwesomeIcon className="text-2xl" icon={getAlbumIcon(node)} />
         }
+        <RecentBadge mark={mark} className="absolute top-1 left-1" />
         <CountBadge count={node.count} />
       </span>
       <NameLabel name={name} />
@@ -179,12 +204,12 @@ const AlbumCard = ({node, showCover, cellSize, scrollSpeed}: {node: TreeNode, sh
  * width. The row is padded by half the gap, so the space around the cells is
  * one gap
  */
-const AlbumRow = ({row, isGrid, showCover, scrollSpeed, expanded, toggle}: {row: any, isGrid: boolean, showCover: boolean, scrollSpeed: number, expanded: ExpandedMap, toggle: (key: string) => void}) => (
+const AlbumRow = ({row, isGrid, showCover, scrollSpeed, getMark, expanded, toggle}: {row: any, isGrid: boolean, showCover: boolean, scrollSpeed: number, getMark: (node: TreeNode) => RecentMark, expanded: ExpandedMap, toggle: (key: string) => void}) => (
   <div className="flex items-center w-full" style={{gap: padding, padding: padding / 2, height: row.height}}>
     { row.columns.map((cell: any) => isGrid ?
-      <AlbumCard key={cell.item.key} node={cell.item} showCover={showCover} cellSize={cell.width} scrollSpeed={scrollSpeed} /> :
+      <AlbumCard key={cell.item.key} node={cell.item} showCover={showCover} cellSize={cell.width} scrollSpeed={scrollSpeed} mark={getMark(cell.item)} /> :
       <AlbumItem key={cell.item.node.key} node={cell.item.node} level={cell.item.level}
-        showCover={showCover} rowHeight={cell.height} scrollSpeed={scrollSpeed} expanded={expanded} toggle={toggle} />
+        showCover={showCover} rowHeight={cell.height} scrollSpeed={scrollSpeed} mark={getMark(cell.item.node)} expanded={expanded} toggle={toggle} />
     )}
   </div>
 )
@@ -209,6 +234,17 @@ export const Albums = () => {
   const appConfig = useAppConfig()
   const showIndex = !!appConfig.pages?.albums?.showIndex
   const showCover = appConfig.pages?.albums?.showCover ?? true
+  const recentDays = appConfig.pages?.albums?.recentDays ?? defaultRecentDays
+
+  // the start of the recent days is fixed while the page is open. Added dates
+  // are ISO dates in UTC, so they compare as strings
+  const getMark = useMemo(() => {
+    if (!(recentDays > 0)) {
+      return () => false as RecentMark
+    }
+    const since = new Date(Date.now() - recentDays * dayMs).toISOString()
+    return (node: TreeNode) => getRecentMark(node, since)
+  }, [recentDays])
 
   // the view and the order are toggled in the nav bar
   const [isGrid] = useAlbumView()
@@ -254,7 +290,7 @@ export const Albums = () => {
       <div className="relative z-0 w-full">
         <VirtualScroll items={rows} padding={padding}>
           {({row, scrollSpeed}) => (
-            <AlbumRow row={row} isGrid={isGrid} showCover={showCover} scrollSpeed={scrollSpeed} expanded={expanded} toggle={toggle} />
+            <AlbumRow row={row} isGrid={isGrid} showCover={showCover} scrollSpeed={scrollSpeed} getMark={getMark} expanded={expanded} toggle={toggle} />
           )}
         </VirtualScroll>
       </div>

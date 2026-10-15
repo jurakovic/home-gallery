@@ -16,6 +16,17 @@ export interface TreeNode {
   count: number
   /** Amount of visible media which are directly in this directory */
   ownCount: number
+  /**
+   * ISO date when the first media of this node and all its children was added
+   * to the gallery. It is empty if any of these media has no added date, e.g.
+   * from a database of an older version
+   */
+  firstAdded: string
+  /**
+   * ISO date when the last media of this node and all its children was added
+   * to the gallery. Empty if none of them has an added date
+   */
+  lastAdded: string
   /** Media of this directory or of a subdirectory which represents this node */
   cover?: Entry
   children: TreeNode[]
@@ -41,8 +52,24 @@ const createNode = (name: string, index: string, path: string): TreeNode => ({
   key: `${index}:${path}`,
   count: 0,
   ownCount: 0,
+  firstAdded: '',
+  lastAdded: '',
   children: []
 })
+
+/**
+ * Adds the added date of a media to the node. A media without an added date
+ * counts as added long ago: it keeps the node from being new, but a later
+ * media still marks it as updated
+ */
+const addAdded = (node: TreeNode, added: string, isFirst: boolean) => {
+  if (isFirst || added < node.firstAdded) {
+    node.firstAdded = added
+  }
+  if (added > node.lastAdded) {
+    node.lastAdded = added
+  }
+}
 
 const getChild = (parent: TreeNode, name: string, index: string, path: string): TreeNode => {
   const child = parent.children.find(child => child.name == name)
@@ -155,9 +182,10 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false, descendi
     // last part is the basename and is not part of the tree
     dirs.pop()
 
+    const added = typeof file.added == 'string' ? file.added : ''
     const indexNode = getChild(indexNodes, index, index, '')
-    root.count++
-    indexNode.count++
+    addAdded(root, added, !root.count++)
+    addAdded(indexNode, added, !indexNode.count++)
 
     let node = indexNode
     let path = ''
@@ -167,7 +195,7 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false, descendi
       }
       path = path ? `${path}/${dir}` : dir
       node = getChild(node, dir, index, path)
-      node.count++
+      addAdded(node, added, !node.count++)
     }
     node.ownCount++
     addCoverCandidate(node, entry, file.filename, coverCandidates)
@@ -187,6 +215,21 @@ export const buildTree = (entries: Entry[], showIndex: boolean = false, descendi
   sortChildren(root, descending ? (a, b) => -byName(a, b) : byName)
 
   return root
+}
+
+/** Mark of an album with recently added media */
+export type RecentMark = 'new' | 'updated' | false
+
+/**
+ * Returns the mark of an album by the added dates of its media. An album is
+ * new if all its media were added since the given ISO date and updated if
+ * some of them were
+ */
+export const getRecentMark = (node: TreeNode, since: string): RecentMark => {
+  if (!node.lastAdded || node.lastAdded < since) {
+    return false
+  }
+  return node.firstAdded >= since ? 'new' : 'updated'
 }
 
 /**
